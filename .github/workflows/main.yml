@@ -37,6 +37,8 @@ jobs:
           trigger: ${{ github.event_name }}
           pr_number: ${{ github.event.number }}
           source_version: ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Authenticate against Azure Container Registry (docker registry)
