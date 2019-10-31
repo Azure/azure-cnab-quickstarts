@@ -1,0 +1,219 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"aks_cluster_name": {
+			"type": "string",
+			"defaultValue": "sql-server-aks",
+			"metadata": {
+				"description": "The name to use for the AKS Cluster"
+			}
+		},
+		"aks_resource_group": {
+			"type": "string",
+			"defaultValue": "sql-server-always-on",
+			"metadata": {
+				"description": "The name of the resource group to create the AKS Cluster in"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"sql_masterkeypassword": {
+			"type": "securestring",
+			"metadata": {
+				"description": "The Password for the SQL Server Master Key"
+			}
+		},
+		"sql_sapassword": {
+			"type": "securestring",
+			"metadata": {
+				"description": "The Password for the sa user in SQL Server"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[resourceGroup().Location]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
+		"cnab_azure_tenant_id": "[subscription().tenantId]",
+		"cnab_installation_name": "sql-server-always-on-aks",
+		"cnab_state_share_name": "sql-server-always-on-aks",
+		"cnab_state_storage_account_key": "",
+		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0-6.0-pull-3-merge.1-18'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0-6.0-pull-3-merge.1-18'))]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "sql-server-always-on-aks"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0-6.0-pull-3-merge.1-18"
+								},
+								{
+									"name": "CNAB_PARAM_aks_cluster_name",
+									"value": "[parameters('aks_cluster_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_aks_resource_group",
+									"value": "[parameters('aks_resource_group')]"
+								},
+								{
+									"name": "CNAB_PARAM_azure_location",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_id",
+									"secureValue": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_secret",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_subscription_id",
+									"secureValue": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_tenant_id",
+									"secureValue": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_CRED_sql_masterkeypassword",
+									"secureValue": "[parameters('sql_masterkeypassword')]"
+								},
+								{
+									"name": "CNAB_CRED_sql_sapassword",
+									"secureValue": "[parameters('sql_sapassword')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
