@@ -1,0 +1,155 @@
+airflow:
+  fernetKey: $AIRFLOW_FERNETKEY
+  service:
+    annotations: $AIRFLOW_SERVICE_ANNOTATIONS
+    type: $AIRFLOW_SERVICE_TYPE
+    externalPort: $AIRFLOW_SERVICE_EXTERNALPORT
+    nodePort:
+      http: $AIRFLOW_SERVICE_NODEPORT_HTTP
+  executor: $AIRFLOW_EXECUTOR
+  initRetryLoop: $AIRFLOW_INITRETRYLOOP
+  image:
+    repository: $AIRFLOW_IMAGE_REPOSITORY
+    tag: $AIRFLOW_IMAGE_TAG
+    pullPolicy: $AIRFLOW_IMAGE_PULLPOLICY
+    pullSecret: $AIRFLOW_IMAGE_PULLSECRET
+  schedulerNumRuns: $AIRFLOW_SCHEDULERNUMRUNS
+  webReplicas: $AIRFLOW_WEBREPLICAS
+  config: $AIRFLOW_CONFIG
+  podDisruptionBudget: $AIRFLOW_PODDISRUPTIONBUDGET
+  podAnnotations: $AIRFLOW_PODANNOTATIONS
+  extraEnv: $AIRFLOW_EXTRAENV
+  extraConfigMapMounts: $AIRFLOW_EXTRACONFIGMAPMOUNTS
+  extraInitContainers: $AIRFLOW_EXTRAINITCONTAINERS
+  extraContainers: $AIRFLOW_EXTRACONTAINERS
+  extraVolumeMounts: $AIRFLOW_EXTRAVOLUMEMOUNTS
+  extraVolumes: $AIRFLOW_EXTRAVOLUMES
+  initdb: $AIRFLOW_INITDB
+scheduler:
+  resources: $SCHEDULER_RESOURCES
+  nodeSelector: $NODESELECTOR
+  affinity: $AFFINITY
+  tolerations: $TOLERATIONS
+flower:
+  resources: $FLOWER_RESOURCES
+  service:
+    annotations: $FLOWER_SERVICE_ANNOTATIONS
+    type: $FLOWER_SERVICE_TYPE
+    externalPort: $FLOWER_SERVICE_EXTERNALPORT
+web:
+  resources: $WEB_RESOURCES
+  initialStartupDelay: $WEB_INITIALSTARTUPDELAY
+  initialDelaySeconds: $WEB_INITIALDELAYSECONDS
+  livenessProbe:
+    periodSeconds: $WEB_LIVENESSPROBE_PERIODSECONDS
+    timeoutSeconds: $WEB_LIVENESSPROBE_TIMEOUTSECONDS
+    successThreshold: $WEB_LIVENESSPROBE_SUCCESSTHRESHOLD
+    failureThreshold: $WEB_LIVENESSPROBE_FAILURETHRESHOLD
+  readinessProbe:
+    periodSeconds: $WEB_READINESSPROBE_PERIODSECONDS
+    timeoutSeconds: $WEB_READINESSPROBE_TIMEOUTSECONDS
+    successThreshold: $WEB_READINESSPROBE_SUCCESSTHRESHOLD
+    failureThreshold: $WEB_READINESSPROBE_FAILURETHRESHOLD
+  nodeSelector: $NODESELECTOR
+  affinity: $AFFINITY
+  tolerations: $TOLERATIONS
+  secretsDir: $WEB_SECRETSDIR
+  secrets: $WEB_SECRETS
+workers:
+  enabled: $WORKERS_ENABLED
+  replicas: $WORKERS_REPLICAS
+  resources: $WORKERS_RESOURCES
+  podAnnotations: $WORKERS_PODANNOTATIONS
+  celery:
+    instances: $WORKERS_CELERY_INSTANCES
+  secretsDir: $WORKERS_SECRETSDIR
+  secrets: $WORKERS_SECRETS
+  nodeSelector: $NODESELECTOR
+  affinity: $AFFINITY
+  tolerations: $TOLERATIONS
+ingress:
+  enabled: $INGRESS_ENABLED
+  web:
+    path: $INGRESS_WEB_PATH
+    host: $INGRESS_WEB_HOST
+    annotations: $INGRESS_WEB_ANNOTATIONS
+    livenessPath: $INGRESS_WEB_LIVENESSPATH
+    tls:
+      enabled: $INGRESS_WEB_TLS_ENABLED
+      secretName: $INGRESS_WEB_TLS_SECRETNAME
+  flower:
+    path: $INGRESS_FLOWER_PATH
+    livenessPath: $INGRESS_FLOWER_LIVENESSPATH
+    host: $INGRESS_FLOWER_HOST
+    annotations: $INGRESS_FLOWER_ANNOTATIONS
+    tls:
+      enabled: $INGRESS_FLOWER_TLS_ENABLED
+      secretName: $INGRESS_FLOWER_TLS_SECRETNAME
+persistence:
+  enabled: $PERSISTENCE_ENABLED
+  existingClaim: $PERSISTENCE_EXISTINGCLAIM
+  subPath: $PERSISTENCE_SUBPATH
+  storageClass: $PERSISTENCE_STORAGECLASS
+  accessMode: $PERSISTENCE_ACCESSMODE
+  size: $PERSISTENCE_SIZE
+logsPersistence:
+  enabled: $LOGSPERSISTENCE_ENABLED
+  existingClaim: $LOGSPERSISTENCE_EXISTINGCLAIM
+  subPath: $LOGSPERSISTENCE_SUBPATH
+  storageClass: $LOGSPERSISTENCE_STORAGECLASS
+  accessMode: $LOGSPERSISTENCE_ACCESSMODE
+  size: $LOGSPERSISTENCE_SIZE
+dags:
+  path: $DAGS_PATH
+  doNotPickle: $DAGS_DONOTPICKLE
+  git:
+    url: $DAGS_GIT_URL
+    ref: $DAGS_GIT_REF
+    secret: $DAGS_GIT_SECRET
+  initContainer:
+    enabled: $DAGS_INITCONTAINER_ENABLED
+    image:
+      repository: $DAGS_INITCONTAINER_IMAGE_REPOSITORY
+      tag: $DAGS_INITCONTAINER_IMAGE_TAG
+    installRequirements: $DAGS_INITCONTAINER_INSTALLREQUIREMENTS
+logs:
+  path: $LOGS_PATH
+rbac:
+  create: $RBAC_CREATE
+serviceAccount:
+  create: $SERVICEACCOUNT_CREATE
+  name: $SERVICEACCOUNT_NAME
+postgresql:
+  enabled: $POSTGRESQL_ENABLED
+  existingSecret: $POSTGRESQL_EXISTINGSECRET
+  existingSecretKey: $POSTGRESQL_EXISTINGSECRETKEY
+  postgresUser: $POSTGRESQL_POSTGRESUSER
+  postgresPassword: $POSTGRESQL_POSTGRESPASSWORD
+  postgresDatabase: $POSTGRESQL_POSTGRESDATABASE
+  persistence:
+    enabled: $POSTGRESQL_PERSISTENCE_ENABLED
+    accessMode: $POSTGRESQL_PERSISTANCE_ACCESSMODE
+    storageClass: $POSTGRESQL_PERSISTANCE_STORAGECLASS
+  postgresUri: $POSTGRESQL_URI
+  postgresHost: $POSTGRESQL_POSTGRESHOST
+redis:
+  enabled: $REDIS_ENABLED
+  existingSecret: $REDIS_EXISTINGSECRET
+  existingSecretKey: $REDIS_EXISTINGSECRETKEY
+  password: $REDIS_PASSWORD
+  master:
+    persistence:
+      enabled: $REDIS_MASTER_PERSISTENCE_ENABLED
+  cluster:
+    enabled: $REDIS_CLUSTER_ENABLED
+  redisHost: $REDIS_REDISHOST
+serviceMonitor:
+  enabled: $SERVICEMONITOR_ENABLED
+  interval: $SERVICEMONITOR_INTERVAL
+  path: $SERVICEMONITOR_PATH
+  selector:
+    $SERVICEMONITOR_SELECTOR
+prometheusRule:
+  enabled: $PROMETHEUSRULE_ENABLED
+  groups: $PROMETHEUSRULE_GROUPS
+  additionalLabels: $PROMETHEUSRULE_ADDITIONALLABELS
