@@ -53,7 +53,6 @@ install:
   - azure:
       description: "Create AKS"
       type: aks
-      template: ""
       name: "{{ bundle.parameters.aks_cluster_name }}"
       resourceGroup: "{{ bundle.parameters.aks_resource_group }}"
       parameters:
