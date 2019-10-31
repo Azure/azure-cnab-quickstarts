@@ -308,7 +308,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0-6.0-pull-3-merge.1-14"
+									"value": "cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0-6.0-pull-3-merge.1-18"
 								},
 								{
 									"name": "CNAB_PARAM_aks_cluster_name",
