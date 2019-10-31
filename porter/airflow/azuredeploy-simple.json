@@ -1,0 +1,1447 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"affinity": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Affinity labels for pod assignment"
+			}
+		},
+		"airflow_config": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "custom airflow configuration env variables"
+			}
+		},
+		"airflow_executor": {
+			"type": "string",
+			"defaultValue": "Celery",
+			"metadata": {
+				"description": "the executor to run"
+			}
+		},
+		"airflow_extraConfigmapMounts": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Additional configMap volume mounts on the airflow pods."
+			}
+		},
+		"airflow_extraContainers": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "additional containers to run in the scheduler, worker \u0026 web pods"
+			}
+		},
+		"airflow_extraEnv": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "specify additional environment variables to mount"
+			}
+		},
+		"airflow_extraInitContainers": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "additional Init Containers to run in the scheduler pods"
+			}
+		},
+		"airflow_extraVolumeMounts": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "additional volumeMounts to the main container in scheduler, worker \u0026 web pods"
+			}
+		},
+		"airflow_extraVolumes": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "additional volumes for the scheduler, worker \u0026 web pods"
+			}
+		},
+		"airflow_fernetKey": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Fernet key"
+			}
+		},
+		"airflow_image_pullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"allowedValues": [
+				"Always",
+				"IfNotPresent"
+			],
+			"metadata": {
+				"description": "Image pull policy"
+			}
+		},
+		"airflow_image_pullSecret": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Image pull secret"
+			}
+		},
+		"airflow_image_repository": {
+			"type": "string",
+			"defaultValue": "puckel/docker-airflow",
+			"metadata": {
+				"description": "Airflow docker image"
+			}
+		},
+		"airflow_image_tag": {
+			"type": "string",
+			"defaultValue": "1.10.2",
+			"metadata": {
+				"description": "Airflow docker tag"
+			}
+		},
+		"airflow_initRetryLoop": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "max number of retries during container init"
+			}
+		},
+		"airflow_initdb": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "run airflow initdb when starting the scheduler"
+			}
+		},
+		"airflow_name": {
+			"type": "string",
+			"defaultValue": "airflow01",
+			"metadata": {}
+		},
+		"airflow_podAnnotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "annotations for scheduler, worker and web pods"
+			}
+		},
+		"airflow_podDisruptionBudget": {
+			"type": "string",
+			"defaultValue": "{\"maxUnavailable\": 1}",
+			"metadata": {
+				"description": "control pod disruption budget"
+			}
+		},
+		"airflow_schedulerNumRuns": {
+			"type": "string",
+			"defaultValue": "-1",
+			"allowedValues": [
+				"-1",
+				"1"
+			],
+			"metadata": {
+				"description": "-1 to loop indefinitively, 1 to restart after each exec"
+			}
+		},
+		"airflow_service_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "service annotations for Airflow UI"
+			}
+		},
+		"airflow_service_externalPort": {
+			"type": "int",
+			"defaultValue": 8080,
+			"metadata": {
+				"description": "external port for Airflow UI"
+			}
+		},
+		"airflow_service_nodePort_http": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "when using service.type == NodePort, an optional NodePort to request"
+			}
+		},
+		"airflow_service_type": {
+			"type": "string",
+			"defaultValue": "ClusterIP",
+			"metadata": {
+				"description": "service type for Airflow UI"
+			}
+		},
+		"airflow_webReplicas": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "how many replicas for web server"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"dags_doNotPickle": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "should the scheduler disable DAG pickling"
+			}
+		},
+		"dags_git_ref": {
+			"type": "string",
+			"defaultValue": "master",
+			"metadata": {
+				"description": "branch name, tag or sha1 to reset to"
+			}
+		},
+		"dags_git_secret": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "name of a secret containing an ssh deploy key"
+			}
+		},
+		"dags_git_url": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "url to clone the git repository"
+			}
+		},
+		"dags_initContainer_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Fetch the source code when the pods starts"
+			}
+		},
+		"dags_initContainer_image_repository": {
+			"type": "string",
+			"defaultValue": "alpine/git",
+			"metadata": {
+				"description": "Init container Docker image."
+			}
+		},
+		"dags_initContainer_image_tag": {
+			"type": "string",
+			"defaultValue": "1.0.7",
+			"metadata": {
+				"description": "Init container Docker image tag."
+			}
+		},
+		"dags_initContainer_installRequirements": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "auto install requirements.txt deps"
+			}
+		},
+		"dags_path": {
+			"type": "string",
+			"defaultValue": "/usr/local/airflow/dags",
+			"metadata": {
+				"description": "mount path for persistent volume"
+			}
+		},
+		"flower_resources": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "custom resource configuration for flower pod"
+			}
+		},
+		"flower_service_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "service annotations for Flower UI"
+			}
+		},
+		"flower_service_externalPort": {
+			"type": "int",
+			"defaultValue": 5555,
+			"metadata": {
+				"description": "external port for Flower UI"
+			}
+		},
+		"flower_service_type": {
+			"type": "string",
+			"defaultValue": "ClusterIP",
+			"metadata": {
+				"description": "service type for Flower UI"
+			}
+		},
+		"ingress_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable ingress"
+			}
+		},
+		"ingress_flower_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "annotations for the flower ui ingress"
+			}
+		},
+		"ingress_flower_host": {
+			"type": "string",
+			"defaultValue": "\"\"",
+			"metadata": {
+				"description": "hostname for the flower ui"
+			}
+		},
+		"ingress_flower_livenessPath": {
+			"type": "string",
+			"defaultValue": "/",
+			"metadata": {
+				"description": "path to the liveness probe"
+			}
+		},
+		"ingress_flower_path": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "path of the flower ui"
+			}
+		},
+		"ingress_flower_tls_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enables TLS termination at the ingress"
+			}
+		},
+		"ingress_flower_tls_secretName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "name of the secret containing the TLS certificate \u0026 key"
+			}
+		},
+		"ingress_web_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "annotations for the web ui ingress"
+			}
+		},
+		"ingress_web_host": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "hostname for the webserver ui"
+			}
+		},
+		"ingress_web_livenessPath": {
+			"type": "string",
+			"defaultValue": "/health",
+			"metadata": {
+				"description": "path to the web liveness probe"
+			}
+		},
+		"ingress_web_path": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "path of the webserver ui"
+			}
+		},
+		"ingress_web_tls_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enables TLS termination at the ingress"
+			}
+		},
+		"ingress_web_tls_secretName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "name of the secret containing the TLS certificate \u0026 key"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"logsPersistence_accessMode": {
+			"type": "string",
+			"defaultValue": "ReadWriteOnce",
+			"metadata": {
+				"description": "PVC access mode"
+			}
+		},
+		"logsPersistence_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable persistent storage for logs"
+			}
+		},
+		"logsPersistence_existingClaim": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "if using an existing claim, specify the name here"
+			}
+		},
+		"logsPersistence_size": {
+			"type": "string",
+			"defaultValue": "1Gi",
+			"metadata": {
+				"description": "Persistant storage size request"
+			}
+		},
+		"logsPersistence_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Persistent Volume Storage Class"
+			}
+		},
+		"logsPersistence_subPath": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "(optional) relative path on the volume to use for logs"
+			}
+		},
+		"logs_path": {
+			"type": "string",
+			"defaultValue": "/usr/local/airflow/logs",
+			"metadata": {
+				"description": "mount path for logs persistent volume"
+			}
+		},
+		"namespace": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {}
+		},
+		"nodeSelector": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Node labels for pod assignment"
+			}
+		},
+		"persistence_accessMode": {
+			"type": "string",
+			"defaultValue": "ReadWriteOnce",
+			"metadata": {
+				"description": "PVC access mode"
+			}
+		},
+		"persistence_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable persistence storage for DAGs"
+			}
+		},
+		"persistence_existingClaim": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "if using an existing claim, specify the name here"
+			}
+		},
+		"persistence_size": {
+			"type": "string",
+			"defaultValue": "1Gi",
+			"metadata": {
+				"description": "Persistant storage size request"
+			}
+		},
+		"persistence_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Persistent Volume Storage Class"
+			}
+		},
+		"persistence_subPath": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "(optional) relative path on the volume to use for DAGs"
+			}
+		},
+		"postgresql_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "create a postgres server"
+			}
+		},
+		"postgresql_existingSecret": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of an existing secret with a key named postgresql.existingSecretKey to use as the password"
+			}
+		},
+		"postgresql_existingSecretKey": {
+			"type": "string",
+			"defaultValue": "postgres-password",
+			"metadata": {
+				"description": "The name of the key containing the password in the secret named postgresql.existingSecret"
+			}
+		},
+		"postgresql_persistance_accessMode": {
+			"type": "string",
+			"defaultValue": "ReadWriteOnce",
+			"metadata": {
+				"description": "Access mode"
+			}
+		},
+		"postgresql_persistance_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Persistant class"
+			}
+		},
+		"postgresql_persistence_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Enable Postgres PVC"
+			}
+		},
+		"postgresql_postgresDatabase": {
+			"type": "string",
+			"defaultValue": "airflow",
+			"metadata": {
+				"description": "PostgreSQL Database name"
+			}
+		},
+		"postgresql_postgresHost": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "PostgreSQL Hostname"
+			}
+		},
+		"postgresql_postgresPassword": {
+			"type": "string",
+			"defaultValue": "airflow",
+			"metadata": {
+				"description": "PostgreSQL Password"
+			}
+		},
+		"postgresql_postgresUser": {
+			"type": "string",
+			"defaultValue": "postgres",
+			"metadata": {
+				"description": "PostgreSQL User"
+			}
+		},
+		"postgresql_uri": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "full URL to custom postgres setup"
+			}
+		},
+		"prometheusRule_additionalLabels": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "add additional labels to the prometheus rule"
+			}
+		},
+		"prometheusRule_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable prometheus rule"
+			}
+		},
+		"prometheusRule_groups": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "define alerting rules"
+			}
+		},
+		"rbac_create": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "create RBAC resources"
+			}
+		},
+		"redis_cluster_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable master-slave cluster"
+			}
+		},
+		"redis_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Create a Redis cluster"
+			}
+		},
+		"redis_existingSecret": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of an existing secret with a key named redis.existingSecretKey to use as the password"
+			}
+		},
+		"redis_existingSecretKey": {
+			"type": "string",
+			"defaultValue": "redis-password",
+			"metadata": {
+				"description": "The name of the key containing the password in the secret named redis.existingSecret"
+			}
+		},
+		"redis_master_persistence_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enable Redis PVC"
+			}
+		},
+		"redis_password": {
+			"type": "string",
+			"defaultValue": "airflow",
+			"metadata": {
+				"description": "Redis password"
+			}
+		},
+		"redis_redisHost": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Redis Hostname"
+			}
+		},
+		"scheduler_resources": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "custom resource configuration for scheduler pod"
+			}
+		},
+		"serviceAccount_create": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "create a service account"
+			}
+		},
+		"serviceAccount_name": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "the service account name"
+			}
+		},
+		"serviceMonitor_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "enable service monitor"
+			}
+		},
+		"serviceMonitor_interval": {
+			"type": "string",
+			"defaultValue": "30s",
+			"metadata": {
+				"description": "Interval at which metrics should be scraped"
+			}
+		},
+		"serviceMonitor_path": {
+			"type": "string",
+			"defaultValue": "/admin/metrics",
+			"metadata": {
+				"description": "The path at which the metrics should be scraped"
+			}
+		},
+		"serviceMonitor_selector": {
+			"type": "string",
+			"defaultValue": "prometheus: kube-prometheus",
+			"metadata": {
+				"description": "label Selector for Prometheus to find ServiceMonitors"
+			}
+		},
+		"tolerations": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Toleration labels for pod assignment"
+			}
+		},
+		"web_initialDelaySeconds": {
+			"type": "int",
+			"defaultValue": 360,
+			"metadata": {
+				"description": "initial delay on livenessprobe before checking if webserver is available"
+			}
+		},
+		"web_initialStartupDelay": {
+			"type": "int",
+			"defaultValue": 60,
+			"metadata": {
+				"description": "amount of time webserver pod should sleep before initializing webserver"
+			}
+		},
+		"web_livenessProbe_failureThreshold": {
+			"type": "int",
+			"defaultValue": 5,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe to be considered failed"
+			}
+		},
+		"web_livenessProbe_periodSeconds": {
+			"type": "int",
+			"defaultValue": 60,
+			"metadata": {
+				"description": "interval between probes"
+			}
+		},
+		"web_livenessProbe_successThreshold": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe to be considered successful"
+			}
+		},
+		"web_livenessProbe_timeoutSeconds": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "time allowed for a result to return"
+			}
+		},
+		"web_readinessProbe_failureThreshold": {
+			"type": "int",
+			"defaultValue": 5,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe to be considered failed"
+			}
+		},
+		"web_readinessProbe_periodSeconds": {
+			"type": "int",
+			"defaultValue": 60,
+			"metadata": {
+				"description": "interval between probes"
+			}
+		},
+		"web_readinessProbe_successThreshold": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe to be considered successful"
+			}
+		},
+		"web_readinessProbe_timeoutSeconds": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "time allowed for a result to return"
+			}
+		},
+		"web_resources": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "custom resource configuration for web pod"
+			}
+		},
+		"web_secrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "secrets to mount as volumes on webserver nodes"
+			}
+		},
+		"web_secretsDir": {
+			"type": "string",
+			"defaultValue": "/var/airflow/secrets",
+			"metadata": {
+				"description": "directory in which to mount secrets on webserver nodes"
+			}
+		},
+		"workers_celery_instances": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "number of parallel celery tasks per worker"
+			}
+		},
+		"workers_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "enable workers"
+			}
+		},
+		"workers_podAnnotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "annotations for the worker pods"
+			}
+		},
+		"workers_replicas": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "number of workers pods to launch"
+			}
+		},
+		"workers_resources": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "custom resource configuration for worker pod"
+			}
+		},
+		"workers_secrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "secrets to mount as volumes on worker nodes"
+			}
+		},
+		"workers_secretsDir": {
+			"type": "string",
+			"defaultValue": "/var/airflow/secrets",
+			"metadata": {
+				"description": "directory in which to mount secrets on worker nodes"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[resourceGroup().Location]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
+		"cnab_azure_tenant_id": "[subscription().tenantId]",
+		"cnab_installation_name": "airflow",
+		"cnab_state_share_name": "airflow",
+		"cnab_state_storage_account_key": "",
+		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0-1.0-pull-4-merge.1-22'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0-1.0-pull-4-merge.1-22'))]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "airflow"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0-1.0-pull-4-merge.1-22"
+								},
+								{
+									"name": "CNAB_PARAM_affinity",
+									"value": "[parameters('affinity')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_config",
+									"value": "[parameters('airflow_config')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_executor",
+									"value": "[parameters('airflow_executor')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraConfigmapMounts",
+									"value": "[parameters('airflow_extraConfigmapMounts')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraContainers",
+									"value": "[parameters('airflow_extraContainers')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraEnv",
+									"value": "[parameters('airflow_extraEnv')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraInitContainers",
+									"value": "[parameters('airflow_extraInitContainers')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraVolumeMounts",
+									"value": "[parameters('airflow_extraVolumeMounts')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_extraVolumes",
+									"value": "[parameters('airflow_extraVolumes')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_fernetKey",
+									"value": "[parameters('airflow_fernetKey')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_image_pullPolicy",
+									"value": "[parameters('airflow_image_pullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_image_pullSecret",
+									"value": "[parameters('airflow_image_pullSecret')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_image_repository",
+									"value": "[parameters('airflow_image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_image_tag",
+									"value": "[parameters('airflow_image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_initRetryLoop",
+									"value": "[parameters('airflow_initRetryLoop')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_initdb",
+									"value": "[parameters('airflow_initdb')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_name",
+									"value": "[parameters('airflow_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_podAnnotations",
+									"value": "[parameters('airflow_podAnnotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_podDisruptionBudget",
+									"value": "[parameters('airflow_podDisruptionBudget')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_schedulerNumRuns",
+									"value": "[parameters('airflow_schedulerNumRuns')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_service_annotations",
+									"value": "[parameters('airflow_service_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_service_externalPort",
+									"value": "[parameters('airflow_service_externalPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_service_nodePort_http",
+									"value": "[parameters('airflow_service_nodePort_http')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_service_type",
+									"value": "[parameters('airflow_service_type')]"
+								},
+								{
+									"name": "CNAB_PARAM_airflow_webReplicas",
+									"value": "[parameters('airflow_webReplicas')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_doNotPickle",
+									"value": "[parameters('dags_doNotPickle')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_git_ref",
+									"value": "[parameters('dags_git_ref')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_git_secret",
+									"value": "[parameters('dags_git_secret')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_git_url",
+									"value": "[parameters('dags_git_url')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_initContainer_enabled",
+									"value": "[parameters('dags_initContainer_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_initContainer_image_repository",
+									"value": "[parameters('dags_initContainer_image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_initContainer_image_tag",
+									"value": "[parameters('dags_initContainer_image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_initContainer_installRequirements",
+									"value": "[parameters('dags_initContainer_installRequirements')]"
+								},
+								{
+									"name": "CNAB_PARAM_dags_path",
+									"value": "[parameters('dags_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_flower_resources",
+									"value": "[parameters('flower_resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_flower_service_annotations",
+									"value": "[parameters('flower_service_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_flower_service_externalPort",
+									"value": "[parameters('flower_service_externalPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_flower_service_type",
+									"value": "[parameters('flower_service_type')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_enabled",
+									"value": "[parameters('ingress_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_annotations",
+									"value": "[parameters('ingress_flower_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_host",
+									"value": "[parameters('ingress_flower_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_livenessPath",
+									"value": "[parameters('ingress_flower_livenessPath')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_path",
+									"value": "[parameters('ingress_flower_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_tls_enabled",
+									"value": "[parameters('ingress_flower_tls_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_flower_tls_secretName",
+									"value": "[parameters('ingress_flower_tls_secretName')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_annotations",
+									"value": "[parameters('ingress_web_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_host",
+									"value": "[parameters('ingress_web_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_livenessPath",
+									"value": "[parameters('ingress_web_livenessPath')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_path",
+									"value": "[parameters('ingress_web_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_tls_enabled",
+									"value": "[parameters('ingress_web_tls_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_web_tls_secretName",
+									"value": "[parameters('ingress_web_tls_secretName')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_accessMode",
+									"value": "[parameters('logsPersistence_accessMode')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_enabled",
+									"value": "[parameters('logsPersistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_existingClaim",
+									"value": "[parameters('logsPersistence_existingClaim')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_size",
+									"value": "[parameters('logsPersistence_size')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_storageClass",
+									"value": "[parameters('logsPersistence_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_logsPersistence_subPath",
+									"value": "[parameters('logsPersistence_subPath')]"
+								},
+								{
+									"name": "CNAB_PARAM_logs_path",
+									"value": "[parameters('logs_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_namespace",
+									"value": "[parameters('namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_nodeSelector",
+									"value": "[parameters('nodeSelector')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_accessMode",
+									"value": "[parameters('persistence_accessMode')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_enabled",
+									"value": "[parameters('persistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_existingClaim",
+									"value": "[parameters('persistence_existingClaim')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_size",
+									"value": "[parameters('persistence_size')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_storageClass",
+									"value": "[parameters('persistence_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_subPath",
+									"value": "[parameters('persistence_subPath')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_enabled",
+									"value": "[parameters('postgresql_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_existingSecret",
+									"value": "[parameters('postgresql_existingSecret')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_existingSecretKey",
+									"value": "[parameters('postgresql_existingSecretKey')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_persistance_accessMode",
+									"value": "[parameters('postgresql_persistance_accessMode')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_persistance_storageClass",
+									"value": "[parameters('postgresql_persistance_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_persistence_enabled",
+									"value": "[parameters('postgresql_persistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_postgresDatabase",
+									"value": "[parameters('postgresql_postgresDatabase')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_postgresHost",
+									"value": "[parameters('postgresql_postgresHost')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_postgresPassword",
+									"value": "[parameters('postgresql_postgresPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_postgresUser",
+									"value": "[parameters('postgresql_postgresUser')]"
+								},
+								{
+									"name": "CNAB_PARAM_postgresql_uri",
+									"value": "[parameters('postgresql_uri')]"
+								},
+								{
+									"name": "CNAB_PARAM_prometheusRule_additionalLabels",
+									"value": "[parameters('prometheusRule_additionalLabels')]"
+								},
+								{
+									"name": "CNAB_PARAM_prometheusRule_enabled",
+									"value": "[parameters('prometheusRule_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_prometheusRule_groups",
+									"value": "[parameters('prometheusRule_groups')]"
+								},
+								{
+									"name": "CNAB_PARAM_rbac_create",
+									"value": "[parameters('rbac_create')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_cluster_enabled",
+									"value": "[parameters('redis_cluster_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_enabled",
+									"value": "[parameters('redis_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_existingSecret",
+									"value": "[parameters('redis_existingSecret')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_existingSecretKey",
+									"value": "[parameters('redis_existingSecretKey')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_master_persistence_enabled",
+									"value": "[parameters('redis_master_persistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_password",
+									"value": "[parameters('redis_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_redis_redisHost",
+									"value": "[parameters('redis_redisHost')]"
+								},
+								{
+									"name": "CNAB_PARAM_scheduler_resources",
+									"value": "[parameters('scheduler_resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceAccount_create",
+									"value": "[parameters('serviceAccount_create')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceAccount_name",
+									"value": "[parameters('serviceAccount_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceMonitor_enabled",
+									"value": "[parameters('serviceMonitor_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceMonitor_interval",
+									"value": "[parameters('serviceMonitor_interval')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceMonitor_path",
+									"value": "[parameters('serviceMonitor_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_serviceMonitor_selector",
+									"value": "[parameters('serviceMonitor_selector')]"
+								},
+								{
+									"name": "CNAB_PARAM_tolerations",
+									"value": "[parameters('tolerations')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_initialDelaySeconds",
+									"value": "[parameters('web_initialDelaySeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_initialStartupDelay",
+									"value": "[parameters('web_initialStartupDelay')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_livenessProbe_failureThreshold",
+									"value": "[parameters('web_livenessProbe_failureThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_livenessProbe_periodSeconds",
+									"value": "[parameters('web_livenessProbe_periodSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_livenessProbe_successThreshold",
+									"value": "[parameters('web_livenessProbe_successThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_livenessProbe_timeoutSeconds",
+									"value": "[parameters('web_livenessProbe_timeoutSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_readinessProbe_failureThreshold",
+									"value": "[parameters('web_readinessProbe_failureThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_readinessProbe_periodSeconds",
+									"value": "[parameters('web_readinessProbe_periodSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_readinessProbe_successThreshold",
+									"value": "[parameters('web_readinessProbe_successThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_readinessProbe_timeoutSeconds",
+									"value": "[parameters('web_readinessProbe_timeoutSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_resources",
+									"value": "[parameters('web_resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_secrets",
+									"value": "[parameters('web_secrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_web_secretsDir",
+									"value": "[parameters('web_secretsDir')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_celery_instances",
+									"value": "[parameters('workers_celery_instances')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_enabled",
+									"value": "[parameters('workers_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_podAnnotations",
+									"value": "[parameters('workers_podAnnotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_replicas",
+									"value": "[parameters('workers_replicas')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_resources",
+									"value": "[parameters('workers_resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_secrets",
+									"value": "[parameters('workers_secrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_secretsDir",
+									"value": "[parameters('workers_secretsDir')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
