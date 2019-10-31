@@ -125,7 +125,7 @@
 		},
 		"airflow_image_tag": {
 			"type": "string",
-			"defaultValue": "1.10.2",
+			"defaultValue": "1.10.4",
 			"metadata": {
 				"description": "Airflow docker tag"
 			}
@@ -1074,7 +1074,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0-1.0-pull-5-merge.1-26"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
