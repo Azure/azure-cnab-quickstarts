@@ -60,7 +60,7 @@ install:
         servicePrincipalClientId: "{{ bundle.credentials.azure_client_id}}"
         servicePrincipalClientSecret: "{{ bundle.credentials.azure_client_secret}}"
         location: "{{ bundle.parameters.azure_location }}"
-        agentCount: "4"
+        agentCount: 4
         kubernetesVersion: "1.14.6"
 
   - az: 
