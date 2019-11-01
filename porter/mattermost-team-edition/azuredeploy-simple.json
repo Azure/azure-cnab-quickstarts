@@ -1,0 +1,449 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"externalDB_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enables use of an preconfigured external database server"
+			}
+		},
+		"externalDB_externalConnectionString": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "See the section about external databases."
+			}
+		},
+		"externalDB_externalDriverType": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [
+				"postgres",
+				"mysql",
+				""
+			],
+			"metadata": {
+				"description": "External driver type (postgres or mysql)"
+			}
+		},
+		"extraEnvVars": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Extra environments variables to be used in the deployments"
+			}
+		},
+		"extraInitContainers": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Additional init containers"
+			}
+		},
+		"extraPodAnnotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Extra pod annotations to be used in the deployments"
+			}
+		},
+		"helm_chart_version": {
+			"type": "string",
+			"defaultValue": "3.8.0",
+			"metadata": {
+				"description": "Version of the mattermost/mattermost-team-edition Helm chart to use for deployment"
+			}
+		},
+		"image_imagePullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"metadata": {
+				"description": "Container image pull policy"
+			}
+		},
+		"image_repository": {
+			"type": "string",
+			"defaultValue": "mattermost/mattermost-team-edition",
+			"metadata": {
+				"description": "Container image repository"
+			}
+		},
+		"image_tag": {
+			"type": "string",
+			"defaultValue": "5.13.2",
+			"metadata": {
+				"description": "Container image tag"
+			}
+		},
+		"ingress_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Annotations for the ingress"
+			}
+		},
+		"ingress_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "If true, an ingress is created"
+			}
+		},
+		"ingress_hosts": {
+			"type": "string",
+			"defaultValue": "[\"mattermost.example.com\"]",
+			"metadata": {
+				"description": "A list of ingress hosts"
+			}
+		},
+		"ingress_path": {
+			"type": "string",
+			"defaultValue": "/",
+			"metadata": {
+				"description": "Path of the web server"
+			}
+		},
+		"ingress_tls": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "A list of ingress tls items"
+			}
+		},
+		"initContainerImage_imagePullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"metadata": {
+				"description": "Container image pull policy"
+			}
+		},
+		"initContainerImage_repository": {
+			"type": "string",
+			"defaultValue": "appropriate/curl",
+			"metadata": {
+				"description": "Init container image repository"
+			}
+		},
+		"initContainerImage_tag": {
+			"type": "string",
+			"defaultValue": "latest",
+			"metadata": {
+				"description": "Init container image tag"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"mysql_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Enables deployment of a mysql server"
+			}
+		},
+		"mysql_mysqlDatabase": {
+			"type": "string",
+			"defaultValue": "mattermost",
+			"metadata": {
+				"description": "Database name (Required)"
+			}
+		},
+		"mysql_mysqlPassword": {
+			"type": "string",
+			"metadata": {
+				"description": "User Password for Mysql (Required)"
+			}
+		},
+		"mysql_mysqlRootPassword": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Root Password for Mysql (Optional)"
+			}
+		},
+		"mysql_mysqlUser": {
+			"type": "string",
+			"metadata": {
+				"description": "Username for Mysql (Required)"
+			}
+		},
+		"namespace": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes namespace for installation"
+			}
+		},
+		"revisionHistoryLimit": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "How many old ReplicaSets for Mattermost Deployment you want to retain"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[resourceGroup().Location]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
+		"cnab_azure_tenant_id": "[subscription().tenantId]",
+		"cnab_installation_name": "mattermost-team-edition",
+		"cnab_state_share_name": "mattermost-team-edition",
+		"cnab_state_storage_account_key": "",
+		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30'))]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "mattermost-team-edition"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30"
+								},
+								{
+									"name": "CNAB_PARAM_externalDB_enabled",
+									"value": "[parameters('externalDB_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDB_externalConnectionString",
+									"value": "[parameters('externalDB_externalConnectionString')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDB_externalDriverType",
+									"value": "[parameters('externalDB_externalDriverType')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraEnvVars",
+									"value": "[parameters('extraEnvVars')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraInitContainers",
+									"value": "[parameters('extraInitContainers')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraPodAnnotations",
+									"value": "[parameters('extraPodAnnotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_helm_chart_version",
+									"value": "[parameters('helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_imagePullPolicy",
+									"value": "[parameters('image_imagePullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_repository",
+									"value": "[parameters('image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_tag",
+									"value": "[parameters('image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_annotations",
+									"value": "[parameters('ingress_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_enabled",
+									"value": "[parameters('ingress_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts",
+									"value": "[parameters('ingress_hosts')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_path",
+									"value": "[parameters('ingress_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_tls",
+									"value": "[parameters('ingress_tls')]"
+								},
+								{
+									"name": "CNAB_PARAM_initContainerImage_imagePullPolicy",
+									"value": "[parameters('initContainerImage_imagePullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_initContainerImage_repository",
+									"value": "[parameters('initContainerImage_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_initContainerImage_tag",
+									"value": "[parameters('initContainerImage_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_installation_name",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_mysql_enabled",
+									"value": "[parameters('mysql_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_mysql_mysqlDatabase",
+									"value": "[parameters('mysql_mysqlDatabase')]"
+								},
+								{
+									"name": "CNAB_PARAM_mysql_mysqlPassword",
+									"value": "[parameters('mysql_mysqlPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_mysql_mysqlRootPassword",
+									"value": "[parameters('mysql_mysqlRootPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_mysql_mysqlUser",
+									"value": "[parameters('mysql_mysqlUser')]"
+								},
+								{
+									"name": "CNAB_PARAM_namespace",
+									"value": "[parameters('namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_revisionHistoryLimit",
+									"value": "[parameters('revisionHistoryLimit')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
