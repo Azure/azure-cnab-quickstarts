@@ -1,0 +1,7 @@
+FROM debian:stretch
+
+ARG BUNDLE_DIR
+
+COPY . $BUNDLE_DIR
+
+RUN apt-get update && apt-get install gettext-base
