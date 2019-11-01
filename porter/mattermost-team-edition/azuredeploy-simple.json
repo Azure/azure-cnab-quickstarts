@@ -221,8 +221,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-team-edition', 'cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -321,7 +321,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0-1.0-pull-6-merge.1-30"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_externalDB_enabled",
