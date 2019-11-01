@@ -68,7 +68,7 @@ parameters:
   - name: airflow_image_tag
     type: string
     description: Airflow docker tag
-    default: '1.10.2'
+    default: '1.10.4'
     destination:
       env: AIRFLOW_IMAGE_TAG
   - name: airflow_image_pullPolicy
