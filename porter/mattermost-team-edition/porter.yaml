@@ -1,0 +1,238 @@
+name: mattermost-team-edition
+version: 0.1.0
+dockerfile: Dockerfile.tmpl
+description: "Mattermost Team Edition on Kubernetes"
+invocationImage: cnabquickstarts.azurecr.io/porter/mattermost-team-edition:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0.1.0
+
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+
+parameters:
+  - name: namespace
+    type: string
+    default: ''
+    description: Kubernetes namespace for installation
+  - name: installation_name
+    type: string
+    default: mattermost01
+    description: Installation name for Helm deployment
+    destination:
+      env: $INSTALLATION_NAME
+  - name: helm_chart_version
+    type: string
+    default: 3.8.0
+    description: Version of the mattermost/mattermost-team-edition Helm chart to use for deployment
+  
+  - name: image_repository
+    type: string
+    description: Container image repository
+    default: 'mattermost/mattermost-team-edition'
+    destination:
+      env: IMAGE_REPOSITORY
+  - name: image_tag
+    type: string
+    description: Container image tag
+    default: '5.13.2'
+    destination:
+      env: IMAGE_TAG
+  - name: image_imagePullPolicy
+    type: string
+    description: Container image pull policy
+    default: 'IfNotPresent'
+    destination:
+      env: IMAGE_IMAGEPULLPOLICY
+  - name: initContainerImage_repository
+    type: string
+    description: Init container image repository
+    default: 'appropriate/curl'
+    destination:
+      env: INITCONTAINERIMAGE_REPOSITORY
+  - name: initContainerImage_tag
+    type: string
+    description: Init container image tag
+    default: 'latest'
+    destination:
+      env: INITCONTAINERIMAGE_TAG
+  - name: initContainerImage_imagePullPolicy
+    type: string
+    description: Container image pull policy
+    default: 'IfNotPresent'
+    destination:
+      env: INITCONTAINERIMAGE_IMAGEPULLPOLICY
+  - name: revisionHistoryLimit
+    type: integer
+    description: How many old ReplicaSets for Mattermost Deployment you want to retain
+    default: 1
+    destination:
+      env: REVISIONHISTORYLIMIT
+  - name: ingress_enabled
+    type: boolean
+    description: If true, an ingress is created
+    default: false
+    destination:
+      env: INGRESS_ENABLED
+  - name: ingress_path
+    type: string
+    description: Path of the web server
+    default: '/'
+    destination:
+      env: INGRESS_PATH
+  - name: ingress_annotations
+    type: string
+    description: Annotations for the ingress
+    default: '{}'
+    destination:
+      env: INGRESS_ANNOTATIONS
+  - name: ingress_hosts
+    type: string
+    description: A list of ingress hosts
+    default: '["mattermost.example.com"]'
+    destination:
+      env: INGRESS_HOSTS
+  - name: ingress_tls
+    type: string
+    description: A list of ingress tls items
+    default: '[]'
+    destination:
+      env: INGRESS_TLS
+  - name: mysql_enabled
+    type: boolean
+    description: Enables deployment of a mysql server
+    default: true
+    destination:
+      env: MYSQL_ENABLED
+  - name: mysql_mysqlRootPassword
+    type: string
+    description: Root Password for Mysql (Optional)
+    default: ''
+    sensitive: true
+    destination:
+      env: MYSQL_MYSQLROOTPASSWORD
+  - name: mysql_mysqlUser
+    type: string
+    description: Username for Mysql (Required)
+    destination:
+      env: MYSQL_MYSQLUSER
+  - name: mysql_mysqlPassword
+    type: string
+    description: User Password for Mysql (Required)
+    sensitive: true
+    destination:
+      env: MYSQL_MYSQLPASSWORD
+  - name: mysql_mysqlDatabase
+    type: string
+    description: Database name (Required)
+    default: 'mattermost'
+    destination:
+      env: MYSQL_MYSQLDATABASE
+  - name: externalDB_enabled
+    type: boolean
+    description: Enables use of an preconfigured external database server
+    default: false
+    destination:
+      env: EXTERNALDB_ENABLED
+  - name: externalDB_externalDriverType
+    type: string
+    enum: ["postgres", "mysql", ""]
+    description: 'External driver type (postgres or mysql)'
+    default: ''
+    destination:
+      env: EXTERNALDB_EXTERNALDRIVERTYPE
+  - name: externalDB_externalConnectionString
+    type: string
+    description: See the section about external databases.
+    default: ''
+    destination:
+      env: EXTERNALDB_EXTERNALCONNECTIONSTRING
+  - name: extraPodAnnotations
+    type: string
+    description: Extra pod annotations to be used in the deployments
+    default: '{}'
+    destination:
+      env: EXTRAPODANNOTATIONS
+  - name: extraEnvVars
+    type: string
+    description: Extra environments variables to be used in the deployments
+    default: '[]'
+    destination:
+      env: EXTRAENVVARS
+  - name: extraInitContainers
+    type: string
+    description: Additional init containers
+    default: '[]'
+    destination:
+      env: EXTRAINITCONTAINERS
+
+
+
+mixins:
+  - exec
+  - helm
+
+install:
+  - exec:
+      description: "Replace tokens in values.yaml.template"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
+  - exec:
+      description: "Log out values.yaml"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "cat /cnab/app/values.yaml && echo \n\n"
+  - exec:
+      description: "Add Matterhost Helm repository"
+      command: "helm"
+      arguments:
+        - "repo"
+        - "add"
+        - "mattermost"
+        - "https://helm.mattermost.com"
+  - helm:
+      description: "Install Mattermost"
+      name: "{{ bundle.parameters.installation_name }}"
+      chart: mattermost/mattermost-team-edition
+      namespace: "{{ bundle.parameters.namespace }}"
+      replace: true
+      values:
+        - /cnab/app/values.yaml
+
+upgrade:
+  - exec:
+      description: "Replace tokens in values.yaml.template"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
+  - exec:
+      description: "Log out values.yaml"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "cat /cnab/app/values.yaml && echo \n\n"
+  - exec:
+      description: "Add Matterhost Helm repository"
+      command: "helm"
+      arguments:
+        - "repo"
+        - "add"
+        - "mattermost"
+        - "https://helm.mattermost.com"
+  - helm:
+      description: "Upgrade Mattermost"
+      name: "{{ bundle.parameters.installation_name }}"
+      chart: mattermost/mattermost-team-edition
+      namespace: "{{ bundle.parameters.namespace }}"
+      values:
+        - /cnab/app/values.yaml
+     
+uninstall:
+  - helm:
+      description: "Uninstall Mattermost"
+      purge: true
+      releases:
+        - "{{ bundle.parameters.installation_name }}"
