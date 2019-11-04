@@ -1,0 +1,54 @@
+name: kubeflow
+version: 0.1.0
+dockerfile: Dockerfile.tmpl
+description: "KubeFlow on Kubernetes"
+invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/kubeflow/bundle:0.1.0
+
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+
+
+parameters:
+- name: kubeflow_name
+  type: string
+  default: "my_kubeflow"
+  description: The name of the KubeFlow deployment
+- name: kustomize_manifest
+  type: string
+  default: "https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.0.yaml"
+  description: The URL to the Kustomize manifest to use as the configuration file
+    
+mixins:
+  - exec
+
+install:
+  - exec:
+      description: "Install KubeFlow"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - |
+          export KF_NAME={{ bundle.parameters.kubeflow_name }}
+          export BASE_DIR=/kubeflow
+          export KF_DIR=${BASE_DIR}/${KF_NAME}
+          export CONFIG_URI={{ bundle.parameters.kustomize_manifest }}
+          mkdir -p ${KF_DIR}
+          cd ${KF_DIR}
+          kfctl apply -V -f ${CONFIG_URI}
+
+uninstall:
+  - exec:
+      description: "Uninstall KubeFlow"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - |
+          export KF_NAME={{ bundle.parameters.kubeflow_name }}
+          export BASE_DIR=/kubeflow
+          export KF_DIR=${BASE_DIR}/${KF_NAME}
+          export CONFIG_URI={{ bundle.parameters.kustomize_manifest }}
+          mkdir -p ${KF_DIR}
+          cd ${KF_DIR}
+          kfctl delete -f ${CONFIG_URI}
