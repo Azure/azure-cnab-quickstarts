@@ -1,0 +1,1437 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"aci_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location in which the bootstrapper ACI resources will be created."
+			}
+		},
+		"affinity": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Map of node/pod affinities"
+			}
+		},
+		"allowEmptyPassword": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Allow DB blank passwords"
+			}
+		},
+		"allowOverrideNone": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Set Apache AllowOverride directive to None"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location which the cnab-azure driver will use to create ACI."
+			}
+		},
+		"cnab_azure_subscription_id": {
+			"type": "string",
+			"defaultValue": "[subscription().subscriptionId]",
+			"metadata": {
+				"description": "Azure Subscription Id - this is the subscription to be used for ACI creation, if not specified the first (random) subscription is used."
+			}
+		},
+		"cnab_azure_tenant_id": {
+			"type": "string",
+			"defaultValue": "[subscription().tenantId]",
+			"metadata": {
+				"description": "Azure AAD Tenant Id Azure account authentication - used to authenticate to Azure using Service Principal or Device Code for ACI creation."
+			}
+		},
+		"cnab_installation_name": {
+			"type": "string",
+			"defaultValue": "wordpress",
+			"metadata": {
+				"description": "The name of the application instance."
+			}
+		},
+		"cnab_state_share_name": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The file share name in the storage account for the CNAB state to be stored in"
+			}
+		},
+		"cnab_state_storage_account_key": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The storage account key for the account for the CNAB state to be stored in, if this is left blank it will be looked up at runtime"
+			}
+		},
+		"cnab_state_storage_account_name": {
+			"type": "string",
+			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
+			}
+		},
+		"cnab_state_storage_account_resource_group": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().name]",
+			"metadata": {
+				"description": "The resource group name for the storage account for the CNAB state to be stored in, by default this will be in the current resource group, if this is changed to a different resource group the storage account is expected to already exist"
+			}
+		},
+		"containerGroupName": {
+			"type": "string",
+			"defaultValue": "[concat('cg-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container group"
+			}
+		},
+		"containerName": {
+			"type": "string",
+			"defaultValue": "[concat('cn-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container"
+			}
+		},
+		"customHTAccessCM": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Configmap with custom wordpress-htaccess.conf directives"
+			}
+		},
+		"externalDatabase_database": {
+			"type": "string",
+			"defaultValue": "bitnami_wordpress",
+			"metadata": {
+				"description": "Name of the existing database"
+			}
+		},
+		"externalDatabase_host": {
+			"type": "string",
+			"defaultValue": "localhost",
+			"metadata": {
+				"description": "Host of the external database"
+			}
+		},
+		"externalDatabase_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Password for the above username"
+			}
+		},
+		"externalDatabase_port": {
+			"type": "int",
+			"defaultValue": 3306,
+			"metadata": {
+				"description": "Database port number"
+			}
+		},
+		"externalDatabase_user": {
+			"type": "string",
+			"defaultValue": "bn_wordpress",
+			"metadata": {
+				"description": "Existing username in the external db"
+			}
+		},
+		"extraEnv": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Additional container environment variables"
+			}
+		},
+		"extraVolumeMounts": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Additional volume mounts"
+			}
+		},
+		"extraVolumes": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Additional volumes"
+			}
+		},
+		"fullnameOverride": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "String to fully override wordpress.fullname template with a string"
+			}
+		},
+		"global_imagePullSecrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Global Docker registry secret names as an array"
+			}
+		},
+		"global_imageRegistry": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Global Docker image registry"
+			}
+		},
+		"global_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Global storage class for dynamic provisioning"
+			}
+		},
+		"healthcheckHttps": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Use https for liveliness and readiness"
+			}
+		},
+		"helm_chart_version": {
+			"type": "string",
+			"defaultValue": "7.6.5",
+			"metadata": {
+				"description": "Version number for the Helm chart"
+			}
+		},
+		"image_pullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"metadata": {
+				"description": "Image pull policy"
+			}
+		},
+		"image_pullSecrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Specify docker-registry secret names as an array"
+			}
+		},
+		"image_registry": {
+			"type": "string",
+			"defaultValue": "docker.io",
+			"metadata": {
+				"description": "WordPress image registry"
+			}
+		},
+		"image_repository": {
+			"type": "string",
+			"defaultValue": "bitnami/wordpress",
+			"metadata": {
+				"description": "WordPress image name"
+			}
+		},
+		"image_tag": {
+			"type": "string",
+			"defaultValue": "5.2.4-debian-9-r16",
+			"metadata": {
+				"description": "WordPress image tag"
+			}
+		},
+		"ingress_annotations": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Ingress annotations"
+			}
+		},
+		"ingress_certManager": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Add annotations for cert-manager"
+			}
+		},
+		"ingress_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enable ingress controller resource"
+			}
+		},
+		"ingress_hostname": {
+			"type": "string",
+			"defaultValue": "wordpress.local",
+			"metadata": {
+				"description": "Default host for the ingress resource"
+			}
+		},
+		"ingress_hosts_0_name": {
+			"type": "string",
+			"defaultValue": "wordpress.local",
+			"metadata": {
+				"description": "Hostname to your Wordpress installation"
+			}
+		},
+		"ingress_hosts_0_path": {
+			"type": "string",
+			"defaultValue": "/",
+			"metadata": {
+				"description": "Path within the url structure"
+			}
+		},
+		"ingress_secrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "TLS Secrets"
+			}
+		},
+		"ingress_tls_0_hosts_0": {
+			"type": "string",
+			"defaultValue": "wordpress.local",
+			"metadata": {
+				"description": "TLS hosts"
+			}
+		},
+		"ingress_tls_0_secretName": {
+			"type": "string",
+			"defaultValue": "wordpress.local-tls",
+			"metadata": {
+				"description": "TLS Secret (certificates)"
+			}
+		},
+		"installation_name": {
+			"type": "string",
+			"defaultValue": "wordpress",
+			"metadata": {
+				"description": "Installation name for Helm deployment"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"livenessProbeHeaders": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Headers to use for livenessProbe"
+			}
+		},
+		"livenessProbe_failureThreshold": {
+			"type": "int",
+			"defaultValue": 6,
+			"metadata": {
+				"description": "Minimum consecutive failures for the probe"
+			}
+		},
+		"livenessProbe_initialDelaySeconds": {
+			"type": "int",
+			"defaultValue": 120,
+			"metadata": {
+				"description": "Delay before liveness probe is initiated"
+			}
+		},
+		"livenessProbe_periodSeconds": {
+			"type": "int",
+			"defaultValue": 10,
+			"metadata": {
+				"description": "How often to perform the probe"
+			}
+		},
+		"livenessProbe_successThreshold": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe"
+			}
+		},
+		"livenessProbe_timeoutSeconds": {
+			"type": "int",
+			"defaultValue": 5,
+			"metadata": {
+				"description": "When the probe times out"
+			}
+		},
+		"mariadb_db_name": {
+			"type": "string",
+			"defaultValue": "bitnami_wordpress",
+			"metadata": {
+				"description": "Database name to create"
+			}
+		},
+		"mariadb_db_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Password for the database"
+			}
+		},
+		"mariadb_db_user": {
+			"type": "string",
+			"defaultValue": "bn_wordpress",
+			"metadata": {
+				"description": "Database user to create"
+			}
+		},
+		"mariadb_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Deploy MariaDB container(s)"
+			}
+		},
+		"mariadb_rootUser_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "MariaDB admin password"
+			}
+		},
+		"metrics_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Start a side-car prometheus exporter"
+			}
+		},
+		"metrics_image_pullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"metadata": {
+				"description": "Image pull policy"
+			}
+		},
+		"metrics_image_pullSecrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Specify docker-registry secret names as an array"
+			}
+		},
+		"metrics_image_registry": {
+			"type": "string",
+			"defaultValue": "docker.io",
+			"metadata": {
+				"description": "Apache exporter image registry"
+			}
+		},
+		"metrics_image_repository": {
+			"type": "string",
+			"defaultValue": "bitnami/apache-exporter",
+			"metadata": {
+				"description": "Apache exporter image name"
+			}
+		},
+		"metrics_image_tag": {
+			"type": "string",
+			"defaultValue": "0.7.0-debian-9-r101",
+			"metadata": {
+				"description": "Apache exporter image tag"
+			}
+		},
+		"metrics_podAnnotations": {
+			"type": "string",
+			"defaultValue": "{prometheus.io/scrape: \"true\", prometheus.io/port: \"9117\"}",
+			"metadata": {
+				"description": "Additional annotations for Metrics exporter pod"
+			}
+		},
+		"metrics_resources": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Exporter resource requests/limit"
+			}
+		},
+		"metrics_serviceMonitor_additionalLabels": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Used to pass Labels that are required by the Installed Prometheus Operator"
+			}
+		},
+		"metrics_serviceMonitor_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Create ServiceMonitor Resource for scraping metrics using PrometheusOperator"
+			}
+		},
+		"metrics_serviceMonitor_honorLabels": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "honorLabels chooses the metric's labels on collisions with target labels."
+			}
+		},
+		"metrics_serviceMonitor_interval": {
+			"type": "string",
+			"defaultValue": "30s",
+			"metadata": {
+				"description": "Specify the interval at which metrics should be scraped"
+			}
+		},
+		"metrics_serviceMonitor_namespace": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Namespace where servicemonitor resource should be created"
+			}
+		},
+		"metrics_serviceMonitor_relabellings": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specify Metric Relabellings to add to the scrape endpoint"
+			}
+		},
+		"metrics_serviceMonitor_scrapeTimeout": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specify the timeout after which the scrape is ended"
+			}
+		},
+		"nameOverride": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "String to partially override wordpress.fullname template with a string (will prepend the release name)"
+			}
+		},
+		"namespace": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes namespace for installation"
+			}
+		},
+		"nodeSelector": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Node labels for pod assignment"
+			}
+		},
+		"persistence_accessMode": {
+			"type": "string",
+			"defaultValue": "ReadWriteOnce",
+			"metadata": {
+				"description": "PVC Access Mode"
+			}
+		},
+		"persistence_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Enable persistence using PVC"
+			}
+		},
+		"persistence_existingClaim": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Enable persistence using an existing PVC"
+			}
+		},
+		"persistence_size": {
+			"type": "string",
+			"defaultValue": "10Gi",
+			"metadata": {
+				"description": "PVC Storage Request"
+			}
+		},
+		"persistence_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "PVC Storage Class"
+			}
+		},
+		"podAnnotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Pod annotations"
+			}
+		},
+		"readinessProbeHeaders": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Headers to use for readinessProbe"
+			}
+		},
+		"readinessProbe_failureThreshold": {
+			"type": "int",
+			"defaultValue": 6,
+			"metadata": {
+				"description": "Minimum consecutive failures for the probe"
+			}
+		},
+		"readinessProbe_initialDelaySeconds": {
+			"type": "int",
+			"defaultValue": 30,
+			"metadata": {
+				"description": "Delay before readiness probe is initiated"
+			}
+		},
+		"readinessProbe_periodSeconds": {
+			"type": "int",
+			"defaultValue": 10,
+			"metadata": {
+				"description": "How often to perform the probe"
+			}
+		},
+		"readinessProbe_successThreshold": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Minimum consecutive successes for the probe"
+			}
+		},
+		"readinessProbe_timeoutSeconds": {
+			"type": "int",
+			"defaultValue": 5,
+			"metadata": {
+				"description": "When the probe times out"
+			}
+		},
+		"replicaCount": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Number of WordPress Pods to run"
+			}
+		},
+		"schedulerName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Name of the alternate scheduler"
+			}
+		},
+		"service_annotations": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Service annotations"
+			}
+		},
+		"service_externalTrafficPolicy": {
+			"type": "string",
+			"defaultValue": "Cluster",
+			"metadata": {
+				"description": "Enable client source IP preservation"
+			}
+		},
+		"service_extraPorts": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Extra ports to expose in the service (normally used with the sidecar value)"
+			}
+		},
+		"service_httpsPort": {
+			"type": "int",
+			"defaultValue": 443,
+			"metadata": {
+				"description": "Service HTTPS port"
+			}
+		},
+		"service_httpsTargetPort": {
+			"type": "string",
+			"defaultValue": "https",
+			"metadata": {
+				"description": "Service Target HTTPS port"
+			}
+		},
+		"service_metricsPort": {
+			"type": "int",
+			"defaultValue": 9117,
+			"metadata": {
+				"description": "Service Metrics port"
+			}
+		},
+		"service_nodePorts_http": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes http node port"
+			}
+		},
+		"service_nodePorts_https": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes https node port"
+			}
+		},
+		"service_nodePorts_metrics": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes metrics node port"
+			}
+		},
+		"service_port": {
+			"type": "int",
+			"defaultValue": 80,
+			"metadata": {
+				"description": "Service HTTP port"
+			}
+		},
+		"service_type": {
+			"type": "string",
+			"defaultValue": "LoadBalancer",
+			"metadata": {
+				"description": "Kubernetes Service type"
+			}
+		},
+		"sidecars": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Attach additional containers to the pod"
+			}
+		},
+		"smtpHost": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP host"
+			}
+		},
+		"smtpPassword": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP password"
+			}
+		},
+		"smtpPort": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP port"
+			}
+		},
+		"smtpProtocol": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP protocol [tls, ssl, none]"
+			}
+		},
+		"smtpUser": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP user"
+			}
+		},
+		"smtpUsername": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "User name for SMTP emails"
+			}
+		},
+		"tolerations": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "List of node taints to tolerate"
+			}
+		},
+		"updateStrategy": {
+			"type": "string",
+			"defaultValue": "{type: RollingUpdate}",
+			"metadata": {
+				"description": "Set up update strategy"
+			}
+		},
+		"wordpressBlogName": {
+			"type": "string",
+			"defaultValue": "User's Blog!",
+			"metadata": {
+				"description": "Blog name"
+			}
+		},
+		"wordpressEmail": {
+			"type": "string",
+			"defaultValue": "user@example.com",
+			"metadata": {
+				"description": "Admin email"
+			}
+		},
+		"wordpressFirstName": {
+			"type": "string",
+			"defaultValue": "FirstName",
+			"metadata": {
+				"description": "First name"
+			}
+		},
+		"wordpressLastName": {
+			"type": "string",
+			"defaultValue": "LastName",
+			"metadata": {
+				"description": "Last name"
+			}
+		},
+		"wordpressPassword": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Application password"
+			}
+		},
+		"wordpressScheme": {
+			"type": "string",
+			"defaultValue": "http",
+			"metadata": {
+				"description": "Scheme to generate application URLs [http, https]"
+			}
+		},
+		"wordpressSkipInstall": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Skip wizard installation"
+			}
+		},
+		"wordpressTablePrefix": {
+			"type": "string",
+			"defaultValue": "wp_",
+			"metadata": {
+				"description": "Table prefix"
+			}
+		},
+		"wordpressUsername": {
+			"type": "string",
+			"defaultValue": "user",
+			"metadata": {
+				"description": "User of the application"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[parameters('aci_location')]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[parameters('cnab_azure_location')]",
+		"cnab_azure_subscription_id": "[parameters('cnab_azure_subscription_id')]",
+		"cnab_azure_tenant_id": "[parameters('cnab_azure_tenant_id')]",
+		"cnab_installation_name": "[parameters('cnab_installation_name')]",
+		"cnab_state_share_name": "[parameters('cnab_state_share_name')]",
+		"cnab_state_storage_account_key": "[parameters('cnab_state_storage_account_key')]",
+		"cnab_state_storage_account_name": "[parameters('cnab_state_storage_account_name')]",
+		"cnab_state_storage_account_resource_group": "[parameters('cnab_state_storage_account_resource_group')]",
+		"containerGroupName": "[parameters('containerGroupName')]",
+		"containerName": "[parameters('containerName')]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "wordpress"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0-1.0-pull-9-merge.1-43"
+								},
+								{
+									"name": "CNAB_PARAM_affinity",
+									"value": "[parameters('affinity')]"
+								},
+								{
+									"name": "CNAB_PARAM_allowEmptyPassword",
+									"value": "[parameters('allowEmptyPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_allowOverrideNone",
+									"value": "[parameters('allowOverrideNone')]"
+								},
+								{
+									"name": "CNAB_PARAM_customHTAccessCM",
+									"value": "[parameters('customHTAccessCM')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_database",
+									"value": "[parameters('externalDatabase_database')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_host",
+									"value": "[parameters('externalDatabase_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_password",
+									"value": "[parameters('externalDatabase_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_port",
+									"value": "[parameters('externalDatabase_port')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_user",
+									"value": "[parameters('externalDatabase_user')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraEnv",
+									"value": "[parameters('extraEnv')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraVolumeMounts",
+									"value": "[parameters('extraVolumeMounts')]"
+								},
+								{
+									"name": "CNAB_PARAM_extraVolumes",
+									"value": "[parameters('extraVolumes')]"
+								},
+								{
+									"name": "CNAB_PARAM_fullnameOverride",
+									"value": "[parameters('fullnameOverride')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_imagePullSecrets",
+									"value": "[parameters('global_imagePullSecrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_imageRegistry",
+									"value": "[parameters('global_imageRegistry')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_storageClass",
+									"value": "[parameters('global_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_healthcheckHttps",
+									"value": "[parameters('healthcheckHttps')]"
+								},
+								{
+									"name": "CNAB_PARAM_helm_chart_version",
+									"value": "[parameters('helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_pullPolicy",
+									"value": "[parameters('image_pullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_pullSecrets",
+									"value": "[parameters('image_pullSecrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_registry",
+									"value": "[parameters('image_registry')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_repository",
+									"value": "[parameters('image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_tag",
+									"value": "[parameters('image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_annotations",
+									"value": "[parameters('ingress_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_certManager",
+									"value": "[parameters('ingress_certManager')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_enabled",
+									"value": "[parameters('ingress_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hostname",
+									"value": "[parameters('ingress_hostname')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_name",
+									"value": "[parameters('ingress_hosts_0_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_path",
+									"value": "[parameters('ingress_hosts_0_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_secrets",
+									"value": "[parameters('ingress_secrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_tls_0_hosts_0",
+									"value": "[parameters('ingress_tls_0_hosts_0')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_tls_0_secretName",
+									"value": "[parameters('ingress_tls_0_secretName')]"
+								},
+								{
+									"name": "CNAB_PARAM_installation_name",
+									"value": "[parameters('installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbeHeaders",
+									"value": "[parameters('livenessProbeHeaders')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbe_failureThreshold",
+									"value": "[parameters('livenessProbe_failureThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbe_initialDelaySeconds",
+									"value": "[parameters('livenessProbe_initialDelaySeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbe_periodSeconds",
+									"value": "[parameters('livenessProbe_periodSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbe_successThreshold",
+									"value": "[parameters('livenessProbe_successThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_livenessProbe_timeoutSeconds",
+									"value": "[parameters('livenessProbe_timeoutSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_name",
+									"value": "[parameters('mariadb_db_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_password",
+									"value": "[parameters('mariadb_db_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_user",
+									"value": "[parameters('mariadb_db_user')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_enabled",
+									"value": "[parameters('mariadb_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_rootUser_password",
+									"value": "[parameters('mariadb_rootUser_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_enabled",
+									"value": "[parameters('metrics_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_image_pullPolicy",
+									"value": "[parameters('metrics_image_pullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_image_pullSecrets",
+									"value": "[parameters('metrics_image_pullSecrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_image_registry",
+									"value": "[parameters('metrics_image_registry')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_image_repository",
+									"value": "[parameters('metrics_image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_image_tag",
+									"value": "[parameters('metrics_image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_podAnnotations",
+									"value": "[parameters('metrics_podAnnotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_resources",
+									"value": "[parameters('metrics_resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_additionalLabels",
+									"value": "[parameters('metrics_serviceMonitor_additionalLabels')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_enabled",
+									"value": "[parameters('metrics_serviceMonitor_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_honorLabels",
+									"value": "[parameters('metrics_serviceMonitor_honorLabels')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_interval",
+									"value": "[parameters('metrics_serviceMonitor_interval')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_namespace",
+									"value": "[parameters('metrics_serviceMonitor_namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_relabellings",
+									"value": "[parameters('metrics_serviceMonitor_relabellings')]"
+								},
+								{
+									"name": "CNAB_PARAM_metrics_serviceMonitor_scrapeTimeout",
+									"value": "[parameters('metrics_serviceMonitor_scrapeTimeout')]"
+								},
+								{
+									"name": "CNAB_PARAM_nameOverride",
+									"value": "[parameters('nameOverride')]"
+								},
+								{
+									"name": "CNAB_PARAM_namespace",
+									"value": "[parameters('namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_nodeSelector",
+									"value": "[parameters('nodeSelector')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_accessMode",
+									"value": "[parameters('persistence_accessMode')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_enabled",
+									"value": "[parameters('persistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_existingClaim",
+									"value": "[parameters('persistence_existingClaim')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_size",
+									"value": "[parameters('persistence_size')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_storageClass",
+									"value": "[parameters('persistence_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_podAnnotations",
+									"value": "[parameters('podAnnotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbeHeaders",
+									"value": "[parameters('readinessProbeHeaders')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbe_failureThreshold",
+									"value": "[parameters('readinessProbe_failureThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbe_initialDelaySeconds",
+									"value": "[parameters('readinessProbe_initialDelaySeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbe_periodSeconds",
+									"value": "[parameters('readinessProbe_periodSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbe_successThreshold",
+									"value": "[parameters('readinessProbe_successThreshold')]"
+								},
+								{
+									"name": "CNAB_PARAM_readinessProbe_timeoutSeconds",
+									"value": "[parameters('readinessProbe_timeoutSeconds')]"
+								},
+								{
+									"name": "CNAB_PARAM_replicaCount",
+									"value": "[parameters('replicaCount')]"
+								},
+								{
+									"name": "CNAB_PARAM_schedulerName",
+									"value": "[parameters('schedulerName')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_annotations",
+									"value": "[parameters('service_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_externalTrafficPolicy",
+									"value": "[parameters('service_externalTrafficPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_extraPorts",
+									"value": "[parameters('service_extraPorts')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_httpsPort",
+									"value": "[parameters('service_httpsPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_httpsTargetPort",
+									"value": "[parameters('service_httpsTargetPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_metricsPort",
+									"value": "[parameters('service_metricsPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_nodePorts_http",
+									"value": "[parameters('service_nodePorts_http')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_nodePorts_https",
+									"value": "[parameters('service_nodePorts_https')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_nodePorts_metrics",
+									"value": "[parameters('service_nodePorts_metrics')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_port",
+									"value": "[parameters('service_port')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_type",
+									"value": "[parameters('service_type')]"
+								},
+								{
+									"name": "CNAB_PARAM_sidecars",
+									"value": "[parameters('sidecars')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpHost",
+									"value": "[parameters('smtpHost')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpPassword",
+									"value": "[parameters('smtpPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpPort",
+									"value": "[parameters('smtpPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpProtocol",
+									"value": "[parameters('smtpProtocol')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpUser",
+									"value": "[parameters('smtpUser')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpUsername",
+									"value": "[parameters('smtpUsername')]"
+								},
+								{
+									"name": "CNAB_PARAM_tolerations",
+									"value": "[parameters('tolerations')]"
+								},
+								{
+									"name": "CNAB_PARAM_updateStrategy",
+									"value": "[parameters('updateStrategy')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressBlogName",
+									"value": "[parameters('wordpressBlogName')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressEmail",
+									"value": "[parameters('wordpressEmail')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressFirstName",
+									"value": "[parameters('wordpressFirstName')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressLastName",
+									"value": "[parameters('wordpressLastName')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressPassword",
+									"value": "[parameters('wordpressPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressScheme",
+									"value": "[parameters('wordpressScheme')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressSkipInstall",
+									"value": "[parameters('wordpressSkipInstall')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressTablePrefix",
+									"value": "[parameters('wordpressTablePrefix')]"
+								},
+								{
+									"name": "CNAB_PARAM_wordpressUsername",
+									"value": "[parameters('wordpressUsername')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
