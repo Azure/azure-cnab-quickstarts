@@ -1,0 +1,1041 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"aci_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location in which the bootstrapper ACI resources will be created."
+			}
+		},
+		"affinity": {
+			"type": "string",
+			"defaultValue": "{}",
+			"metadata": {
+				"description": "Map of node/pod affinities"
+			}
+		},
+		"allowEmptyPassword": {
+			"type": "string",
+			"defaultValue": "yes",
+			"metadata": {
+				"description": "Allow DB blank passwords"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location which the cnab-azure driver will use to create ACI."
+			}
+		},
+		"cnab_azure_subscription_id": {
+			"type": "string",
+			"defaultValue": "[subscription().subscriptionId]",
+			"metadata": {
+				"description": "Azure Subscription Id - this is the subscription to be used for ACI creation, if not specified the first (random) subscription is used."
+			}
+		},
+		"cnab_azure_tenant_id": {
+			"type": "string",
+			"defaultValue": "[subscription().tenantId]",
+			"metadata": {
+				"description": "Azure AAD Tenant Id Azure account authentication - used to authenticate to Azure using Service Principal or Device Code for ACI creation."
+			}
+		},
+		"cnab_installation_name": {
+			"type": "string",
+			"defaultValue": "ghost",
+			"metadata": {
+				"description": "The name of the application instance."
+			}
+		},
+		"cnab_state_share_name": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The file share name in the storage account for the CNAB state to be stored in"
+			}
+		},
+		"cnab_state_storage_account_key": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The storage account key for the account for the CNAB state to be stored in, if this is left blank it will be looked up at runtime"
+			}
+		},
+		"cnab_state_storage_account_name": {
+			"type": "string",
+			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
+			}
+		},
+		"cnab_state_storage_account_resource_group": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().name]",
+			"metadata": {
+				"description": "The resource group name for the storage account for the CNAB state to be stored in, by default this will be in the current resource group, if this is changed to a different resource group the storage account is expected to already exist"
+			}
+		},
+		"containerGroupName": {
+			"type": "string",
+			"defaultValue": "[concat('cg-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container group"
+			}
+		},
+		"containerName": {
+			"type": "string",
+			"defaultValue": "[concat('cn-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container"
+			}
+		},
+		"externalDatabase_database": {
+			"type": "string",
+			"defaultValue": "bitnami_ghost",
+			"metadata": {
+				"description": "Name of the existing database"
+			}
+		},
+		"externalDatabase_host": {
+			"type": "string",
+			"defaultValue": "localhost",
+			"metadata": {
+				"description": "Host of the external database"
+			}
+		},
+		"externalDatabase_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Password for the above username"
+			}
+		},
+		"externalDatabase_port": {
+			"type": "int",
+			"defaultValue": 3306,
+			"metadata": {
+				"description": "Port of the external database"
+			}
+		},
+		"externalDatabase_user": {
+			"type": "string",
+			"defaultValue": "bn_ghost",
+			"metadata": {
+				"description": "Existing username in the external db"
+			}
+		},
+		"fullnameOverride": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "String to fully override ghost.fullname template with a string"
+			}
+		},
+		"ghostBlogTitle": {
+			"type": "string",
+			"defaultValue": "User's Blog",
+			"metadata": {
+				"description": "Ghost Blog name"
+			}
+		},
+		"ghostEmail": {
+			"type": "string",
+			"defaultValue": "user@example.com",
+			"metadata": {
+				"description": "Admin email"
+			}
+		},
+		"ghostHost": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Ghost host to create application URLs"
+			}
+		},
+		"ghostPassword": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Application password"
+			}
+		},
+		"ghostPath": {
+			"type": "string",
+			"defaultValue": "/",
+			"metadata": {
+				"description": "Ghost path to create application URLs"
+			}
+		},
+		"ghostPort": {
+			"type": "int",
+			"defaultValue": 80,
+			"metadata": {
+				"description": "Ghost port to use in application URLs"
+			}
+		},
+		"ghostProtocol": {
+			"type": "string",
+			"defaultValue": "http",
+			"metadata": {
+				"description": "Protocol (http or https) to use in the application URLs"
+			}
+		},
+		"ghostUsername": {
+			"type": "string",
+			"defaultValue": "user@example.com",
+			"metadata": {
+				"description": "User of the application"
+			}
+		},
+		"global_imagePullSecrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Global Docker registry secret names as an array"
+			}
+		},
+		"global_imageRegistry": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Global Docker image registry"
+			}
+		},
+		"global_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Global storage class for dynamic provisioning"
+			}
+		},
+		"helm_chart_version": {
+			"type": "string",
+			"defaultValue": "8.0.5",
+			"metadata": {
+				"description": "Version number for the Helm chart"
+			}
+		},
+		"image_pullPolicy": {
+			"type": "string",
+			"defaultValue": "IfNotPresent",
+			"metadata": {
+				"description": "Image pull policy"
+			}
+		},
+		"image_pullSecrets": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Specify docker-registry secret names as an array"
+			}
+		},
+		"image_registry": {
+			"type": "string",
+			"defaultValue": "docker.io",
+			"metadata": {
+				"description": "Ghost image registry"
+			}
+		},
+		"image_repository": {
+			"type": "string",
+			"defaultValue": "bitnami/ghost",
+			"metadata": {
+				"description": "Ghost Image name"
+			}
+		},
+		"image_tag": {
+			"type": "string",
+			"defaultValue": "3.0.2-debian-9-r2",
+			"metadata": {
+				"description": "Ghost Image tag"
+			}
+		},
+		"ingress_annotations": {
+			"type": "string",
+			"defaultValue": "[]",
+			"metadata": {
+				"description": "Ingress annotations"
+			}
+		},
+		"ingress_certManager": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Add annotations for cert-manager"
+			}
+		},
+		"ingress_enabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enable ingress controller resource"
+			}
+		},
+		"ingress_hosts_0_name": {
+			"type": "string",
+			"defaultValue": "ghost.local",
+			"metadata": {
+				"description": "Hostname to your Ghost installation"
+			}
+		},
+		"ingress_hosts_0_path": {
+			"type": "string",
+			"defaultValue": "/",
+			"metadata": {
+				"description": "Path within the url structure"
+			}
+		},
+		"ingress_hosts_0_tls": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Utilize TLS backend in ingress"
+			}
+		},
+		"ingress_hosts_0_tlsHosts": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Array of TLS hosts for ingress record (defaults to ingress.hosts[0].name if nil)"
+			}
+		},
+		"ingress_hosts_0_tlsSecret": {
+			"type": "string",
+			"defaultValue": "ghost.local-tls-secret",
+			"metadata": {
+				"description": "TLS Secret (certificates)"
+			}
+		},
+		"ingress_secrets_0_certificate": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "TLS Secret Certificate"
+			}
+		},
+		"ingress_secrets_0_key": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "TLS Secret Key"
+			}
+		},
+		"ingress_secrets_0_name": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "TLS Secret Name"
+			}
+		},
+		"installation_name": {
+			"type": "string",
+			"defaultValue": "ghost",
+			"metadata": {
+				"description": "Installation name for Helm deployment"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"mariadb_db_name": {
+			"type": "string",
+			"defaultValue": "bitnami_ghost",
+			"metadata": {
+				"description": "MariaDB Database name to create"
+			}
+		},
+		"mariadb_db_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "MariaDB Password for user"
+			}
+		},
+		"mariadb_db_user": {
+			"type": "string",
+			"defaultValue": "bn_ghost",
+			"metadata": {
+				"description": "MariaDB Database user to create"
+			}
+		},
+		"mariadb_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Whether or not to install MariaDB (disable if using external)"
+			}
+		},
+		"mariadb_rootUser_password": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "MariaDB admin password"
+			}
+		},
+		"nameOverride": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "String to partially override ghost.fullname template with a string (will prepend the release name)"
+			}
+		},
+		"namespace": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes namespace for installation"
+			}
+		},
+		"persistence_accessMode": {
+			"type": "string",
+			"defaultValue": "ReadWriteOnce",
+			"metadata": {
+				"description": "PVC Access Mode for Ghost volume"
+			}
+		},
+		"persistence_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Enable persistence using PVC"
+			}
+		},
+		"persistence_path": {
+			"type": "string",
+			"defaultValue": "/bitnami",
+			"metadata": {
+				"description": "Path to mount the volume at, to use other images"
+			}
+		},
+		"persistence_size": {
+			"type": "string",
+			"defaultValue": "8Gi",
+			"metadata": {
+				"description": "PVC Storage Request for Ghost volume"
+			}
+		},
+		"persistence_storageClass": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "PVC Storage Class for Ghost volume"
+			}
+		},
+		"resources": {
+			"type": "string",
+			"defaultValue": "{ requests: { memory: 512Mi, cpu: 300m } }",
+			"metadata": {
+				"description": "CPU/Memory resource requests/limits"
+			}
+		},
+		"securityContext_enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Enable security context"
+			}
+		},
+		"securityContext_fsGroup": {
+			"type": "int",
+			"defaultValue": 1001,
+			"metadata": {
+				"description": "Group ID for the container"
+			}
+		},
+		"securityContext_runAsUser": {
+			"type": "int",
+			"defaultValue": 1001,
+			"metadata": {
+				"description": "User ID for the container"
+			}
+		},
+		"service_annotations": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Service annotations"
+			}
+		},
+		"service_externalTrafficPolicy": {
+			"type": "string",
+			"defaultValue": "Cluster",
+			"metadata": {
+				"description": "Enable client source IP preservation"
+			}
+		},
+		"service_loadBalancerIP": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "LoadBalancerIP for the Ghost service"
+			}
+		},
+		"service_nodePorts_http": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Kubernetes http node port"
+			}
+		},
+		"service_port": {
+			"type": "int",
+			"defaultValue": 80,
+			"metadata": {
+				"description": "Service HTTP port"
+			}
+		},
+		"service_type": {
+			"type": "string",
+			"defaultValue": "LoadBalancer",
+			"metadata": {
+				"description": "Kubernetes Service type"
+			}
+		},
+		"smtpFromAddress": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP from address"
+			}
+		},
+		"smtpHost": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP host"
+			}
+		},
+		"smtpPassword": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP password"
+			}
+		},
+		"smtpPort": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP port"
+			}
+		},
+		"smtpService": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP service"
+			}
+		},
+		"smtpUser": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "SMTP user"
+			}
+		},
+		"volumePermissions_image_pullPolicy": {
+			"type": "string",
+			"defaultValue": "Always",
+			"metadata": {
+				"description": "Init container volume-permissions image pull policy"
+			}
+		},
+		"volumePermissions_image_registry": {
+			"type": "string",
+			"defaultValue": "docker.io",
+			"metadata": {
+				"description": "Init container volume-permissions image registry"
+			}
+		},
+		"volumePermissions_image_repository": {
+			"type": "string",
+			"defaultValue": "bitnami/minideb",
+			"metadata": {
+				"description": "Init container volume-permissions image name"
+			}
+		},
+		"volumePermissions_image_tag": {
+			"type": "string",
+			"defaultValue": "stretch",
+			"metadata": {
+				"description": "Init container volume-permissions image tag"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[parameters('aci_location')]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[parameters('cnab_azure_location')]",
+		"cnab_azure_subscription_id": "[parameters('cnab_azure_subscription_id')]",
+		"cnab_azure_tenant_id": "[parameters('cnab_azure_tenant_id')]",
+		"cnab_installation_name": "[parameters('cnab_installation_name')]",
+		"cnab_state_share_name": "[parameters('cnab_state_share_name')]",
+		"cnab_state_storage_account_key": "[parameters('cnab_state_storage_account_key')]",
+		"cnab_state_storage_account_name": "[parameters('cnab_state_storage_account_name')]",
+		"cnab_state_storage_account_resource_group": "[parameters('cnab_state_storage_account_resource_group')]",
+		"containerGroupName": "[parameters('containerGroupName')]",
+		"containerName": "[parameters('containerName')]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "ghost"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0-1.0-pull-8-merge.1-39"
+								},
+								{
+									"name": "CNAB_PARAM_affinity",
+									"value": "[parameters('affinity')]"
+								},
+								{
+									"name": "CNAB_PARAM_allowEmptyPassword",
+									"value": "[parameters('allowEmptyPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_database",
+									"value": "[parameters('externalDatabase_database')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_host",
+									"value": "[parameters('externalDatabase_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_password",
+									"value": "[parameters('externalDatabase_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_port",
+									"value": "[parameters('externalDatabase_port')]"
+								},
+								{
+									"name": "CNAB_PARAM_externalDatabase_user",
+									"value": "[parameters('externalDatabase_user')]"
+								},
+								{
+									"name": "CNAB_PARAM_fullnameOverride",
+									"value": "[parameters('fullnameOverride')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostBlogTitle",
+									"value": "[parameters('ghostBlogTitle')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostEmail",
+									"value": "[parameters('ghostEmail')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostHost",
+									"value": "[parameters('ghostHost')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostPassword",
+									"value": "[parameters('ghostPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostPath",
+									"value": "[parameters('ghostPath')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostPort",
+									"value": "[parameters('ghostPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostProtocol",
+									"value": "[parameters('ghostProtocol')]"
+								},
+								{
+									"name": "CNAB_PARAM_ghostUsername",
+									"value": "[parameters('ghostUsername')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_imagePullSecrets",
+									"value": "[parameters('global_imagePullSecrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_imageRegistry",
+									"value": "[parameters('global_imageRegistry')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_storageClass",
+									"value": "[parameters('global_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_helm_chart_version",
+									"value": "[parameters('helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_pullPolicy",
+									"value": "[parameters('image_pullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_pullSecrets",
+									"value": "[parameters('image_pullSecrets')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_registry",
+									"value": "[parameters('image_registry')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_repository",
+									"value": "[parameters('image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_image_tag",
+									"value": "[parameters('image_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_annotations",
+									"value": "[parameters('ingress_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_certManager",
+									"value": "[parameters('ingress_certManager')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_enabled",
+									"value": "[parameters('ingress_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_name",
+									"value": "[parameters('ingress_hosts_0_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_path",
+									"value": "[parameters('ingress_hosts_0_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_tls",
+									"value": "[parameters('ingress_hosts_0_tls')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_tlsHosts",
+									"value": "[parameters('ingress_hosts_0_tlsHosts')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_hosts_0_tlsSecret",
+									"value": "[parameters('ingress_hosts_0_tlsSecret')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_secrets_0_certificate",
+									"value": "[parameters('ingress_secrets_0_certificate')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_secrets_0_key",
+									"value": "[parameters('ingress_secrets_0_key')]"
+								},
+								{
+									"name": "CNAB_PARAM_ingress_secrets_0_name",
+									"value": "[parameters('ingress_secrets_0_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_installation_name",
+									"value": "[parameters('installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_name",
+									"value": "[parameters('mariadb_db_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_password",
+									"value": "[parameters('mariadb_db_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_db_user",
+									"value": "[parameters('mariadb_db_user')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_enabled",
+									"value": "[parameters('mariadb_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_mariadb_rootUser_password",
+									"value": "[parameters('mariadb_rootUser_password')]"
+								},
+								{
+									"name": "CNAB_PARAM_nameOverride",
+									"value": "[parameters('nameOverride')]"
+								},
+								{
+									"name": "CNAB_PARAM_namespace",
+									"value": "[parameters('namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_accessMode",
+									"value": "[parameters('persistence_accessMode')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_enabled",
+									"value": "[parameters('persistence_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_path",
+									"value": "[parameters('persistence_path')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_size",
+									"value": "[parameters('persistence_size')]"
+								},
+								{
+									"name": "CNAB_PARAM_persistence_storageClass",
+									"value": "[parameters('persistence_storageClass')]"
+								},
+								{
+									"name": "CNAB_PARAM_resources",
+									"value": "[parameters('resources')]"
+								},
+								{
+									"name": "CNAB_PARAM_securityContext_enabled",
+									"value": "[parameters('securityContext_enabled')]"
+								},
+								{
+									"name": "CNAB_PARAM_securityContext_fsGroup",
+									"value": "[parameters('securityContext_fsGroup')]"
+								},
+								{
+									"name": "CNAB_PARAM_securityContext_runAsUser",
+									"value": "[parameters('securityContext_runAsUser')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_annotations",
+									"value": "[parameters('service_annotations')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_externalTrafficPolicy",
+									"value": "[parameters('service_externalTrafficPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_loadBalancerIP",
+									"value": "[parameters('service_loadBalancerIP')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_nodePorts_http",
+									"value": "[parameters('service_nodePorts_http')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_port",
+									"value": "[parameters('service_port')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_type",
+									"value": "[parameters('service_type')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpFromAddress",
+									"value": "[parameters('smtpFromAddress')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpHost",
+									"value": "[parameters('smtpHost')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpPassword",
+									"value": "[parameters('smtpPassword')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpPort",
+									"value": "[parameters('smtpPort')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpService",
+									"value": "[parameters('smtpService')]"
+								},
+								{
+									"name": "CNAB_PARAM_smtpUser",
+									"value": "[parameters('smtpUser')]"
+								},
+								{
+									"name": "CNAB_PARAM_volumePermissions_image_pullPolicy",
+									"value": "[parameters('volumePermissions_image_pullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_volumePermissions_image_registry",
+									"value": "[parameters('volumePermissions_image_registry')]"
+								},
+								{
+									"name": "CNAB_PARAM_volumePermissions_image_repository",
+									"value": "[parameters('volumePermissions_image_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_volumePermissions_image_tag",
+									"value": "[parameters('volumePermissions_image_tag')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
