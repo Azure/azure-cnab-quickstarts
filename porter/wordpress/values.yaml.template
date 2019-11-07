@@ -1,0 +1,120 @@
+global:
+  imageRegistry: $GLOBAL_IMAGEREGISTRY
+  imagePullSecrets: $GLOBAL_IMAGEPULLSECRETS
+  storageClass: $GLOBAL_STORAGECLASS
+image:
+  registry: $IMAGE_REGISTRY
+  repository: $IMAGE_REPOSITORY
+  tag: $IMAGE_TAG
+  pullPolicy: $IMAGE_PULLPOLICY
+  pullSecrets: $IMAGE_PULLSECRETS
+nameOverride: $NAMEOVERRIDE
+fullnameOverride: $FULLNAMEOVERRIDE
+wordpressSkipInstall: $WORDPRESSSKIPINSTALL
+wordpressUsername: $WORDPRESSUSERNAME
+wordpressPassword: $WORDPRESSPASSWORD
+wordpressEmail: $WORDPRESSEMAIL
+wordpressFirstName: $WORDPRESSFIRSTNAME
+wordpressLastName: $WORDPRESSLASTNAME
+wordpressBlogName: $WORDPRESSBLOGNAME
+wordpressTablePrefix: $WORDPRESSTABLEPREFIX
+wordpressScheme: $WORDPRESSSCHEME
+allowEmptyPassword: $ALLOWEMPTYPASSWORD
+allowOverrideNone: $ALLOWOVERRIDENONE
+customHTAccessCM: $CUSTOMHTACCESSCM
+smtpHost: $SMTPHOST
+smtpPort: $SMTPPORT
+smtpUser: $SMTPUSER
+smtpPassword: $SMTPPASSWORD
+smtpUsername: $SMTPUSERNAME
+smtpProtocol: $SMTPPROTOCOL
+replicaCount: $REPLICACOUNT
+extraEnv: $EXTRAENV
+extraVolumeMounts: $EXTRAVOLUMEMOUNTS
+extraVolumes: $EXTRAVOLUMES
+mariadb:
+  enabled: $MARIADB_ENABLED
+  rootUser:
+    password: $MARIADB_ROOTUSER_PASSWORD
+  db:
+    name: $MARIADB_DB_NAME
+    user: $MARIADB_DB_USER
+    password: $MARIADB_DB_PASSWORD
+externalDatabase:
+  host: $EXTERNALDATABASE_HOST
+  user: $EXTERNALDATABASE_USER
+  password: $EXTERNALDATABASE_PASSWORD
+  database: $EXTERNALDATABASE_DATABASE
+  port: $EXTERNALDATABASE_PORT
+service:
+  annotations: $SERVICE_ANNOTATIONS
+  type: $SERVICE_TYPE
+  port: $SERVICE_PORT
+  httpsPort: $SERVICE_HTTPSPORT
+  httpsTargetPort: $SERVICE_HTTPSTARGETPORT
+  metricsPort: $SERVICE_METRICSPORT
+  externalTrafficPolicy: $SERVICE_EXTERNALTRAFFICPOLICY
+  nodePorts:
+    http: $SERVICE_NODEPORTS_HTTP
+    https: $SERVICE_NODEPORTS_HTTPS
+    metrics: $SERVICE_NODEPORTS_METRICS
+  extraPorts: $SERVICE_EXTRAPORTS
+healthcheckHttps: $HEALTHCHECKHTTPS
+livenessProbe:
+  initialDelaySeconds: $LIVENESSPROBE_INITIALDELAYSECONDS
+  periodSeconds: $LIVENESSPROBE_PERIODSECONDS
+  timeoutSeconds: $LIVENESSPROBE_TIMEOUTSECONDS
+  failureThreshold: $LIVENESSPROBE_FAILURETHRESHOLD
+  successThreshold: $LIVENESSPROBE_SUCCESSTHRESHOLD
+livenessProbeHeaders: $LIVENESSPROBEHEADERS
+readinessProbe:
+  initialDelaySeconds: $READINESSPROBE_INITIALDELAYSECONDS
+  periodSeconds: $READINESSPROBE_PERIODSECONDS
+  timeoutSeconds: $READINESSPROBE_TIMEOUTSECONDS
+  failureThreshold: $READINESSPROBE_FAILURETHRESHOLD
+  successThreshold: $READINESSPROBE_SUCCESSTHRESHOLD
+readinessProbeHeaders: $READINESSPROBEHEADERS
+ingress:
+  enabled: $INGRESS_ENABLED
+  certManager: $INGRESS_CERTMANAGER
+  hostname: $INGRESS_HOSTNAME
+  annotations: $INGRESS_ANNOTATIONS
+  hosts:
+  - name: $INGRESS_HOSTS_0_NAME
+    path: $INGRESS_HOSTS_0_PATH
+  tls:
+  - hosts:
+    - $INGRESS_TLS_0_HOSTS_0
+    secretName: $INGRESS_TLS_0_SECRETNAME
+  secrets: $INGRESS_SECRETS
+schedulerName: $SCHEDULERNAME
+persistence:
+  enabled: $PERSISTENCE_ENABLED
+  existingClaim: $PERSISTENCE_EXISTINGCLAIM
+  storageClass: $PERSISTENCE_STORAGECLASS
+  accessMode: $PERSISTENCE_ACCESSMODE
+  size: $PERSISTENCE_SIZE
+nodeSelector: $NODESELECTOR
+tolerations: $TOLERATIONS
+affinity: $AFFINITY
+podAnnotations: $PODANNOTATIONS
+metrics:
+  enabled: $METRICS_ENABLED
+  image:
+    registry: $METRICS_IMAGE_REGISTRY
+    repository: $METRICS_IMAGE_REPOSITORY
+    tag: $METRICS_IMAGE_TAG
+    pullPolicy: $METRICS_IMAGE_PULLPOLICY
+    pullSecrets: $METRICS_IMAGE_PULLSECRETS
+  podAnnotations: $METRICS_PODANNOTATIONS
+  resources: $METRICS_RESOURCES
+  serviceMonitor:
+    enabled: $METRICS_SERVICEMONITOR_ENABLED
+    namespace: $METRICS_SERVICEMONITOR_NAMESPACE
+    interval: $METRICS_SERVICEMONITOR_INTERVAL
+    scrapeTimeout: $METRICS_SERVICEMONITOR_SCRAPETIMEOUT
+    relabellings: $METRICS_SERVICEMONITOR_RELABELLINGS
+    honorLabels: $METRICS_SERVICEMONITOR_HONORLABELS
+    additionalLabels: $METRICS_SERVICEMONITOR_ADDITIONALLABELS
+sidecars: $SIDECARS
+updateStrategy: $UPDATESTRATEGY
