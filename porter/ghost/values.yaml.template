@@ -1,0 +1,81 @@
+global:
+  imageRegistry: $GLOBAL_IMAGEREGISTRY
+  imagePullSecrets: $GLOBAL_IMAGEPULLSECRETS
+  storageClass: $GLOBAL_STORAGECLASS
+image:
+  registry: $IMAGE_REGISTRY
+  repository: $IMAGE_REPOSITORY
+  tag: $IMAGE_TAG
+  pullPolicy: $IMAGE_PULLPOLICY
+  pullSecrets: $IMAGE_PULLSECRETS
+nameOverride: $NAMEOVERRIDE
+fullnameOverride: $FULLNAMEOVERRIDE
+volumePermissions:
+  image:
+    registry: $VOLUMEPERMISSIONS_IMAGE_REGISTRY
+    repository: $VOLUMEPERMISSIONS_IMAGE_REPOSITORY
+    tag: $VOLUMEPERMISSIONS_IMAGE_TAG
+    pullPolicy: $VOLUMEPERMISSIONS_IMAGE_PULLPOLICY
+ghostHost: $GHOSTHOST
+ghostPort: $GHOSTPORT
+ghostProtocol: $GHOSTPROTOCOL
+ghostPath: $GHOSTPATH
+ghostUsername: $GHOSTUSERNAME
+ghostPassword: $GHOSTPASSWORD
+ghostEmail: $GHOSTEMAIL
+ghostBlogTitle: $GHOSTBLOGTITLE
+smtpHost: $SMTPHOST
+smtpPort: $SMTPPORT
+smtpUser: $SMTPUSER
+smtpPassword: $SMTPPASSWORD
+smtpFromAddress: $SMTPFROMADDRESS
+smtpService: $SMTPSERVICE
+allowEmptyPassword: $ALLOWEMPTYPASSWORD
+securityContext:
+  enabled: $SECURITYCONTEXT_ENABLED
+  fsGroup: $SECURITYCONTEXT_FSGROUP
+  runAsUser: $SECURITYCONTEXT_RUNASUSER
+service:
+  type: $SERVICE_TYPE
+  port: $SERVICE_PORT
+  nodePorts:
+    http: $SERVICE_NODEPORTS_HTTP
+  externalTrafficPolicy: $SERVICE_EXTERNALTRAFFICPOLICY
+  loadBalancerIP: $SERVICE_LOADBALANCERIP
+  annotations: $SERVICE_ANNOTATIONS
+ingress:
+  enabled: $INGRESS_ENABLED
+  annotations: $INGRESS_ANNOTATIONS
+  certManager: $INGRESS_CERTMANAGER
+  hosts:
+  - name: $INGRESS_HOSTS_0_NAME
+    path: $INGRESS_HOSTS_0_PATH
+    tls: $INGRESS_HOSTS_0_TLS
+    tlsHosts: $INGRESS_HOSTS_0_TLSHOSTS
+    tlsSecret: $INGRESS_HOSTS_0_TLSSECRET
+  secrets:
+  - name: $INGRESS_SECRETS_0_NAME
+    certificate: $INGRESS_SECRETS_0_CERTIFICATE
+    key: $INGRESS_SECRETS_0_KEY
+externalDatabase:
+  host: $EXTERNALDATABASE_HOST
+  port: $EXTERNALDATABASE_PORT
+  user: $EXTERNALDATABASE_USER
+  password: $EXTERNALDATABASE_PASSWORD
+  database: $EXTERNALDATABASE_DATABASE
+mariadb:
+  enabled: $MARIADB_ENABLED
+  rootUser:
+    password: $MARIADB_ROOTUSER_PASSWORD
+  db:
+    name: $MARIADB_DB_NAME
+    user: $MARIADB_DB_USER
+    password: $MARIADB_DB_PASSWORD
+persistence:
+  enabled: $PERSISTENCE_ENABLED
+  storageClass: $PERSISTENCE_STORAGECLASS
+  accessMode: $PERSISTENCE_ACCESSMODE
+  size: $PERSISTENCE_SIZE
+  path: $PERSISTENCE_PATH
+resources: $RESOURCES
+affinity: $AFFINITY
