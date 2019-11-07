@@ -1,0 +1,476 @@
+name: ghost
+version: 0.1.0
+dockerfile: dockerfile.tmpl
+description: Ghost on Kubernetes
+invocationImage: cnabquickstarts.azurecr.io/porter/ghost:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.0
+credentials:
+- name: kubeconfig
+  path: /root/.kube/config
+parameters:
+- name: namespace
+  type: string
+  description: Kubernetes namespace for installation
+  default: ''
+- name: installation_name
+  type: string
+  description: Installation name for Helm deployment
+  default: ghost
+- name: helm_chart_version
+  type: string
+  description: Version number for the Helm chart
+  default: '8.0.5'
+- name: global_imageRegistry
+  type: string
+  description: Global Docker image registry
+  default: ''
+  destination:
+    env: GLOBAL_IMAGEREGISTRY
+- name: global_imagePullSecrets
+  type: string
+  description: Global Docker registry secret names as an array
+  default: '[]'
+  destination:
+    env: GLOBAL_IMAGEPULLSECRETS
+- name: global_storageClass
+  type: string
+  description: Global storage class for dynamic provisioning
+  default: ''
+  destination:
+    env: GLOBAL_STORAGECLASS
+- name: image_registry
+  type: string
+  description: Ghost image registry
+  default: docker.io
+  destination:
+    env: IMAGE_REGISTRY
+- name: image_repository
+  type: string
+  description: Ghost Image name
+  default: bitnami/ghost
+  destination:
+    env: IMAGE_REPOSITORY
+- name: image_tag
+  type: string
+  description: Ghost Image tag
+  default: '3.0.2-debian-9-r2'
+  destination:
+    env: IMAGE_TAG
+- name: image_pullPolicy
+  type: string
+  description: Image pull policy
+  default: IfNotPresent
+  destination:
+    env: IMAGE_PULLPOLICY
+- name: image_pullSecrets
+  type: string
+  description: Specify docker-registry secret names as an array
+  default: '[]'
+  destination:
+    env: IMAGE_PULLSECRETS
+- name: nameOverride
+  type: string
+  description: String to partially override ghost.fullname template with a string (will prepend the release name)
+  default: ''
+  destination:
+    env: NAMEOVERRIDE
+- name: fullnameOverride
+  type: string
+  description: String to fully override ghost.fullname template with a string
+  default: ''
+  destination:
+    env: FULLNAMEOVERRIDE
+- name: volumePermissions_image_registry
+  type: string
+  description: Init container volume-permissions image registry
+  default: docker.io
+  destination:
+    env: VOLUMEPERMISSIONS_IMAGE_REGISTRY
+- name: volumePermissions_image_repository
+  type: string
+  description: Init container volume-permissions image name
+  default: bitnami/minideb
+  destination:
+    env: VOLUMEPERMISSIONS_IMAGE_REPOSITORY
+- name: volumePermissions_image_tag
+  type: string
+  description: Init container volume-permissions image tag
+  default: stretch
+  destination:
+    env: VOLUMEPERMISSIONS_IMAGE_TAG
+- name: volumePermissions_image_pullPolicy
+  type: string
+  description: Init container volume-permissions image pull policy
+  default: Always
+  destination:
+    env: VOLUMEPERMISSIONS_IMAGE_PULLPOLICY
+- name: ghostHost
+  type: string
+  description: Ghost host to create application URLs
+  default: ''
+  destination:
+    env: GHOSTHOST
+- name: ghostPort
+  type: integer
+  description: Ghost port to use in application URLs
+  default: 80
+  destination:
+    env: GHOSTPORT
+- name: ghostProtocol
+  type: string
+  description: Protocol (http or https) to use in the application URLs
+  default: http
+  destination:
+    env: GHOSTPROTOCOL
+- name: ghostPath
+  type: string
+  description: Ghost path to create application URLs
+  default: /
+  destination:
+    env: GHOSTPATH
+- name: ghostUsername
+  type: string
+  description: User of the application
+  default: user@example.com
+  destination:
+    env: GHOSTUSERNAME
+- name: ghostPassword
+  type: string
+  description: Application password
+  default: ''
+  sensitive: true
+  destination:
+    env: GHOSTPASSWORD
+- name: ghostEmail
+  type: string
+  description: Admin email
+  default: user@example.com
+  destination:
+    env: GHOSTEMAIL
+- name: ghostBlogTitle
+  type: string
+  description: Ghost Blog name
+  default: User's Blog
+  destination:
+    env: GHOSTBLOGTITLE
+- name: smtpHost
+  type: string
+  description: SMTP host
+  default: ''
+  destination:
+    env: SMTPHOST
+- name: smtpPort
+  type: string
+  description: SMTP port
+  default: ''
+  destination:
+    env: SMTPPORT
+- name: smtpUser
+  type: string
+  description: SMTP user
+  default: ''
+  destination:
+    env: SMTPUSER
+- name: smtpPassword
+  type: string
+  description: SMTP password
+  default: ''
+  sensitive: true
+  destination:
+    env: SMTPPASSWORD
+- name: smtpFromAddress
+  type: string
+  description: SMTP from address
+  default: ''
+  destination:
+    env: SMTPFROMADDRESS
+- name: smtpService
+  type: string
+  description: SMTP service
+  default: ''
+  destination:
+    env: SMTPSERVICE
+- name: allowEmptyPassword
+  type: string
+  description: Allow DB blank passwords
+  default: yes
+  destination:
+    env: ALLOWEMPTYPASSWORD
+- name: securityContext_enabled
+  type: boolean
+  description: Enable security context
+  default: true
+  destination:
+    env: SECURITYCONTEXT_ENABLED
+- name: securityContext_fsGroup
+  type: integer
+  description: Group ID for the container
+  default: 1001
+  destination:
+    env: SECURITYCONTEXT_FSGROUP
+- name: securityContext_runAsUser
+  type: integer
+  description: User ID for the container
+  default: 1001
+  destination:
+    env: SECURITYCONTEXT_RUNASUSER
+- name: service_type
+  type: string
+  description: Kubernetes Service type
+  default: LoadBalancer
+  destination:
+    env: SERVICE_TYPE
+- name: service_port
+  type: integer
+  description: Service HTTP port
+  default: 80
+  destination:
+    env: SERVICE_PORT
+- name: service_nodePorts_http
+  type: string
+  description: Kubernetes http node port
+  default: ''
+  destination:
+    env: SERVICE_NODEPORTS_HTTP
+- name: service_externalTrafficPolicy
+  type: string
+  description: Enable client source IP preservation
+  default: Cluster
+  destination:
+    env: SERVICE_EXTERNALTRAFFICPOLICY
+- name: service_loadBalancerIP
+  type: string
+  description: LoadBalancerIP for the Ghost service
+  default: ''
+  destination:
+    env: SERVICE_LOADBALANCERIP
+- name: service_annotations
+  type: string
+  description: Service annotations
+  default: ''
+  destination:
+    env: SERVICE_ANNOTATIONS
+- name: ingress_enabled
+  type: boolean
+  description: Enable ingress controller resource
+  default: false
+  destination:
+    env: INGRESS_ENABLED
+- name: ingress_annotations
+  type: string
+  description: Ingress annotations
+  default: '[]'
+  destination:
+    env: INGRESS_ANNOTATIONS
+- name: ingress_certManager
+  type: boolean
+  description: Add annotations for cert-manager
+  default: false
+  destination:
+    env: INGRESS_CERTMANAGER
+- name: ingress_hosts_0_name
+  type: string
+  description: Hostname to your Ghost installation
+  default: ghost.local
+  destination:
+    env: INGRESS_HOSTS_0_NAME
+- name: ingress_hosts_0_path
+  type: string
+  description: Path within the url structure
+  default: /
+  destination:
+    env: INGRESS_HOSTS_0_PATH
+- name: ingress_hosts_0_tls
+  type: boolean
+  description: Utilize TLS backend in ingress
+  default: false
+  destination:
+    env: INGRESS_HOSTS_0_TLS
+- name: ingress_hosts_0_tlsHosts
+  type: string
+  description: Array of TLS hosts for ingress record (defaults to ingress.hosts[0].name if nil)
+  default: ''
+  destination:
+    env: INGRESS_HOSTS_0_TLSHOSTS
+- name: ingress_hosts_0_tlsSecret
+  type: string
+  description: TLS Secret (certificates)
+  default: ghost.local-tls-secret
+  destination:
+    env: INGRESS_HOSTS_0_TLSSECRET
+- name: ingress_secrets_0_name
+  type: string
+  description: TLS Secret Name
+  default: ''
+  destination:
+    env: INGRESS_SECRETS_0_NAME
+- name: ingress_secrets_0_certificate
+  type: string
+  description: TLS Secret Certificate
+  default: ''
+  destination:
+    env: INGRESS_SECRETS_0_CERTIFICATE
+- name: ingress_secrets_0_key
+  type: string
+  description: TLS Secret Key
+  default: ''
+  destination:
+    env: INGRESS_SECRETS_0_KEY
+- name: externalDatabase_host
+  type: string
+  description: Host of the external database
+  default: localhost
+  destination:
+    env: EXTERNALDATABASE_HOST
+- name: externalDatabase_port
+  type: integer
+  description: Port of the external database
+  default: 3306
+  destination:
+    env: EXTERNALDATABASE_PORT
+- name: externalDatabase_user
+  type: string
+  description: Existing username in the external db
+  default: bn_ghost
+  destination:
+    env: EXTERNALDATABASE_USER
+- name: externalDatabase_password
+  type: string
+  description: Password for the above username
+  default: ''
+  sensitive: true
+  destination:
+    env: EXTERNALDATABASE_PASSWORD
+- name: externalDatabase_database
+  type: string
+  description: Name of the existing database
+  default: bitnami_ghost
+  destination:
+    env: EXTERNALDATABASE_DATABASE
+- name: mariadb_enabled
+  type: boolean
+  description: Whether or not to install MariaDB (disable if using external)
+  default: true
+  destination:
+    env: MARIADB_ENABLED
+- name: mariadb_rootUser_password
+  type: string
+  description: MariaDB admin password
+  default: ''
+  sensitive: true
+  destination:
+    env: MARIADB_ROOTUSER_PASSWORD
+- name: mariadb_db_name
+  type: string
+  description: MariaDB Database name to create
+  default: bitnami_ghost
+  destination:
+    env: MARIADB_DB_NAME
+- name: mariadb_db_user
+  type: string
+  description: MariaDB Database user to create
+  default: bn_ghost
+  destination:
+    env: MARIADB_DB_USER
+- name: mariadb_db_password
+  type: string
+  description: MariaDB Password for user
+  default: ''
+  sensitive: true
+  destination:
+    env: MARIADB_DB_PASSWORD
+- name: persistence_enabled
+  type: boolean
+  description: Enable persistence using PVC
+  default: true
+  destination:
+    env: PERSISTENCE_ENABLED
+- name: persistence_storageClass
+  type: string
+  description: PVC Storage Class for Ghost volume
+  default: ''
+  destination:
+    env: PERSISTENCE_STORAGECLASS
+- name: persistence_accessMode
+  type: string
+  description: PVC Access Mode for Ghost volume
+  default: ReadWriteOnce
+  destination:
+    env: PERSISTENCE_ACCESSMODE
+- name: persistence_size
+  type: string
+  description: PVC Storage Request for Ghost volume
+  default: 8Gi
+  destination:
+    env: PERSISTENCE_SIZE
+- name: persistence_path
+  type: string
+  description: Path to mount the volume at, to use other images
+  default: /bitnami
+  destination:
+    env: PERSISTENCE_PATH
+- name: resources
+  type: string
+  description: CPU/Memory resource requests/limits
+  default: '{ requests: { memory: 512Mi, cpu: 300m } }'
+  destination:
+    env: RESOURCES
+- name: affinity
+  type: string
+  description: Map of node/pod affinities
+  default: '{}'
+  destination:
+    env: AFFINITY
+mixins:
+- exec
+- helm
+install:
+- exec:
+    description: Replace tokens in values.yaml.template
+    command: bash
+    arguments:
+    - -c
+    - envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml
+- exec:
+    description: Log out values.yaml
+    command: bash
+    arguments:
+    - -c
+    - "cat /cnab/app/values.yaml && echo \n\n"
+- helm:
+    description: Install ghost
+    name: '{{ bundle.parameters.installation_name }}'
+    chart: stable/ghost
+    version: '{{ bundle.parameters.helm_chart_version }}'
+    namespace: '{{ bundle.parameters.namespace }}'
+    replace: true
+    values:
+    - /cnab/app/values.yaml
+upgrade:
+- exec:
+    description: Replace tokens in values.yaml.template
+    command: bash
+    arguments:
+    - -c
+    - envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml
+- exec:
+    description: Log out values.yaml
+    command: bash
+    arguments:
+    - -c
+    - "cat /cnab/app/values.yaml && echo \n\n"
+- helm:
+    description: Upgrade ghost
+    name: '{{ bundle.parameters.installation_name }}'
+    chart: stable/ghost
+    version: '{{ bundle.parameters.helm_chart_version }}'
+    namespace: '{{ bundle.parameters.namespace }}'
+    replace: false
+    values:
+    - /cnab/app/values.yaml
+uninstall:
+- helm:
+    description: Uninstall ghost
+    purge: true
+    releases:
+    - '{{ bundle.parameters.installation_name }}'
