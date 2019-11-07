@@ -993,7 +993,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0-1.0-pull-9-merge.1-43"
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
