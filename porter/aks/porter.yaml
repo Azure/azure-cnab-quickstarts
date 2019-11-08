@@ -1,0 +1,167 @@
+name: aks
+version: 0.1.0
+description: "Azure Kubernetes Service (AKS)"
+invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.0
+
+credentials:
+- name: azure_client_id
+  env: AZURE_CLIENT_ID
+  description: AAD Client ID for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig
+- name: azure_tenant_id
+  env: AZURE_TENANT_ID
+  description: Azure AAD Tenant Id for Azure account authentication - used to authenticate to Azure to get KubeConfig 
+- name: azure_client_secret
+  env: AZURE_CLIENT_SECRET
+  description: AAD Client Secret for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig
+- name: azure_subscription_id
+  env: AZURE_SUBSCRIPTION_ID
+  description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+
+parameters:
+- name: resource_group
+  type: string
+  description: The name of the resource group to create the AKS Cluster in
+- name: cluster_name
+  type: string
+  description: The name to use for the AKS Cluster
+- name: azure_location
+  type: string
+  description: The Azure location to create the resources in
+  applyTo:
+    - "install"
+- name: kubernetes_version
+  type: string
+  description: The Kubernetes version to use
+  default: "1.14.7"
+  applyTo:
+    - "install"
+- name: node_vm_size
+  type: string
+  description: The VM size to use for the cluster
+  default: "Standard_D8s_v3"
+  applyTo:
+    - "install"
+- name: node_count
+  type: integer
+  minimum: 1
+  description: The VM size to use for the cluster
+  default: 4
+  applyTo:
+    - "install"
+- name: vm_set_type
+  type: string
+  enum: 
+  - VirtualMachineScaleSets
+  - AvailabilitySet
+  description: Agent pool VM set type
+  default: VirtualMachineScaleSets
+  applyTo:
+    - "install"
+
+outputs:
+- name: kubeconfig
+  type: string
+  description: "Kubeconfig for the AKS cluster"
+  sensitive: true
+  applyTo:
+    - "install"
+
+mixins:
+  - exec
+  - az
+
+install:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal:
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec: 
+      description: "Create resource group if not exists"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          if [[ $(az group exists --name {{ bundle.parameters.resource_group }}) == false ]]; then
+              az group create --name {{ bundle.parameters.resource_group }} --location {{ bundle.parameters.azure_location }}
+          else
+            echo "Resource group already exists"
+          fi
+  
+  - exec: 
+      description: "Create AKS if not exists"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          if [[ $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }}) == false ]]; then
+              az aks create \
+                --name {{ bundle.parameters.cluster_name }} \
+                --resource-group {{ bundle.parameters.resource_group }} \
+                --kubernetes-version {{ bundle.parameters.kubernetes_version }} \
+                --node-vm-size {{ bundle.parameters.node_vm_size }} \
+                --node-count {{ bundle.parameters.node_count }} \
+                --service-principal {{ bundle.credentials.azure_client_id}} \
+                --client-secret {{ bundle.credentials.azure_client_secret}} \
+                --location {{ bundle.parameters.azure_location }} \
+                --vm-set-type {{ bundle.parameters.vm_set_type }} \
+                --generate-ssh-keys
+          else
+              echo "AKS cluster already exists in specified resource group with specified name"
+          fi
+
+  - az: 
+      description: "Azure CLI AKS get-credentials"
+      arguments: 
+        - "aks" 
+        - "get-credentials" 
+      flags:
+        resource-group: "{{ bundle.parameters.resource_group }}"
+        name: "{{ bundle.parameters.cluster_name }}"
+        file: kubeconfig
+      outputs:
+        - name: kubeconfig
+          path: kubeconfig
+
+ 
+uninstall:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec: 
+      description: "Delete AKS"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          az aks delete --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }} --yes
+        
