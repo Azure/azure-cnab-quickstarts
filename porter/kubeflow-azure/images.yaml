@@ -1,0 +1,21 @@
+images:
+  - preprocess:
+      gitUrl: https://github.com/kubeflow/examples.git
+      branch: master
+      path: examples/pipelines/azurepipeline/preprocess
+  - training:
+      gitUrl: https://github.com/kubeflow/examples.git
+      branch: master
+      path: examples/pipelines/azurepipeline/training
+  - register:
+      gitUrl: https://github.com/kubeflow/examples.git
+      branch: master
+      path: examples/pipelines/azurepipeline/training
+  - profile:
+      gitUrl: https://github.com/kubeflow/examples.git
+      branch: master
+      path: examples/pipelines/azurepipeline/training
+  - deploy:
+      gitUrl: https://github.com/kubeflow/examples.git
+      branch: master
+      path: examples/pipelines/azurepipeline/training
