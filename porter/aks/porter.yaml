@@ -108,7 +108,8 @@ install:
       arguments:
         - "-c"
         - |
-          if [[ $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }}) == false ]]; then
+          if [[ -z $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }}) ]]
+          then
               az aks create \
                 --name {{ bundle.parameters.cluster_name }} \
                 --resource-group {{ bundle.parameters.resource_group }} \
@@ -145,9 +146,9 @@ uninstall:
         - "login" 
       flags:
         service-principal: 
-        username: "{{ bundle.credentials.azure_client_id}}"
-        password: "{{ bundle.credentials.azure_client_secret}}"
-        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+        username: "{{ bundle.credentials.azure_client_id }}"
+        password: "{{ bundle.credentials.azure_client_secret }}"
+        tenant: "{{ bundle.credentials.azure_tenant_id }}"
 
   - az: 
       description: "Azure set subscription Id"
@@ -155,7 +156,7 @@ uninstall:
         - "account" 
         - "set" 
       flags:
-        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+        subscription: "{{ bundle.credentials.azure_subscription_id }}"
 
   - exec: 
       description: "Delete AKS"
