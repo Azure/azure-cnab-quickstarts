@@ -1,0 +1,295 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"cert_manager_helm_chart_version": {
+			"type": "string",
+			"defaultValue": "v0.8.0",
+			"metadata": {
+				"description": "Version number for the cert-manager Helm chart"
+			}
+		},
+		"cert_manager_installation_name": {
+			"type": "string",
+			"defaultValue": "cert-manager",
+			"metadata": {
+				"description": "Installation name for cert-manager Helm deployment"
+			}
+		},
+		"cert_manager_namespace": {
+			"type": "string",
+			"defaultValue": "cert-manager",
+			"metadata": {
+				"description": "Kubernetes namespace for nginx-ingress installation"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"controller_replica_count": {
+			"type": "int",
+			"defaultValue": 2,
+			"metadata": {
+				"description": "Replica count for ingress controller"
+			}
+		},
+		"dns_name": {
+			"type": "string",
+			"metadata": {
+				"description": "The DNS name to to associate with public IP address for the FQDN"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"letsencrypt_email": {
+			"type": "string",
+			"metadata": {
+				"description": "Valid email address to use for Let's Encrypt certificate"
+			}
+		},
+		"letsencrypt_environment": {
+			"type": "string",
+			"defaultValue": "staging",
+			"allowedValues": [
+				"staging",
+				"prod"
+			],
+			"metadata": {
+				"description": "The environment to use for Let's Encrypt certificates"
+			}
+		},
+		"nginx_ingress_helm_chart_version": {
+			"type": "string",
+			"defaultValue": "1.24.7",
+			"metadata": {
+				"description": "Version number for the nginx-ingress Helm chart"
+			}
+		},
+		"nginx_ingress_installation_name": {
+			"type": "string",
+			"defaultValue": "nginx-ingress",
+			"metadata": {
+				"description": "Installation name for nginx-ingress Helm deployment"
+			}
+		},
+		"nginx_ingress_namespace": {
+			"type": "string",
+			"defaultValue": "nginx-ingress",
+			"metadata": {
+				"description": "Kubernetes namespace for nginx-ingress installation"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[resourceGroup().Location]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
+		"cnab_azure_tenant_id": "[subscription().tenantId]",
+		"cnab_installation_name": "aks-nginx-ingress",
+		"cnab_state_share_name": "aks-nginx-ingress",
+		"cnab_state_storage_account_key": "",
+		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60'))]"
+	},
+	"resources": [
+		{
+			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_state_storage_account_name')]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_state_storage_account_key')]"
+								},
+								{
+									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_state_storage_account_resource_group')]"
+								},
+								{
+									"name": "CNAB_STATE_SHARE_NAME",
+									"value": "[variables('cnab_state_share_name')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "aks-nginx-ingress"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60"
+								},
+								{
+									"name": "CNAB_PARAM_cert_manager_helm_chart_version",
+									"value": "[parameters('cert_manager_helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_cert_manager_installation_name",
+									"value": "[parameters('cert_manager_installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_cert_manager_namespace",
+									"value": "[parameters('cert_manager_namespace')]"
+								},
+								{
+									"name": "CNAB_PARAM_controller_replica_count",
+									"value": "[parameters('controller_replica_count')]"
+								},
+								{
+									"name": "CNAB_PARAM_dns_name",
+									"value": "[parameters('dns_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_letsencrypt_email",
+									"value": "[parameters('letsencrypt_email')]"
+								},
+								{
+									"name": "CNAB_PARAM_letsencrypt_environment",
+									"value": "[parameters('letsencrypt_environment')]"
+								},
+								{
+									"name": "CNAB_PARAM_nginx_ingress_helm_chart_version",
+									"value": "[parameters('nginx_ingress_helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_nginx_ingress_installation_name",
+									"value": "[parameters('nginx_ingress_installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_nginx_ingress_namespace",
+									"value": "[parameters('nginx_ingress_namespace')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_id",
+									"secureValue": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_secret",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_subscription_id",
+									"secureValue": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_tenant_id",
+									"secureValue": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
