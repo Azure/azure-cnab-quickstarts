@@ -2,7 +2,9 @@ FROM debian:stretch
 
 ARG BUNDLE_DIR
 
-COPY manifests/ $BUNDLE_DIR
-COPY scripts/ $BUNDLE_DIR
+# PORTER_MIXINS
 
 RUN apt-get update && apt-get install gettext-base
+
+COPY manifests/ $BUNDLE_DIR
+COPY scripts/ $BUNDLE_DIR
