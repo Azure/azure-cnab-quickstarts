@@ -115,8 +115,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -215,7 +215,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0-pull-12-merge.1-60"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_cert_manager_helm_chart_version",
