@@ -321,8 +321,8 @@
 			}
 		},
 		"ingress_certManager": {
-			"type": "bool",
-			"defaultValue": false,
+			"type": "string",
+			"defaultValue": "",
 			"metadata": {
 				"description": "Add annotations for cert-manager"
 			}
@@ -741,7 +741,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0-1.0-pull-11-merge.1-47"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
