@@ -43,29 +43,52 @@ parameters:
   destination:
     env: LOCATION
     
- 
-dependencies:
-  aks:
-    tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0-1.0-pull-10-merge.1-48 
-    parameters:
-      resource_group: "{{ bundle.parameters.aks_resource_group }}"
-      cluster_name: "{{ bundle.parameters.aks_cluster_name }}"
-      azure_location: "{{ bundle.parameters.azure_location }}"
-
 mixins:
   - exec
+  - azure
   - kubernetes
   - az
 
 install:
-  - exec:
-      description: "Set kubeconfig"
-      command: "bash"
-      arguments:
-        - "-c"
-        - |
-          '"{{ bundle.dependencies.aks.outputs.kubeconfig }}" > kubeconfig'
-          'KUBECONFIG=kubeconfig'
+  - azure:
+      description: "Create AKS"
+      type: aks
+      name: "{{ bundle.parameters.aks_cluster_name }}"
+      resourceGroup: "{{ bundle.parameters.aks_resource_group }}"
+      parameters:
+        clusterName: "{{ bundle.parameters.aks_cluster_name }}"
+        servicePrincipalClientId: "{{ bundle.credentials.azure_client_id}}"
+        servicePrincipalClientSecret: "{{ bundle.credentials.azure_client_secret}}"
+        location: "{{ bundle.parameters.azure_location }}"
+        agentCount: 4
+        kubernetesVersion: "1.14.6"
+
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal:
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - az: 
+      description: "Azure CLI AKS get-credentials"
+      arguments: 
+        - "aks" 
+        - "get-credentials" 
+      flags:
+        resource-group: "{{ bundle.parameters.aks_resource_group }}"
+        name: "{{ bundle.parameters.aks_cluster_name }}"
 
   - kubernetes:
       description: "Create SQL Operator"
