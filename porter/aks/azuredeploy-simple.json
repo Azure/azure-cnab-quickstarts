@@ -82,8 +82,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0-1.0-pull-10-merge.1-48'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0-1.0-pull-10-merge.1-48'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -182,7 +182,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:0-1.0-pull-10-merge.1-48"
+									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_azure_location",
