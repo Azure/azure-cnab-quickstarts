@@ -64,6 +64,13 @@ parameters:
     destination:
       env: LETSENCRYPT_EMAIL
 
+outputs:
+  - name: fqdn
+    type: string
+    applyTo:
+      - install
+    description: "Fully qualified domain name for the ingress controller"
+
 mixins:
   - exec
   - helm
@@ -109,6 +116,9 @@ install:
         - "{{ bundle.parameters.nginx_ingress_namespace }}"
         - "{{ bundle.parameters.nginx_ingress_installation_name }}"
         - "{{ bundle.parameters.dns_name }}"
+      outputs:
+        - name: fqdn
+          path: FQDN
 
   - exec:
       description: "Add Jetstack Helm repo"
