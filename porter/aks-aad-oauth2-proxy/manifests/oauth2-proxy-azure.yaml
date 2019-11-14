@@ -1,0 +1,85 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: oauth2-proxy
+    spec:
+      containers:
+      - name: oauth2-proxy
+        image: quay.io/pusher/oauth2_proxy:latest
+        imagePullPolicy: Always   
+        args:
+        - --provider=azure
+        - --email-domain=*
+        - --upstream=file:///dev/null
+        - --http-address=0.0.0.0:4180        
+        env: 
+        - name: OAUTH2_AZURE_TENANT
+          value: $AZURE_TENANT_ID   
+        - name: OAUTH2_PROXY_CLIENT_ID
+          value: $AAD_CLIENT_ID
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-secrets
+              key: clientSecret
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          value: $COOKIE_SECRET
+        - name: OAUTH2_PROXY_EMAIL_DOMAINS
+          value: "*"
+        ports:
+        - containerPort: 4180
+          protocol: TCP
+        resources:
+          limits:
+            memory: "300Mi"
+            cpu: "0.2"             
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+spec:
+  ports:
+  - name: http
+    port: 4180
+    protocol: TCP
+    targetPort: 4180
+  selector:
+    k8s-app: oauth2-proxy
+
+---
+
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: oauth2-proxy
+  annotations:
+    kubernetes.io/ingress.class: $INGRESS_CLASS
+spec:
+  rules:
+  - host: $FQDN
+    http:
+      paths:
+      - path: /oauth2     
+        backend:
+          serviceName: oauth2-proxy
+          servicePort: 4180
+  tls:
+  - hosts:
+    - $FQDN
+    secretName: $TLS_SECRETNAME

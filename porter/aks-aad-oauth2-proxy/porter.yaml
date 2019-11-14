@@ -1,0 +1,164 @@
+name: aks-aad-oauth2-proxy
+version: 0.1.0
+dockerfile: Dockerfile.tmpl
+description: "Installs an OAuth2 Proxy into an AKS cluster, configured with Azure Active Directory"
+invocationImage: cnabquickstarts.azurecr.io/porter/aks-aad-oauth2-proxy:0-1.0
+tag: cnabquickstarts.azurecr.io/porter/aks-aad-oauth2-proxy/bundle:0-1.0
+
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client ID for Azure account authentication - used for Az CLI
+  - name: azure_tenant_id
+    env: AZURE_TENANT_ID
+    description: Azure AAD Tenant Id for Azure account authentication  - used for Az CLI
+  - name: azure_client_secret
+    env: AZURE_CLIENT_SECRET
+    description: AAD Client Secret for Azure account authentication - used for Az CLI
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+
+parameters:
+  - name: namespace
+    type: string
+    description: Kubernetes namespace for installation
+    default: aad-oauth2-proxy
+  - name: aad_application_name
+    type: string
+    description: Name for the Azure AD application that will be created
+    destination:
+      env: AAD_APPLICATION_NAME
+  - name: aad_application_secret
+    type: string
+    description: Secret (password) for the Azure AD application that will be created
+    sensitive: true
+    destination:
+      env: AAD_APPLICATION_SECRET
+  - name: fqdn
+    type: string
+    description: Fully qualified domain name
+    destination:
+      env: FQDN
+  - name: tls_secret_name
+    type: string
+    default: oauth2-proxy.tls
+    description: Name for TLS secret for oauth2-proxy ingress
+    destination:
+      env: TLS_SECRET_NAME
+  - name: ingress_class
+    type: string
+    default: nginx
+    description: The type of ingress controller to use for the proxy ingress
+    destination:
+      env: INGRESS_CLASS
+
+
+mixins:
+  - exec
+  - az
+  - kubernetes
+
+install:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure CLI set subscription"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec:
+      description: Create AAD app registration and add permission to sign in and read profile information
+      command: bash
+      arguments:
+        - "-c"
+        - |
+          az ad app create --display-name "{{ bundle.parameters.aad_application_name}}" --identifier-uris "http://{{ bundle.parameters.aad_application_name}}" --password "{{ bundle.parameters.aad_application_secret }}" --reply-url "https://{{ bundle.parameters.fqdn }}/oauth2/callback"
+          AAD_CLIENT_ID=$(az ad app list --display-name {{ bundle.parameters.aad_application_name}} --query "[0].appId" -o tsv)
+          az ad app permission add --id $AAD_CLIENT_ID --api 00000002-0000-0000-c000-000000000000 --api-permissions 311a71cc-e848-46a1-bdf8-97ff7156d8e6=Scope
+
+  - exec:
+      description: Get AAD app ID, Generate cookie secret, Replace tokens in oauth2-proxy-azure.yaml
+      command: bash
+      arguments:
+      - -c
+      - |
+        export AAD_CLIENT_ID=$(az ad app list --display-name {{ bundle.parameters.aad_application_name}} --query "[0].appId" -o tsv)
+        export COOKIE_SECRET=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
+        envsubst < oauth2-proxy-azure.yaml > manifest.yaml
+
+  - exec:
+      description: Log out manifest.yaml
+      command: bash
+      arguments:
+      - -c
+      - "cat manifest.yaml && echo \n\n"
+
+  - exec:
+      description: Create Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+
+  - exec:
+      description: Create oauth2 secret
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl create secret generic oauth2-secrets --namespace {{ bundle.parameters.namespace }} --from-literal=clientSecret={{ bundle.parameters.aad_application_secret }}"
+
+  - kubernetes:
+      description: "Deploy OAuth2 proxy"
+      namespace: "{{ bundle.parameters.namespace }}"
+      manifests:
+        - manifest.yaml
+      wait: true
+
+uninstall:
+  - az: 
+        description: "Azure CLI login"
+        arguments: 
+          - "login" 
+        flags:
+          service-principal: 
+          username: "{{ bundle.credentials.azure_client_id}}"
+          password: "{{ bundle.credentials.azure_client_secret}}"
+          tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure CLI set subscription"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec:
+      description: "Delete namespace"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+
+  - az: 
+      description: "Delete AAD app registration"
+      arguments: 
+        - "ad" 
+        - "app"
+        - "delete" 
+      flags:
+        id: "http://{{ bundle.parameters.aad_application_name}}"
