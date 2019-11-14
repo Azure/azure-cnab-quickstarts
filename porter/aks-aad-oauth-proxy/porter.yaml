@@ -1,9 +1,9 @@
-name: aks-aad-oauth2-proxy
+name: aks-aad-oauth-proxy
 version: 0.1.0
 dockerfile: Dockerfile.tmpl
 description: "Installs an OAuth2 Proxy into an AKS cluster, configured with Azure Active Directory"
-invocationImage: cnabquickstarts.azurecr.io/porter/aks-aad-oauth2-proxy:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/aks-aad-oauth2-proxy/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0
 
 credentials:
   - name: kubeconfig
