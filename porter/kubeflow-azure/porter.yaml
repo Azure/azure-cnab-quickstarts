@@ -4,27 +4,27 @@ description: "KubeFlow on AKS"
 invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow-azure:0.1.0
 tag: cnabquickstarts.azurecr.io/porter/kubeflow-azure/bundle:0.1.0
 
-images:
-- preprocess:
-    description: "preprocess"
-    imageType: "docker"
-    repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
-- training:
-    description: "preprocess"
-    imageType: "docker"
-    repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
-- register:
-    description: "preprocess"
-    imageType: "docker"
-    repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
-- profile:
-    description: "preprocess"
-    imageType: "docker"
-    repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
-- deploy:
-    description: "preprocess"
-    imageType: "docker"
-    repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
+# images:
+# - preprocess:
+#     description: "preprocess"
+#     imageType: "docker"
+#     repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/preprocess:0.1.0"
+# - training:
+#     description: "training"
+#     imageType: "docker"
+#     repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/training:0.1.0"
+# - register:
+#     description: "register"
+#     imageType: "docker"
+#     repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/register:0.1.0"
+# - profile:
+#     description: "profile"
+#     imageType: "docker"
+#     repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/profile:0.1.0"
+# - deploy:
+#     description: "deploy"
+#     imageType: "docker"
+#     repository: "cnabquickstarts.azurecr.io/porter/kubeflow-azure/deploy:0.1.0"
 
 
 credentials:
@@ -32,17 +32,16 @@ credentials:
     path: /root/.kube/config
 
 dependencies:
-  azure-kubernetes-service:
-    tag: cnabquickstarts.azurecr.io/porter/azure-kubernetes-service:0.1.0
+  aks:
+    tag: cnabquickstarts.azurecr.io/porter/aks:0.1.0
   aks-nginx-ingress:
     tag: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress:0.1.0
     parameters:
       kubeconfig: '{{ bundle.dependencies.aks.outputs.kubeconfig }}'
-      enableLetsEncryptCerts: true
-  # aks-oauth2-proxy:
-  #   tag: cnabquickstarts.azurecr.io/porter/aks-oauth2-proxy:0.1.0
-  #   parameters:
-  #     kubeconfig: '{{ bundle.dependencies.aks.outputs.kubeconfig }}'
+  aks-oauth2-proxy:
+    tag: cnabquickstarts.azurecr.io/porter/aks-oauth2-proxy:0.1.0
+    parameters:
+      kubeconfig: '{{ bundle.dependencies.aks.outputs.kubeconfig }}'
   azure-container-registry:
     tag: cnabquickstarts.azurecr.io/porter/azure-container-registry:0.1.0
   azure-machine-learning:
@@ -52,8 +51,6 @@ dependencies:
     parameters:
       kubeconfig: '{{ bundle.dependencies.aks.outputs.kubeconfig }}'
 
-
-   
 mixins:
   - exec
   - az
