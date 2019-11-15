@@ -321,7 +321,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0-1.0-pull-14-merge.1-70"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-72"
 								},
 								{
 									"name": "CNAB_PARAM_aad_application_name",
