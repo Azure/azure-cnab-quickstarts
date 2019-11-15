@@ -54,6 +54,7 @@ jobs:
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/calculate-version@v1
         with:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
+          branch: ${{ steps.get_branch_name.outputs.branch_name }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Detect Porter mixins from manifest
@@ -67,7 +68,7 @@ jobs:
         id: install_porter
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/install-porter@v1
         with:
-          porter_version: v0.17.1-beta.1
+          porter_version: latest
           mixins: ${{ steps.detect_porter_mixins.outputs.mixins }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
