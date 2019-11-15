@@ -1,0 +1,181 @@
+name: aks-nginx-ingress
+version: 0.1.0
+dockerfile: Dockerfile.tmpl
+description: "Installs an nginx ingress controller to an AKS cluster"
+invocationImage: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress:0-1.0
+tag: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0
+
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client ID for Azure account authentication - used for Az CLI
+  - name: azure_tenant_id
+    env: AZURE_TENANT_ID
+    description: Azure AAD Tenant Id for Azure account authentication  - used for Az CLI
+  - name: azure_client_secret
+    env: AZURE_CLIENT_SECRET
+    description: AAD Client Secret for Azure account authentication - used for Az CLI
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+
+parameters:
+  - name: nginx_ingress_namespace
+    type: string
+    description: Kubernetes namespace for nginx-ingress installation
+    default: nginx-ingress
+  - name: nginx_ingress_installation_name
+    type: string
+    description: Installation name for nginx-ingress Helm deployment
+    default: nginx-ingress
+  - name: nginx_ingress_helm_chart_version
+    type: string
+    description: Version number for the nginx-ingress Helm chart
+    default: '1.24.7'
+  - name: cert_manager_namespace
+    type: string
+    description: Kubernetes namespace for nginx-ingress installation
+    default: cert-manager
+  - name: cert_manager_installation_name
+    type: string
+    description: Installation name for cert-manager Helm deployment
+    default: cert-manager
+  - name: cert_manager_helm_chart_version
+    type: string
+    description: Version number for the cert-manager Helm chart
+    default: 'v0.8.0'
+  - name: controller_replica_count
+    type: integer
+    description: Replica count for ingress controller
+    default: 2
+  - name: dns_name
+    type: string
+    description: The DNS name to to associate with public IP address for the FQDN
+  - name: letsencrypt_environment
+    type: string
+    enum: ["staging", "prod"]
+    default: staging
+    description: The environment to use for Let's Encrypt certificates
+  - name: letsencrypt_email
+    type: string
+    description: Valid email address to use for Let's Encrypt certificate
+    destination:
+      env: LETSENCRYPT_EMAIL
+
+outputs:
+  - name: fqdn
+    type: string
+    applyTo:
+      - install
+    description: "Fully qualified domain name for the ingress controller"
+
+mixins:
+  - exec
+  - helm
+  - az
+  - kubernetes
+
+install:
+  - helm:
+      description: "Install nginx"
+      name: '{{ bundle.parameters.nginx_ingress_installation_name }}'
+      chart: stable/nginx-ingress
+      version: '{{ bundle.parameters.nginx_ingress_helm_chart_version }}'
+      namespace: '{{ bundle.parameters.nginx_ingress_namespace }}'
+      replace: true
+      set:
+        controller.replicaCount: '{{ bundle.parameters.controller_replica_count }}'
+      values:
+        - nginx-ingress-values.yaml
+
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure CLI set subscription"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec:
+      description: "Configure DNS name"
+      command: "bash"
+      arguments:
+        - "configure-dns-name.sh"
+        - "{{ bundle.parameters.nginx_ingress_namespace }}"
+        - "{{ bundle.parameters.nginx_ingress_installation_name }}"
+        - "{{ bundle.parameters.dns_name }}"
+      outputs:
+        - name: fqdn
+          path: FQDN
+
+  - exec:
+      description: "Add Jetstack Helm repo"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "helm repo add jetstack https://charts.jetstack.io"
+
+  - exec:
+      description: "Run cert-manager pre-reqs"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
+          kubectl create namespace {{ bundle.parameters.cert_manager_namespace }}
+          kubectl label namespace {{ bundle.parameters.cert_manager_namespace }} certmanager.k8s.io/disable-validation=true
+
+  - helm:
+      description: "Install cert-manager"
+      name: '{{ bundle.parameters.cert_manager_installation_name }}'
+      chart: jetstack/cert-manager
+      version: '{{ bundle.parameters.cert_manager_helm_chart_version }}'
+      namespace: '{{ bundle.parameters.cert_manager_namespace }}'
+      replace: true
+      set:
+        webhook.enabled: false
+
+  - exec:
+      description: Replace tokens in cluster-issuer.yaml
+      command: bash
+      arguments:
+      - -c
+      - envsubst < /cnab/app/cluster-issuer-{{ bundle.parameters.letsencrypt_environment }}.yaml > /cnab/app/cluster-issuer.yaml
+
+  - kubernetes:
+      description: "Create a CA cluster issuer"
+      manifests:
+        - cluster-issuer.yaml
+      wait: true
+
+uninstall:
+  - helm:
+      description: "Uninstall nginx"
+      purge: true
+      releases:
+      - '{{ bundle.parameters.nginx_ingress_installation_name }}'
+
+  - helm:
+      description: "Uninstall cert-manager"
+      purge: true
+      releases:
+      - '{{ bundle.parameters.cert_manager_installation_name }}'
+
+  - exec:
+      description: "Delete cert-manager namespace"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "kubectl delete namespace {{ bundle.parameters.cert_manager_namespace }}"

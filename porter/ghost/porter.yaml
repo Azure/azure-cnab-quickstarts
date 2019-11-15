@@ -263,9 +263,9 @@ parameters:
   destination:
     env: INGRESS_ANNOTATIONS
 - name: ingress_certManager
-  type: boolean
+  type: string
   description: Add annotations for cert-manager
-  default: false
+  default: ''
   destination:
     env: INGRESS_CERTMANAGER
 - name: ingress_hosts_0_name

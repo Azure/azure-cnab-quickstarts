@@ -1,2 +1,6 @@
 .gitignore
 Dockerfile.tmpl
+INSTRUCTIONS.md
+README.md
+azuredeploy-*.json
+example-params.txt
