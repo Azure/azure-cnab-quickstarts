@@ -82,8 +82,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-72'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-72'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-75'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-75'))]"
 	},
 	"resources": [
 		{
@@ -182,7 +182,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-72"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0-pull-14-merge.1-75"
 								},
 								{
 									"name": "CNAB_PARAM_aad_application_name",
