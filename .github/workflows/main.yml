@@ -51,9 +51,10 @@ jobs:
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Calculate quickstart solution version from Porter manifest, using GitVersion
         id: calculate_version
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/calculate-version@v1
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/calculate-version@master
         with:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
+          branch: ${{ steps.get_branch_name.outputs.branch_name }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Detect Porter mixins from manifest
