@@ -1,3 +1,11 @@
+# Azure CNAB Quickstarts
+
+This repository contains CNAB quickstart solutions for deploying applications to Azure.
+
+For more information about authoring quickstarts, see [this guide](/docs/authoring.md).
+
+For more information about consuming quickstarts, see [this guide](/docs/consuming.md).
+
 
 # Contributing
 
