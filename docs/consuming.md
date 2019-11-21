@@ -129,7 +129,7 @@ Every deployment will have the following full set of settings:
 | Container Group Name | The name for the Azure Container Instance Group |
 | Container Name | The name for the Azure Container Instance |
 
-### Executing the deployment
+### Running the deployment
 
 Once the parameters are filled in, accept the terms and conditions checkbox and select 'Purchase'. This will start the deployment of the bootstrapper ACI.
 
