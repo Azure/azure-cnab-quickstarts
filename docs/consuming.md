@@ -8,7 +8,7 @@ Here we list 2 different ways of installing bundles, using either Porter in Azur
 
 ## Deploy from Cloud Shell
 
-CNAB Quickstarts can be installed from Azure Cloud Shell.
+CNAB Quickstarts can be installed from [Azure Cloud Shell](https://azure.microsoft.com/en-gb/features/cloud-shell/).
 
 To setup Porter and the [CNAB Azure Driver](https://github.com/deislabs/cnab-azure-driver) in Cloud Shell, run the following command:
 
