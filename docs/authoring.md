@@ -66,7 +66,7 @@ This CI/CD process will:
 - Build the bundle using the Porter tool
 - Publish the pre-release bundle to the cnabquickstarts Azure Container Registry
 - Generate ARM templates to use for 'Deploy from Azure' buttons (see [Consuming: Deploy from Azure](consuming.md#deploy-from-azure) for more details)
-- Generate a readme for the quickstart, automatically generated a table of credentials/parameters based on the manifest, and merging in your INSTRUCTIONS.md file
+- Generate a readme for the quickstart, automatically generating a table of credentials/parameters based on the manifest, and merging in your INSTRUCTIONS.md file
 - Commit the ARM templates and readme to the branch
 
 Once a project maintainer is happy with the set of the changes and the bundle, they will merge the PR.

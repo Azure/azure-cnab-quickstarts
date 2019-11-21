@@ -2,7 +2,7 @@
 
 Each bundle produced from this repository is published to a public Azure Container Registry (ACR) at cnabquickstarts.azurecr.io.
 
-There are several ways to consume these bundles, using any CNAB-compliant tool (such as Duffle, Porter, or Docker App).
+There are several ways to consume these bundles, using any CNAB-compliant tool (such as [Duffle](https://duffle.sh/), [Porter](https://porter.sh/), or [Docker App](https://www.docker.com/products/docker-app)).
 
 Here we list 2 different ways of installing bundles, using either Porter in Azure Cloud Shell or via the 'Deploy from Azure' button that is included on the readme page of each quickstart.
 
@@ -10,14 +10,14 @@ Here we list 2 different ways of installing bundles, using either Porter in Azur
 
 CNAB Quickstarts can be installed from Azure Cloud Shell.
 
-To setup your Cloud Shell, run the following command:
+To setup Porter and the [CNAB Azure Driver](https://github.com/deislabs/cnab-azure-driver) in Cloud Shell, run the following command:
 
 ```
 curl https://raw.githubusercontent.com/deislabs/cnab-azure-driver/master/install-in-azure-cloudshell.sh |/bin/bash
 source .bashrc
 ```
 
-This will install Porter and the [CNAB Azure Driver](https://github.com/deislabs/cnab-azure-driver), which allows Cloud Shell to install bundles using Azure Container Instances as the driver.
+The CNAB Azure Driver allows Porter to install bundles using Azure Container Instances as the driver.
 
 Once setup is complete, you can install Quickstarts by using the following steps:
 
@@ -29,12 +29,24 @@ You can view details about the bundle, including any credentials and parameters 
 porter explain --tag cnabquickstarts.azurecr.io/porter/<quickstart-name>/bundle:<quickstart-version>
 ```
 
+e.g.
+
+```
+porter explain --tag cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0
+```
+
 ### 2. Set up credentials, if required
 
 If the bundle requires credentials, you must generate a credentials file with the required values.
 
 ```
 porter credentials generate --tag cnabquickstarts.azurecr.io/porter/<quickstart-name>/bundle:<quickstart-version>
+```
+
+e.g.
+
+```
+porter credentials generate --tag cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.0
 ```
 
 This will output the path to the credentials file generated.
@@ -46,8 +58,13 @@ This command uses Porter with the CNAB Azure Driver. By default, the driver will
 The account must, at a minimum, have permission to create resource groups and create Azure Container Instance (ACI) resources, plus permission for creating any resources defined in the specific bundle you are installing. 
 
 More information about the requirements and configuration for the CNAB Azure Driver can be found over on the [GitHub repo](https://github.com/deislabs/cnab-azure-driver).
+
 ```
 porter install --tag cnabquickstarts.azurecr.io/porter/<quickstart-name>:<quickstart-version> --cred <path-to-creds-file> -d azure --param <param1>=<param1value> --param <param2>=<param2value> ...
+```
+
+```
+porter install --tag cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy:0.1.0 --cred aks-aad-oauth-proxy -d azure --param aad_application_name=myapp --param aad_application_secret=53cret! --param fqdn=myapp.microsoft.com
 ```
 
 
