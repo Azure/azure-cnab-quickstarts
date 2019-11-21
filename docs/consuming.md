@@ -106,7 +106,13 @@ Every deployment will have the following settings:
 
 In addition to these, any credentials & parameters from the bundle itself will be displayed as settings (`Kubeconfig`, `Kubeflow_name`, and `Kustomize_manifest` in the example above).
 
-If any of the bundle credentials/parameters are file-based, the corresponding setting will accept a base64 encoded string of the file (`Kubeconfig` is one such setting in the example above).
+If any of the bundle credentials/parameters are file-based, the corresponding setting will accept a base64 string representation of the file (`Kubeconfig` is one such setting in the example above).
+
+You can get the base64 representation of a file using the following:
+
+Windows PowerShell - `[Convert]::ToBase64String([System.Text.Encoding]::Utf8.GetBytes($(gc <path-to-file>)))`
+
+Linux Bash - `cat <path-to-file> | base64`
 
 Additionally, with the 'Simple deployment' option, any of the following credentials/parameters from the bundle will be inferred and not presented as settings:
 
