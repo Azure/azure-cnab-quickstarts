@@ -5,6 +5,11 @@ invocationImage: cnabquickstarts.azurecr.io/porter/<bundle-name>:0.1.0
 tag: cnabquickstarts.azurecr.io/porter/<bundle-name>/bundle:0.1.0
 dockerfile: Dockerfile.tmpl # Remove this line if not using a custom template
 
+# You can include dependencies on other quickstart bundles if building a composite bundle
+dependencies:
+  example-dependency:
+    tag: cnabquickstarts.azurecr.io/porter/example-dependency/bundle:0.1.0
+
 credentials:
 - name: example_credential
   env: EXAMPLE_CREDENTIAL
