@@ -91,7 +91,7 @@
 		},
 		"cnab_installation_name": {
 			"type": "string",
-			"defaultValue": "pi-kubernetes",
+			"defaultValue": "pi-k-three-s",
 			"metadata": {
 				"description": "The name of the application instance."
 			}
@@ -282,11 +282,11 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_NAME",
-									"value": "pi-kubernetes"
+									"value": "pi-k-three-s"
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-kubernetes/bundle:0.1.0-pull-16-merge.1-81"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-84"
 								},
 								{
 									"name": "CNAB_PARAM_master_ipAddress",

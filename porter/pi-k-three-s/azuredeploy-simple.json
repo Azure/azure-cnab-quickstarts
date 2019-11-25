@@ -66,13 +66,13 @@
 		"cnab_azure_location": "[resourceGroup().Location]",
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
-		"cnab_installation_name": "pi-kubernetes",
-		"cnab_state_share_name": "pi-kubernetes",
+		"cnab_installation_name": "pi-k-three-s",
+		"cnab_state_share_name": "pi-k-three-s",
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-kubernetes', 'cnabquickstarts.azurecr.io/porter/pi-kubernetes/bundle:0.1.0-pull-16-merge.1-81'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-kubernetes', 'cnabquickstarts.azurecr.io/porter/pi-kubernetes/bundle:0.1.0-pull-16-merge.1-81'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-84'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-84'))]"
 	},
 	"resources": [
 		{
@@ -167,11 +167,11 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_NAME",
-									"value": "pi-kubernetes"
+									"value": "pi-k-three-s"
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-kubernetes/bundle:0.1.0-pull-16-merge.1-81"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-84"
 								},
 								{
 									"name": "CNAB_PARAM_master_ipAddress",
