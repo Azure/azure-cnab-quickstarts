@@ -1,8 +1,8 @@
-name: pi-k3s
+name: pi-kubernetes
 version: 0.1.0
 description: Setups up Kubernetes and Tiller on a Raspberry Pi cluster using k3s
-invocationImage: cnabquickstarts.azurecr.io/porter/pi-k3s:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/pi-k3s/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/pi-kubernetes:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/pi-kubernetes/bundle:0.1.0
 dockerfile: Dockerfile.tmpl
 
 credentials:
