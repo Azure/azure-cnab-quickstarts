@@ -24,7 +24,7 @@ jobs:
         id: params
         run: |
           . params.ini
-          "echo 'Registry server: $REGISTRY_SERVER'"
+          'echo "Registry server: $REGISTRY_SERVER"'
           ::set-output name=registry_server::$REGISTRY_SERVER
 
       - name: '[WORKAROUND] Fetch required tags for GitVersion'
