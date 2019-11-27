@@ -20,6 +20,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v1.1.0
 
+      - name: Read params.ini
+        id: params
+        run: |
+          . params.ini
+          "echo 'Registry server: $REGISTRY_SERVER'"
+          ::set-output name=registry_server::$REGISTRY_SERVER
+
       - name: '[WORKAROUND] Fetch required tags for GitVersion'
         run: |
           git fetch --tags
@@ -46,7 +53,7 @@ jobs:
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-          login-server: ${{ secrets.REGISTRY_SERVER }}
+          login-server: ${{ steps.params.outputs.registry_server }}
       
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Calculate quickstart solution version from Porter manifest, using GitVersion
@@ -79,7 +86,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: ${{ steps.calculate_version.outputs.version }}
-          registry: ${{ secrets.REGISTRY_SERVER }}
+          registry: ${{ steps.params.outputs.registry_server }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Build Porter bundle
@@ -103,7 +110,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: 'latest'
-          registry: ${{ secrets.REGISTRY_SERVER }}
+          registry: ${{ steps.params.outputs.registry_server }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
         name: Publish 'latest' Porter bundle and invocation image
