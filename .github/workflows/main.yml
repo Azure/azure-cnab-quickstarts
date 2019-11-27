@@ -22,6 +22,7 @@ jobs:
 
       - name: Read params.ini
         id: params
+        working-directory: ${{ github.workspace }}
         run: |
           . params.ini
           ::set-output name=registry_server::$REGISTRY_SERVER
