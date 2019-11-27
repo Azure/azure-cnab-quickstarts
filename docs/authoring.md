@@ -58,17 +58,37 @@ Additional files can added in the sub-directory, as required by the bundle.
 
 Once you have finished implementing your quickstart, commit the changes and push them to your branch. Then create a new pull request from your branch to the master branch in the original repo.
 
-When you create the PR, this will automatically trigger a new GitHub Actions workflow for running the CI/CD process (NOTE: THIS CURRENTLY DOES NOT WORK FOR PULL REQUESTS FROM FORKED REPOS).
+When you create the PR, this will automatically trigger a new GitHub Actions workflow for running the CI/CD process.
 
 This CI/CD process will:
 - Detect and validate the set of changes in the pull request
 - Update the version of the bundle to reflect the pull request branch and signify that this is a pre-release version
 - Build the bundle using the Porter tool
-- Publish the pre-release bundle to the cnabquickstarts Azure Container Registry
 - Generate ARM templates to use for 'Deploy from Azure' buttons (see [Consuming: Deploy from Azure](consuming.md#deploy-from-azure) for more details)
 - Generate a readme for the quickstart, automatically generating a table of credentials/parameters based on the manifest, and merging in your INSTRUCTIONS.md file
-- Commit the ARM templates and readme to the branch
+- Uploads the generated ARM templates and readme as artifacts to the workflow, so these can be downloaded and verified if you wish (when the PR is merged to master, these will be automatically commited to the quickstart directory)
+
 
 Once a project maintainer is happy with the set of the changes and the bundle, they will merge the PR.
 
-When merged to master, the CI/CD process runs again, with the same steps as above, except the version number for the bundle is not updated to a pre-release version; it is instead kept as the value specified in the manifest.
+When merged to master, the CI/CD process runs again, with the steps as above (except the version number for the bundle is not updated to a pre-release version; it is instead kept as the value specified in the manifest), plus it will run the following additional steps:
+
+- Publish the bundle to the cnabquickstarts Azure Container Registry
+- Commit the ARM templates and readme to the branch
+
+## Publishing bundle to your own registry
+
+If you want to use the CI/CD workflow to publish the bundle to your own registry as part of testing (before merging your changes to the base repository), use the following steps:
+
+- Fork the repository and create a branch for your new quickstart in your fork, as per the instructions above in [Fork the repo and create a new branch](#Fork-the-repo-and-create-a-new-branch)
+- Create or use an existing container registry. You can use any OCI-compliant registry for publishing the bundle (e.g. Azure Container Registry, Docker Hub)
+- In your forked repository, go to Settings > Secrets and add the following secrets for your registry:
+    - REGISTRY_SERVER - the server path for your registry
+    - REGISTRY_USERNAME - the username for the user to use for authenticating with your registry (must have permission to push)
+    - REGISTRY_PASSWORD - the password for the user to use for authenticating with your registry
+- Open a new pull request from the new forked branch to the master branch in your forked repo (**not** the base repo master branch)
+- This will automatically trigger the Quickstart CI/CD GitHub workflow in your forked repository. As part of the workflow, it will publish your quickstart bundle to your configured registry, with a tag based on the pull request number and the commit.
+- As you push new changes to your branch, the workflow will automatically trigger, and publish new versions of the bundle to your registry.
+- When you are ready to merge your changes back to the base repository, you can create a new PR to the base repo, as per the instructions above in [Submit a new PR to master branch](#Submit-a-new-PR-to-master-branch)
+
+
