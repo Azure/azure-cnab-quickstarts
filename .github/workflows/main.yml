@@ -12,6 +12,8 @@ jobs:
   build-and-publish:
     name: Build & Publish
     runs-on: ubuntu-latest
+    env:
+      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' }}
     steps:
       - name: '[DEBUG] Echo environment variables'
         run: 'gci Env:'
