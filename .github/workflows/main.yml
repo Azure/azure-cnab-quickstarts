@@ -13,7 +13,7 @@ jobs:
     name: Build & Publish
     runs-on: ubuntu-latest
     env:
-      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' }}
+      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' && secrets.GITHUB_TOKEN != '' }}
     steps:
       - name: '[DEBUG] Echo environment variables'
         run: 'gci Env:'
@@ -49,7 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Authenticate against Azure Container Registry (docker registry)
         uses: azure/container-actions/docker-login@master
         with:
@@ -97,7 +97,7 @@ jobs:
         with:
           bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish Porter bundle and invocation image
         id: publish_porter_bundle
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
@@ -114,7 +114,7 @@ jobs:
           tag: 'latest'
           registry: ${{ steps.params.outputs.registry_server }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish 'latest' Porter bundle and invocation image
         id: publish_latest_porter_bundle
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
@@ -128,7 +128,7 @@ jobs:
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
-          simplify: true
+          simplify: 'true'
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate advanced ARM template for 'Deploy to Azure' button
@@ -137,7 +137,7 @@ jobs:
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
-          simplify: false
+          simplify: 'false'
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate quickstart solution readme
@@ -150,7 +150,7 @@ jobs:
           advanced_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Commit & push ARM template & readme (if updated)
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/git-commit-updates@v1
         with:
