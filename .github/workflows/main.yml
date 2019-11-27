@@ -131,6 +131,13 @@ jobs:
           simplify: 'true'
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for simple ARM template
+        uses: actions/upload-artifact@v1
+        with:
+          name: azuredeploy-simple.json
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate advanced ARM template for 'Deploy to Azure' button
         id: generate_advanced_arm_template
         uses: endjin/CNAB.ARM-Converter.GitHub.Actions/run-cnab-to-arm-tool@v1
@@ -138,6 +145,13 @@ jobs:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           simplify: 'false'
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for advanced ARM template
+        uses: actions/upload-artifact@v1
+        with:
+          name: azuredeploy-advanced.json
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate quickstart solution readme
@@ -149,6 +163,13 @@ jobs:
           simple_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
           advanced_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for README.md
+        uses: actions/upload-artifact@v1
+        with:
+          name: README.md
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Commit & push ARM template & readme (if updated)
