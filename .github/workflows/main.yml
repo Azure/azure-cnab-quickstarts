@@ -81,7 +81,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: ${{ steps.calculate_version.outputs.version }}
-          registry: ${{ secrets.REGISTRY_SERVER || "cnabquickstarts.azurecr.io" }}
+          registry: ${{ secrets.REGISTRY_SERVER || 'cnabquickstarts.azurecr.io' }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Build Porter bundle
@@ -105,7 +105,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: 'latest'
-          registry: ${{ secrets.REGISTRY_SERVER || "cnabquickstarts.azurecr.io" }}
+          registry: ${{ secrets.REGISTRY_SERVER || 'cnabquickstarts.azurecr.io' }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish 'latest' Porter bundle and invocation image
