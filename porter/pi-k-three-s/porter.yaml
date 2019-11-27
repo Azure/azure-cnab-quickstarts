@@ -23,11 +23,11 @@ parameters:
 - name: workers_ipAddress
   type: string
   description: "Comma-separated array of IP addresses of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
-  default: 192.168.0.66,192.168.0.67,192.168.0.68
+  default: 192.168.0.66,192.168.0.67,192.168.0.68,192.168.0.69
 - name: workers_username
   type: string
   description: "Comma-separated array of usernames for the worker Raspberry Pi nodes, e.g. 'pi,pi,pi'"
-  default: pi,pi,pi
+  default: pi,pi,pi,pi
 
 outputs:
 - name: kubeconfig
