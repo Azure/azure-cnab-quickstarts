@@ -13,7 +13,7 @@ jobs:
     name: Build & Publish
     runs-on: ubuntu-latest
     env:
-      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' && secrets.GITHUB_TOKEN != '' }}
+      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_SERVER != '' && secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' && secrets.GITHUB_TOKEN != '' }}
     steps:
       - name: '[DEBUG] Echo environment variables'
         run: 'gci Env:'
@@ -21,13 +21,6 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v1.1.0
-
-      - name: Read params.ini
-        id: params
-        working-directory: ${{ github.workspace }}
-        run: |
-          . params.ini
-          echo ::set-output name=registry_server::$REGISTRY_SERVER
 
       - name: '[WORKAROUND] Fetch required tags for GitVersion'
         run: |
@@ -55,7 +48,7 @@ jobs:
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-          login-server: ${{ steps.params.outputs.registry_server }}
+          login-server: ${{ secrets.REGISTRY_SERVER }}
       
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Calculate quickstart solution version from Porter manifest, using GitVersion
@@ -88,7 +81,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: ${{ steps.calculate_version.outputs.version }}
-          registry: ${{ steps.params.outputs.registry_server }}
+          registry: ${{ secrets.REGISTRY_SERVER || "cnabquickstarts.azurecr.io" }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Build Porter bundle
@@ -112,7 +105,7 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: 'latest'
-          registry: ${{ steps.params.outputs.registry_server }}
+          registry: ${{ secrets.REGISTRY_SERVER || "cnabquickstarts.azurecr.io" }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish 'latest' Porter bundle and invocation image
