@@ -147,14 +147,22 @@ jobs:
           path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
-        name: Generate quickstart solution readme
-        id: generate_readme
-        uses: endjin/CNAB.ARM-Converter.GitHub.Actions/generate-readme@v1
+        name: Generate deployment readme fragment
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/generate-deployment-readme-fragment@v1
         with:
           bundle_metadata_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
-          instructions_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/INSTRUCTIONS.md
           simple_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
           advanced_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
+          output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Combine readme fragments
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/combine-readme-fragments@v1
+        with:
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
+          instructions_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/INSTRUCTIONS.md
+          deployment_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md
+          issues_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/ISSUES.md
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
@@ -168,7 +176,7 @@ jobs:
         name: Commit & push ARM template & readme (if updated)
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/git-commit-updates@v1
         with:
-          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json'
+          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json'
           commit_message: "Update ARM template / readme for bundle '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}'"
           branch: ${{ steps.get_branch_name.outputs.branch_name }}
         env:
