@@ -158,4 +158,4 @@ workers_secretsDir | directory in which to mount secrets on worker nodes |  | No
 
 ## Known issues
 
-- [Test issue - ignore](https://github.com/Azure/azure-cnab-quickstarts/issues/20)
+- ~~[Test issue - ignore](https://github.com/Azure/azure-cnab-quickstarts/issues/20)~~
