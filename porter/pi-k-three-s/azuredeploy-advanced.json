@@ -160,14 +160,14 @@
 		},
 		"workers_ipAddress": {
 			"type": "string",
-			"defaultValue": "192.168.0.66,192.168.0.67,192.168.0.68",
+			"defaultValue": "192.168.0.66,192.168.0.67,192.168.0.68,192.168.0.69",
 			"metadata": {
 				"description": "Comma-separated array of IP addresses of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
 			}
 		},
 		"workers_username": {
 			"type": "string",
-			"defaultValue": "pi,pi,pi",
+			"defaultValue": "pi,pi,pi,pi",
 			"metadata": {
 				"description": "Comma-separated array of usernames for the worker Raspberry Pi nodes, e.g. 'pi,pi,pi'"
 			}
@@ -286,7 +286,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-84"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-86"
 								},
 								{
 									"name": "CNAB_PARAM_master_ipAddress",
