@@ -286,7 +286,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-86"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-101"
 								},
 								{
 									"name": "CNAB_PARAM_master_ipAddress",
