@@ -10,7 +10,7 @@ The bundle is based on the official Helm chart for Airflow (more information abo
 You will need to create a service principal in order to use the 'Deploy from Azure' buttons.
 
 
-For detailed instructions on deploying from Azure, including how to setup the service principal, see [Consuming: Deploy from Azure](../../docs/consuming.md#deploy-from-azure)
+For detailed instructions on deploying from Azure, including how to setup the service principal, see [Consuming: Deploy from Azure](../../consuming.md#deploy-from-azure)
 
 ### Simple deployment
 
@@ -26,7 +26,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ## Deploy from Cloud Shell
 
 
-For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
+For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../consuming.md#deploy-from-cloud-shell)
 
 
 ```porter install --tag cnabquickstarts.azurecr.io/porter/airflow:latest -d azure```
