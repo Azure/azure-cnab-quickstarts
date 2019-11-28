@@ -1,4 +1,8 @@
-TODO: Write up pre-requisites and instructions here
+## Pre-requisites
+
+In order to use this bundle, you must first prepare your Raspberry Pi device.
+
+Note - this bundle has been tested with Raspberry Pi 4.
 
 - Flash Raspbian Lite onto SD (balanaEtcher)
 - Add ssh and wpa-config
