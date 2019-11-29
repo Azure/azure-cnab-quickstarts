@@ -147,4 +147,4 @@ wordpressUsername | User of the application |  | No |
 
 ## Known issues
 
-- [Test issue for demo](https://github.com/Azure/azure-cnab-quickstarts/issues/24)
+- ~~[Test issue for demo](https://github.com/Azure/azure-cnab-quickstarts/issues/24)~~
