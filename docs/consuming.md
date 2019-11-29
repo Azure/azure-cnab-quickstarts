@@ -67,6 +67,7 @@ porter install --tag cnabquickstarts.azurecr.io/porter/<quickstart-name>:<quicks
 porter install --tag cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy:0.1.0 --cred aks-aad-oauth-proxy -d azure --param aad_application_name=myapp --param aad_application_secret=53cret! --param fqdn=myapp.microsoft.com
 ```
 
+Please note that it may take a few minutes for the ACI boostrapper to start up before the installer runs.
 
 ## Deploy from Azure
 
@@ -84,7 +85,7 @@ On each readme, you will see two buttons like this:
 
 ![Deploy from Azure buttons](../images/deploy-from-azure-buttons.png)
 
-Both options create a custom deployment in Azure, which will create an Azure Container Instance (ACI) group and create a container instance in that group for running a bootstrapper image, which in turn will create a container instance that runs the invocation image for the bundle.
+Both options create a custom deployment in Azure, which will create an Azure Container Instance (ACI) group and create a container instance in that group for running a bootstrapper image, which in turn will create a container instance that runs the invocation image for the bundle. Please note that it may take a few minutes for the ACI boostrapper to start up.
 
 The 'Simple deployment' and 'Advanced deployment' only differ in the number of settings available to configure.
 

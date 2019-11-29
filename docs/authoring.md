@@ -22,7 +22,7 @@ All files for the quickstart must be placed in this sub-directory.
 
 ---
 
-These are the default required and optional files to include:
+These are the default files (included in the `porter-template` folder). You must include `porter.yaml` and `INSTRUCTIONS.md` in your bundle sub-directory, and you may optionally want to include `Dockerfile.tmpl` and `.dockerignore` depending on your requirements.
 
 ### porter.yaml (required)
 
@@ -69,7 +69,7 @@ This CI/CD process will:
 - Uploads the generated ARM templates and readme as artifacts to the workflow, so these can be downloaded and verified if you wish (when the PR is merged to master, these will be automatically commited to the quickstart directory)
 
 
-Once a project maintainer is happy with the set of the changes and the bundle, they will merge the PR.
+Once a project maintainer is happy with the set of changes and the bundle, they will merge the PR.
 
 When merged to master, the CI/CD process runs again, with the steps as above (except the version number for the bundle is not updated to a pre-release version; it is instead kept as the value specified in the manifest), plus it will run the following additional steps:
 
