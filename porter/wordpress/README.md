@@ -143,3 +143,8 @@ wordpressScheme | Scheme to generate application URLs [http, https] |  | No
 wordpressSkipInstall | Skip wizard installation |  | No
 wordpressTablePrefix | Table prefix |  | No
 wordpressUsername | User of the application |  | No | 
+
+
+## Known issues
+
+- [Test issue for demo](https://github.com/Azure/azure-cnab-quickstarts/issues/24)
