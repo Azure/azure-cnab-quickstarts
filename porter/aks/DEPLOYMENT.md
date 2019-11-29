@@ -1,7 +1,3 @@
-# Azure Kubernetes Service (AKS)
-
-This Bundle installs an instance of Azure Kubernetes Service (AKS)
-
 ## Deploy from Azure
 
 
