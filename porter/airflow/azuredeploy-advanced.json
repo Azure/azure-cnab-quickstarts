@@ -1074,7 +1074,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.1-pull-26-merge.1-127"
+									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.0-pull-26-merge.1-130"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",

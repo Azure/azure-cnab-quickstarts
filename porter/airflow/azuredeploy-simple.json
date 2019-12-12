@@ -859,8 +859,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.1-pull-26-merge.1-127'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.1-pull-26-merge.1-127'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.0-pull-26-merge.1-130'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'airflow', 'cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.0-pull-26-merge.1-130'))]"
 	},
 	"resources": [
 		{
@@ -959,7 +959,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.1-pull-26-merge.1-127"
+									"value": "cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.0-pull-26-merge.1-130"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
