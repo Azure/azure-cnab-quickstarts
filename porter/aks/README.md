@@ -46,3 +46,8 @@ node_vm_size | The VM size to use for the cluster |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No
 resource_group | The name of the resource group to create the AKS Cluster in |  | Yes
 vm_set_type | Agent pool VM set type |  | No | 
+
+
+## Known issues
+
+- [ERROR instead of WARNING on cluster name doesn't exist](https://github.com/Azure/azure-cnab-quickstarts/issues/28)
