@@ -10,6 +10,7 @@ on:
 
 jobs:
   build-and-publish:
+    if: "!contains(github.event.head_commit.message, '***NO_CI***')"
     name: Build & Publish
     runs-on: ubuntu-latest
     env:
