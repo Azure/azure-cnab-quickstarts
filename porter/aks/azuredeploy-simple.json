@@ -78,18 +78,18 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "aks",
-		"cnab_state_share_name": "aks",
-		"cnab_state_storage_account_key": "",
-		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
-		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
+		"cnab_azure_state_fileshare": "aks",
+		"cnab_azure_state_storage_account_key": "",
+		"cnab_azure_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_azure_state_storage_account_resource_group": "[resourceGroup().name]",
 		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:latest'))]",
 		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:latest'))]"
 	},
 	"resources": [
 		{
-			"condition": "[equals(variables('cnab_state_storage_account_resource_group'),resourceGroup().name)]",
+			"condition": "[equals(variables('cnab_azure_state_storage_account_resource_group'),resourceGroup().name)]",
 			"type": "Microsoft.Storage/storageAccounts",
-			"name": "[variables('cnab_state_storage_account_name')]",
+			"name": "[variables('cnab_azure_state_storage_account_name')]",
 			"apiVersion": "2019-04-01",
 			"location": "[variables('aci_location')]",
 			"sku": {
@@ -113,7 +113,7 @@
 			"apiVersion": "2018-10-01",
 			"location": "[variables('aci_location')]",
 			"dependsOn": [
-				"[variables('cnab_state_storage_account_name')]"
+				"[variables('cnab_azure_state_storage_account_name')]"
 			],
 			"properties": {
 				"containers": [
@@ -157,20 +157,20 @@
 									"value": "[variables('cnab_azure_tenant_id')]"
 								},
 								{
-									"name": "CNAB_STATE_STORAGE_ACCOUNT_NAME",
-									"value": "[variables('cnab_state_storage_account_name')]"
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_azure_state_storage_account_name')]"
 								},
 								{
-									"name": "CNAB_STATE_STORAGE_ACCOUNT_KEY",
-									"secureValue": "[variables('cnab_state_storage_account_key')]"
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[variables('cnab_azure_state_storage_account_key')]"
 								},
 								{
-									"name": "CNAB_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
-									"value": "[variables('cnab_state_storage_account_resource_group')]"
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
+									"value": "[variables('cnab_azure_state_storage_account_resource_group')]"
 								},
 								{
-									"name": "CNAB_STATE_SHARE_NAME",
-									"value": "[variables('cnab_state_share_name')]"
+									"name": "CNAB_AZURE_STATE_FILESHARE",
+									"value": "[variables('cnab_azure_state_fileshare')]"
 								},
 								{
 									"name": "VERBOSE",
