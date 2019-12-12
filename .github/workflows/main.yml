@@ -151,6 +151,7 @@ jobs:
         name: Generate deployment readme fragment
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/generate-deployment-readme-fragment@v1
         with:
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           bundle_metadata_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           simple_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
           advanced_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
