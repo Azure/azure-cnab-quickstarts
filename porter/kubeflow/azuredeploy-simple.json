@@ -54,7 +54,7 @@
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "kubeflow",
 		"cnab_azure_state_fileshare": "kubeflow",
-		"cnab_azure_state_storage_account_key": "",
+		"cnab_azure_state_storage_account_key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]",
 		"cnab_azure_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_azure_state_storage_account_resource_group": "[resourceGroup().name]",
 		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'kubeflow', 'cnabquickstarts.azurecr.io/porter/kubeflow/bundle:latest'))]",

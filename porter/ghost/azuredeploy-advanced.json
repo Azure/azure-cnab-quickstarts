@@ -119,9 +119,9 @@
 		},
 		"cnab_azure_state_storage_account_key": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]",
 			"metadata": {
-				"description": "The storage account key for the account for the CNAB state to be stored in, if this is left blank it will be looked up at runtime"
+				"description": "The storage account key for the account for the CNAB state to be stored in."
 			}
 		},
 		"cnab_azure_state_storage_account_name": {
