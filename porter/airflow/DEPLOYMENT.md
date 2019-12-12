@@ -1,9 +1,3 @@
-# Apache Airflow on Kubernetes
-
-This bundle installs the [Apache Airflow](https://airflow.apache.org/) application into a Kubernetes cluster.
-
-The bundle is based on the official Helm chart for Airflow (more information about the Helm chart can be found on the [GitHub page](https://github.com/helm/charts/tree/master/stable/airflow)).
-
 ## Deploy from Azure
 
 
@@ -154,8 +148,3 @@ workers_replicas | number of workers pods to launch |  | No
 workers_resources | custom resource configuration for worker pod |  | No
 workers_secrets | secrets to mount as volumes on worker nodes |  | No
 workers_secretsDir | directory in which to mount secrets on worker nodes |  | No | 
-
-
-## Known issues
-
-- ~~[Test issue - ignore](https://github.com/Azure/azure-cnab-quickstarts/issues/20)~~

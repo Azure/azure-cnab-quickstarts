@@ -1,9 +1,3 @@
-# Wordpress on Kubernetes
-
-This bundle installs the [Wordpress](https://wordpress.org/) application into a Kubernetes cluster.
-
-The bundle is based on the official Helm chart for Wordpress (more information about the Helm chart can be found on the [GitHub page](https://github.com/helm/charts/tree/master/stable/wordpress)).
-
 ## Deploy from Azure
 
 
@@ -143,8 +137,3 @@ wordpressScheme | Scheme to generate application URLs [http, https] |  | No
 wordpressSkipInstall | Skip wizard installation |  | No
 wordpressTablePrefix | Table prefix |  | No
 wordpressUsername | User of the application |  | No | 
-
-
-## Known issues
-
-- ~~[Test issue for demo](https://github.com/Azure/azure-cnab-quickstarts/issues/24)~~

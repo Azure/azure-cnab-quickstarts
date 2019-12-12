@@ -1,8 +1,8 @@
 name: sql-server-always-on-aks
-version: 0.6.0
+version: 0.6.1
 description: "SQL Server Always On for AKS"
-invocationImage: cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks:0.6.0
-tag: cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0.6.0
+invocationImage: cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks:0.6.1
+tag: cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0.6.1
 
 credentials:
 - name: azure_client_id

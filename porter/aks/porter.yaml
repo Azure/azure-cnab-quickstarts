@@ -1,8 +1,8 @@
 name: aks
-version: 0.1.0
+version: 0.1.2
 description: "Azure Kubernetes Service (AKS)"
-invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.2
+tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.2
 
 credentials:
 - name: azure_client_id

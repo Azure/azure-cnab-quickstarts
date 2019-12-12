@@ -1,0 +1,41 @@
+name: Issues workflow
+
+on:
+  issues:
+    types:
+      - opened
+      - closed
+      - reopened
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+        
+      - name: 'Update issues readme fragment'
+        id: update_issues_readme_fragment
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/update-issues-readme-fragment@v1
+        with:
+          issue_title: ${{ github.event.issue.title }}
+          issue_url: ${{ github.event.issue.html_url }}
+          issue_action: ${{ github.event.action }}
+
+      - name: Combine readme fragments
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/combine-readme-fragments@v1
+        with:
+          manifest_path: ${{ steps.update_issues_readme_fragment.outputs.quickstart_solution_path }}/porter.yaml
+          instructions_path: ${{ steps.update_issues_readme_fragment.outputs.quickstart_solution_path }}/INSTRUCTIONS.md
+          deployment_path: ${{ steps.update_issues_readme_fragment.outputs.quickstart_solution_path }}/DEPLOYMENT.md
+          issues_path: ${{ steps.update_issues_readme_fragment.outputs.quickstart_solution_path }}/ISSUES.md
+          output_path: ${{ steps.update_issues_readme_fragment.outputs.quickstart_solution_path }}/README.md
+
+      - name: Commit & push readme and issues
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/git-commit-updates@v1
+        with:
+          add_path_spec: '.'
+          commit_message: "Update readme for bundle '${{ steps.update-issues-readme-fragment.outputs.quickstart_solution_path }}' with issue"
+          branch: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

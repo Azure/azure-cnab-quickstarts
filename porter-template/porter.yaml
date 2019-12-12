@@ -1,0 +1,55 @@
+name: <bundle-name>
+version: 0.1.0
+description: <bundle-description>
+invocationImage: cnabquickstarts.azurecr.io/porter/<bundle-name>:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/<bundle-name>/bundle:0.1.0
+dockerfile: Dockerfile.tmpl # Remove this line if not using a custom template
+
+# You can include dependencies on other quickstart bundles if building a composite bundle
+dependencies:
+  example-dependency:
+    tag: cnabquickstarts.azurecr.io/porter/example-dependency/bundle:0.1.0
+
+credentials:
+- name: example_credential
+  env: EXAMPLE_CREDENTIAL
+  description: This is an example credential
+
+parameters:
+- name: exmaple_parameter
+  type: string
+  description: This is an example parameter
+
+
+outputs:
+- name: example_output
+  type: string
+  description: This is an example output
+
+mixins:
+  - exec
+
+
+install:
+  - exec: 
+      description: "Install step"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "echo 'Installing!'"
+ 
+upgrade:
+  - exec: 
+      description: "Upgrade step"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "echo 'Upgrading!'"
+
+uninstall:
+  - exec: 
+      description: "Uninstall step"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "echo 'Uninstalling!'"

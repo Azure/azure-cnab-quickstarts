@@ -10,8 +10,11 @@ on:
 
 jobs:
   build-and-publish:
+    if: "!contains(github.event.head_commit.message, '***NO_CI***')"
     name: Build & Publish
     runs-on: ubuntu-latest
+    env:
+      RUN_PUBLISH_STEPS: ${{ secrets.REGISTRY_SERVER != '' && secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_PASSWORD != '' && secrets.GITHUB_TOKEN != '' }}
     steps:
       - name: '[DEBUG] Echo environment variables'
         run: 'gci Env:'
@@ -40,7 +43,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Authenticate against Azure Container Registry (docker registry)
         uses: azure/container-actions/docker-login@master
         with:
@@ -57,19 +60,16 @@ jobs:
           branch: ${{ steps.get_branch_name.outputs.branch_name }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
-        name: Detect Porter mixins from manifest
-        id: detect_porter_mixins
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/detect-porter-mixins@v1
-        with:
-          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
-
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Install latest version of Porter and mixins
         id: install_porter
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/install-porter@v1
+        uses: deislabs/porter-gh-action@master
+    
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
+        name: Install Porter mixins from manifest
+        id: install_porter_mixins
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/install-porter-mixins@v1
         with:
-          porter_version: latest
-          mixins: ${{ steps.detect_porter_mixins.outputs.mixins }}
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Patch version and registry for bundle and invocation image
@@ -79,21 +79,20 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: ${{ steps.calculate_version.outputs.version }}
-          registry: ${{ secrets.REGISTRY_SERVER }}
+          registry: ${{ secrets.REGISTRY_SERVER || 'cnabquickstarts.azurecr.io' }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Build Porter bundle
         id: build_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/build-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter build
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish Porter bundle and invocation image
         id: publish_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter publish
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
         name: Patch bundle and invocation image tags with 'latest'
@@ -103,14 +102,13 @@ jobs:
           manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           version: ${{ steps.calculate_version.outputs.version }}
           tag: 'latest'
-          registry: ${{ secrets.REGISTRY_SERVER }}
+          registry: ${{ secrets.REGISTRY_SERVER || 'cnabquickstarts.azurecr.io' }}
 
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish 'latest' Porter bundle and invocation image
         id: publish_latest_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter publish
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate simple ARM template for 'Deploy to Azure' button
@@ -119,7 +117,14 @@ jobs:
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
-          simplify: true
+          simplify: 'true'
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for simple ARM template
+        uses: actions/upload-artifact@v1
+        with:
+          name: azuredeploy-simple.json
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate advanced ARM template for 'Deploy to Azure' button
@@ -128,24 +133,47 @@ jobs:
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
-          simplify: false
+          simplify: 'false'
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for advanced ARM template
+        uses: actions/upload-artifact@v1
+        with:
+          name: azuredeploy-advanced.json
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
-        name: Generate quickstart solution readme
-        id: generate_readme
-        uses: endjin/CNAB.ARM-Converter.GitHub.Actions/generate-readme@v1
+        name: Generate deployment readme fragment
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/generate-deployment-readme-fragment@v1
         with:
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
           bundle_metadata_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
-          instructions_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/INSTRUCTIONS.md
           simple_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
           advanced_template_uri: https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.get_branch_name.outputs.branch_name }}/${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
+          output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Combine readme fragments
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/combine-readme-fragments@v1
+        with:
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
+          instructions_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/INSTRUCTIONS.md
+          deployment_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md
+          issues_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/ISSUES.md
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
+        name: Upload artifacts for README.md
+        uses: actions/upload-artifact@v1
+        with:
+          name: README.md
+          path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
+
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Commit & push ARM template & readme (if updated)
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/git-commit-updates@v1
         with:
-          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json'
+          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json'
           commit_message: "Update ARM template / readme for bundle '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}'"
           branch: ${{ steps.get_branch_name.outputs.branch_name }}
         env:

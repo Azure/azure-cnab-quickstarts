@@ -1,9 +1,9 @@
 name: aks-nginx-ingress
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: "Installs an nginx ingress controller to an AKS cluster"
-invocationImage: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress:0-1.0
-tag: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0-1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress:0.1.1
+tag: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.1
 
 credentials:
   - name: kubeconfig
