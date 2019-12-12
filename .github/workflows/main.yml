@@ -60,19 +60,16 @@ jobs:
           branch: ${{ steps.get_branch_name.outputs.branch_name }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
-        name: Detect Porter mixins from manifest
-        id: detect_porter_mixins
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/detect-porter-mixins@v1
-        with:
-          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
-
-      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Install latest version of Porter and mixins
         id: install_porter
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/install-porter@v1
+        uses: deislabs/porter-gh-action@master
+    
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
+        name: Install Porter mixins from manifest
+        id: install_porter_mixins
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/install-porter-mixins@v1
         with:
-          porter_version: latest
-          mixins: ${{ steps.detect_porter_mixins.outputs.mixins }}
+          manifest_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/porter.yaml
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Patch version and registry for bundle and invocation image
@@ -87,16 +84,15 @@ jobs:
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter'
         name: Build Porter bundle
         id: build_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/build-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter build
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish Porter bundle and invocation image
         id: publish_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter publish
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
 
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
         name: Patch bundle and invocation image tags with 'latest'
@@ -111,9 +107,8 @@ jobs:
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish 'latest' Porter bundle and invocation image
         id: publish_latest_porter_bundle
-        uses: endjin/CNAB.Quickstarts.GitHub.Actions/publish-porter-bundle@v1
-        with:
-          bundle_dir: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
+        run: porter publish
+        working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
           
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true'
         name: Generate simple ARM template for 'Deploy to Azure' button
