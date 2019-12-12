@@ -1,9 +1,9 @@
 name: airflow
-version: 0.1.1
+version: 0.1.0
 dockerfile: Dockerfile.tmpl
 description: "Apache Airflow on Kubernetes"
-invocationImage: cnabquickstarts.azurecr.io/porter/airflow:0.1.1
-tag: cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.1
+invocationImage: cnabquickstarts.azurecr.io/porter/airflow:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/airflow/bundle:0.1.0
 
 credentials:
   - name: kubeconfig
