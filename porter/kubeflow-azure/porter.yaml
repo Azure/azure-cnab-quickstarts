@@ -43,7 +43,7 @@ parameters:
   - name: kubernetes_version
     type: string
     description: The Kubernetes version to use
-    default: "1.14.7"
+    default: "1.15.5"
     applyTo:
       - "install"
   - name: node_vm_size
@@ -120,17 +120,14 @@ install:
       flags:
         subscription: "{{ bundle.credentials.azure_subscription_id}}"
 
-  - exec: 
+  - az: 
       description: "Create resource group if not exists"
-      command: "bash"
       arguments:
-        - "-c"
-        - |
-          if [[ $(az group exists --name {{ bundle.parameters.resource_group }}) == false ]]; then
-              az group create --name {{ bundle.parameters.resource_group }} --location {{ bundle.parameters.azure_location }}
-          else
-            echo "Resource group already exists"
-          fi
+        - "group"
+        - "create"
+      flags:
+        name: "{{ bundle.parameters.resource_group }}"
+        location: "{{ bundle.parameters.azure_location }}"
   
   - exec: 
       description: "Create AKS if not exists"
@@ -164,6 +161,13 @@ install:
         resource-group: "{{ bundle.parameters.resource_group }}"
         name: "{{ bundle.parameters.cluster_name }}"
         file: /root/.kube/config
+        
+  - exec:
+      description: "Test kubectl"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - kubectl get all
 
   - exec:
       description: "Install KubeFlow"

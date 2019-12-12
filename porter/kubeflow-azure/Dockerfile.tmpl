@@ -7,7 +7,7 @@ ARG BUNDLE_DIR
 RUN az extension add --name azure-cli-ml
 
 ENV KUBEFLOW_REPO=https://github.com/kubeflow/kubeflow
-ENV KUBEFLOW_VERSION=v0.7.0-rc.8
+ENV KUBEFLOW_VERSION=v0.7.0
 ENV TOOLHOME="/usr/bin"
 
 RUN apt-get update && apt-get -y install wget bzip2
