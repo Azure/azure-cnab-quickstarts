@@ -1,8 +1,8 @@
 name: aks
-version: 0.1.2
+version: 0.1.3
 description: "Azure Kubernetes Service (AKS)"
-invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.2
-tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.2
+invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.3
+tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.3
 
 credentials:
 - name: azure_client_id
@@ -108,7 +108,7 @@ install:
       arguments:
         - "-c"
         - |
-          if [[ -z $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }}) ]]
+          if [[ -z $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }} 2> /dev/null) ]]
           then
               az aks create \
                 --name {{ bundle.parameters.cluster_name }} \
