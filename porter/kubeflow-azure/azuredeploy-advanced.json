@@ -1,0 +1,432 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"aci_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location in which the bootstrapper ACI resources will be created."
+			}
+		},
+		"acr_name": {
+			"type": "string",
+			"metadata": {
+				"description": "The name to use for the Azure Container Registry"
+			}
+		},
+		"azure_client_id": {
+			"type": "securestring",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig"
+			}
+		},
+		"azure_client_secret": {
+			"type": "securestring",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig"
+			}
+		},
+		"azure_location": {
+			"type": "string",
+			"metadata": {
+				"description": "The Azure location to create the resources in"
+			}
+		},
+		"azure_subscription_id": {
+			"type": "securestring",
+			"metadata": {
+				"description": "Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions"
+			}
+		},
+		"azure_tenant_id": {
+			"type": "securestring",
+			"metadata": {
+				"description": "Azure AAD Tenant Id for Azure account authentication - used to authenticate to Azure to get KubeConfig"
+			}
+		},
+		"cluster_name": {
+			"type": "string",
+			"metadata": {
+				"description": "The name to use for the AKS Cluster"
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location which the cnab-azure driver will use to create ACI."
+			}
+		},
+		"cnab_azure_state_fileshare": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The file share name in the storage account for the CNAB state to be stored in"
+			}
+		},
+		"cnab_azure_state_storage_account_name": {
+			"type": "string",
+			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
+			}
+		},
+		"cnab_azure_subscription_id": {
+			"type": "string",
+			"defaultValue": "[subscription().subscriptionId]",
+			"metadata": {
+				"description": "Azure Subscription Id - this is the subscription to be used for ACI creation, if not specified the first (random) subscription is used."
+			}
+		},
+		"cnab_azure_tenant_id": {
+			"type": "string",
+			"defaultValue": "[subscription().tenantId]",
+			"metadata": {
+				"description": "Azure AAD Tenant Id Azure account authentication - used to authenticate to Azure using Service Principal or Device Code for ACI creation."
+			}
+		},
+		"cnab_installation_name": {
+			"type": "string",
+			"defaultValue": "kubeflow-azure",
+			"metadata": {
+				"description": "The name of the application instance."
+			}
+		},
+		"containerGroupName": {
+			"type": "string",
+			"defaultValue": "[concat('cg-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container group"
+			}
+		},
+		"containerName": {
+			"type": "string",
+			"defaultValue": "[concat('cn-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container"
+			}
+		},
+		"kubeflow_name": {
+			"type": "string",
+			"defaultValue": "kubeflow_azure",
+			"metadata": {
+				"description": "The name of the KubeFlow deployment"
+			}
+		},
+		"kubernetes_version": {
+			"type": "string",
+			"defaultValue": "1.15.5",
+			"metadata": {
+				"description": "The Kubernetes version to use"
+			}
+		},
+		"kustomize_manifest": {
+			"type": "string",
+			"defaultValue": "https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.0.yaml",
+			"metadata": {
+				"description": "The URL to the Kustomize manifest to use as the configuration file"
+			}
+		},
+		"ml_workspace_name": {
+			"type": "string",
+			"metadata": {
+				"description": "The name to use for the Azure ML workspace"
+			}
+		},
+		"node_count": {
+			"type": "int",
+			"defaultValue": 2,
+			"metadata": {
+				"description": "The VM size to use for the cluster"
+			},
+			"minValue": 1
+		},
+		"node_vm_size": {
+			"type": "string",
+			"defaultValue": "Standard_DS13_v2",
+			"metadata": {
+				"description": "The VM size to use for the cluster"
+			}
+		},
+		"resource_group": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the resource group to create the AKS Cluster in"
+			}
+		},
+		"service_principal_name": {
+			"type": "string",
+			"metadata": {
+				"description": "The name to use for the service principal created"
+			}
+		},
+		"vm_set_type": {
+			"type": "string",
+			"defaultValue": "VirtualMachineScaleSets",
+			"allowedValues": [
+				"VirtualMachineScaleSets",
+				"AvailabilitySet"
+			],
+			"metadata": {
+				"description": "Agent pool VM set type"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[parameters('aci_location')]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[parameters('cnab_azure_location')]",
+		"cnab_azure_state_fileshare": "[parameters('cnab_azure_state_fileshare')]",
+		"cnab_azure_state_storage_account_name": "[parameters('cnab_azure_state_storage_account_name')]",
+		"cnab_azure_subscription_id": "[parameters('cnab_azure_subscription_id')]",
+		"cnab_azure_tenant_id": "[parameters('cnab_azure_tenant_id')]",
+		"cnab_installation_name": "[parameters('cnab_installation_name')]",
+		"containerGroupName": "[parameters('containerGroupName')]",
+		"containerName": "[parameters('containerName')]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_azure_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('cnab_azure_state_storage_account_name'), 'default', variables('cnab_azure_state_fileshare'))]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.23.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_azure_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_FILESHARE",
+									"value": "[variables('cnab_azure_state_fileshare')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "kubeflow-azure"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/kubeflow-azure/bundle:0.1.0-pull-31-merge.1-141"
+								},
+								{
+									"name": "CNAB_PARAM_acr_name",
+									"value": "[parameters('acr_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_azure_location",
+									"value": "[parameters('azure_location')]"
+								},
+								{
+									"name": "CNAB_PARAM_cluster_name",
+									"value": "[parameters('cluster_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_kubeflow_name",
+									"value": "[parameters('kubeflow_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_kubernetes_version",
+									"value": "[parameters('kubernetes_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_kustomize_manifest",
+									"value": "[parameters('kustomize_manifest')]"
+								},
+								{
+									"name": "CNAB_PARAM_ml_workspace_name",
+									"value": "[parameters('ml_workspace_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_node_count",
+									"value": "[parameters('node_count')]"
+								},
+								{
+									"name": "CNAB_PARAM_node_vm_size",
+									"value": "[parameters('node_vm_size')]"
+								},
+								{
+									"name": "CNAB_PARAM_resource_group",
+									"value": "[parameters('resource_group')]"
+								},
+								{
+									"name": "CNAB_PARAM_service_principal_name",
+									"value": "[parameters('service_principal_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_vm_set_type",
+									"value": "[parameters('vm_set_type')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_id",
+									"secureValue": "[parameters('azure_client_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_secret",
+									"secureValue": "[parameters('azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_subscription_id",
+									"secureValue": "[parameters('azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_tenant_id",
+									"secureValue": "[parameters('azure_tenant_id')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
