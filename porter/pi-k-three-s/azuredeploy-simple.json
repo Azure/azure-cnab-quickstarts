@@ -71,8 +71,8 @@
 		"cnab_state_storage_account_key": "",
 		"cnab_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-86'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-86'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-101'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-101'))]"
 	},
 	"resources": [
 		{
@@ -171,7 +171,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-86"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-16-merge.1-101"
 								},
 								{
 									"name": "CNAB_PARAM_master_ipAddress",
