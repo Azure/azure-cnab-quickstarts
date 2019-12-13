@@ -764,19 +764,16 @@
 		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
 		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
 		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_state_fileshare": "wordpress",
+		"cnab_azure_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "wordpress",
-		"cnab_azure_state_fileshare": "wordpress",
-		"cnab_azure_state_storage_account_key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]",
-		"cnab_azure_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
-		"cnab_azure_state_storage_account_resource_group": "[resourceGroup().name]",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0'))]"
 	},
 	"resources": [
 		{
-			"condition": "[equals(variables('cnab_azure_state_storage_account_resource_group'),resourceGroup().name)]",
 			"type": "Microsoft.Storage/storageAccounts",
 			"name": "[variables('cnab_azure_state_storage_account_name')]",
 			"apiVersion": "2019-04-01",
@@ -797,19 +794,29 @@
 			}
 		},
 		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
 			"type": "Microsoft.ContainerInstance/containerGroups",
 			"name": "[variables('containerGroupName')]",
 			"apiVersion": "2018-10-01",
 			"location": "[variables('aci_location')]",
 			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
+				"[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('cnab_azure_state_storage_account_name'), 'default', variables('cnab_azure_state_fileshare'))]"
 			],
 			"properties": {
 				"containers": [
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.22.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -851,11 +858,7 @@
 								},
 								{
 									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
-									"secureValue": "[variables('cnab_azure_state_storage_account_key')]"
-								},
-								{
-									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
-									"value": "[variables('cnab_azure_state_storage_account_resource_group')]"
+									"secureValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]"
 								},
 								{
 									"name": "CNAB_AZURE_STATE_FILESHARE",
@@ -871,7 +874,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",

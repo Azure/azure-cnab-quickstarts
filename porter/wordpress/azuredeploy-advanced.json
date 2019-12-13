@@ -96,6 +96,20 @@
 				"description": "The location which the cnab-azure driver will use to create ACI."
 			}
 		},
+		"cnab_azure_state_fileshare": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The file share name in the storage account for the CNAB state to be stored in"
+			}
+		},
+		"cnab_azure_state_storage_account_name": {
+			"type": "string",
+			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
+			}
+		},
 		"cnab_azure_subscription_id": {
 			"type": "string",
 			"defaultValue": "[subscription().subscriptionId]",
@@ -115,34 +129,6 @@
 			"defaultValue": "wordpress",
 			"metadata": {
 				"description": "The name of the application instance."
-			}
-		},
-		"cnab_azure_state_fileshare": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "The file share name in the storage account for the CNAB state to be stored in"
-			}
-		},
-		"cnab_azure_state_storage_account_key": {
-			"type": "string",
-			"defaultValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]",
-			"metadata": {
-				"description": "The storage account key for the account for the CNAB state to be stored in."
-			}
-		},
-		"cnab_azure_state_storage_account_name": {
-			"type": "string",
-			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
-			"metadata": {
-				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
-			}
-		},
-		"cnab_azure_state_storage_account_resource_group": {
-			"type": "string",
-			"defaultValue": "[resourceGroup().name]",
-			"metadata": {
-				"description": "The resource group name for the storage account for the CNAB state to be stored in, by default this will be in the current resource group, if this is changed to a different resource group the storage account is expected to already exist"
 			}
 		},
 		"containerGroupName": {
@@ -886,19 +872,16 @@
 		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
 		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
 		"cnab_azure_location": "[parameters('cnab_azure_location')]",
+		"cnab_azure_state_fileshare": "[parameters('cnab_azure_state_fileshare')]",
+		"cnab_azure_state_storage_account_name": "[parameters('cnab_azure_state_storage_account_name')]",
 		"cnab_azure_subscription_id": "[parameters('cnab_azure_subscription_id')]",
 		"cnab_azure_tenant_id": "[parameters('cnab_azure_tenant_id')]",
 		"cnab_installation_name": "[parameters('cnab_installation_name')]",
-		"cnab_azure_state_fileshare": "[parameters('cnab_azure_state_fileshare')]",
-		"cnab_azure_state_storage_account_key": "[parameters('cnab_azure_state_storage_account_key')]",
-		"cnab_azure_state_storage_account_name": "[parameters('cnab_azure_state_storage_account_name')]",
-		"cnab_azure_state_storage_account_resource_group": "[parameters('cnab_azure_state_storage_account_resource_group')]",
 		"containerGroupName": "[parameters('containerGroupName')]",
 		"containerName": "[parameters('containerName')]"
 	},
 	"resources": [
 		{
-			"condition": "[equals(variables('cnab_azure_state_storage_account_resource_group'),resourceGroup().name)]",
 			"type": "Microsoft.Storage/storageAccounts",
 			"name": "[variables('cnab_azure_state_storage_account_name')]",
 			"apiVersion": "2019-04-01",
@@ -919,19 +902,29 @@
 			}
 		},
 		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
 			"type": "Microsoft.ContainerInstance/containerGroups",
 			"name": "[variables('containerGroupName')]",
 			"apiVersion": "2018-10-01",
 			"location": "[variables('aci_location')]",
 			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
+				"[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('cnab_azure_state_storage_account_name'), 'default', variables('cnab_azure_state_fileshare'))]"
 			],
 			"properties": {
 				"containers": [
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.19.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.22.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -973,11 +966,7 @@
 								},
 								{
 									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
-									"secureValue": "[variables('cnab_azure_state_storage_account_key')]"
-								},
-								{
-									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_RESOURCE_GROUP",
-									"value": "[variables('cnab_azure_state_storage_account_resource_group')]"
+									"secureValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]"
 								},
 								{
 									"name": "CNAB_AZURE_STATE_FILESHARE",
@@ -993,7 +982,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
