@@ -107,3 +107,8 @@ volumePermissions_image_pullPolicy | Init container volume-permissions image pul
 volumePermissions_image_registry | Init container volume-permissions image registry |  | No
 volumePermissions_image_repository | Init container volume-permissions image name |  | No
 volumePermissions_image_tag | Init container volume-permissions image tag |  | No | 
+
+
+## Known issues
+
+- [template deploy fails with InvalidTemplate error](https://github.com/Azure/azure-cnab-quickstarts/issues/32)
