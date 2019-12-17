@@ -1,9 +1,9 @@
 name: ghost
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: Ghost on Kubernetes
-invocationImage: cnabquickstarts.azurecr.io/porter/ghost:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/ghost:0.1.1
+tag: cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1
 credentials:
 - name: kubeconfig
   path: /root/.kube/config
@@ -191,9 +191,9 @@ parameters:
   destination:
     env: SMTPSERVICE
 - name: allowEmptyPassword
-  type: string
+  type: boolean
   description: Allow DB blank passwords
-  default: yes
+  default: true
   destination:
     env: ALLOWEMPTYPASSWORD
 - name: securityContext_enabled
