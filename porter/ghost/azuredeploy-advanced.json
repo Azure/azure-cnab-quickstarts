@@ -36,7 +36,7 @@
 			}
 		},
 		"allowEmptyPassword": {
-			"type": "string",
+			"type": "bool",
 			"defaultValue": true,
 			"metadata": {
 				"description": "Allow DB blank passwords"
@@ -728,7 +728,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.0"
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1-pull-35-merge.1-138"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
