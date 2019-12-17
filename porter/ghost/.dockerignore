@@ -1,6 +1,5 @@
 .gitignore
 Dockerfile.tmpl
-INSTRUCTIONS.md
-README.md
+*.md
 azuredeploy-*.json
 example-params.txt
