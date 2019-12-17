@@ -37,14 +37,12 @@
 		},
 		"cnab_azure_client_id": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
 		},
 		"cnab_azure_client_secret": {
 			"type": "securestring",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
@@ -152,14 +150,14 @@
 		},
 		"extraEnvVars": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Extra environments variables to be used in the deployments"
 			}
 		},
 		"extraInitContainers": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Additional init containers"
 			}
@@ -215,7 +213,7 @@
 		},
 		"ingress_hosts": {
 			"type": "string",
-			"defaultValue": "[\"mattermost.example.com\"]",
+			"defaultValue": "[[\"mattermost.example.com\"]",
 			"metadata": {
 				"description": "A list of ingress hosts"
 			}
@@ -229,7 +227,7 @@
 		},
 		"ingress_tls": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "A list of ingress tls items"
 			}
@@ -374,7 +372,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.22.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.24.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",

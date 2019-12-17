@@ -25,14 +25,12 @@
 		},
 		"cnab_azure_client_id": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
 		},
 		"cnab_azure_client_secret": {
 			"type": "securestring",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
@@ -137,7 +135,7 @@
 		},
 		"global_imagePullSecrets": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Global Docker registry secret names as an array"
 			}
@@ -172,7 +170,7 @@
 		},
 		"image_pullSecrets": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Specify docker-registry secret names as an array"
 			}
@@ -200,7 +198,7 @@
 		},
 		"ingress_annotations": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Ingress annotations"
 			}
@@ -564,7 +562,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.22.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.24.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",

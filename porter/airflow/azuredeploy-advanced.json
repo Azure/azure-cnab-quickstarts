@@ -51,42 +51,42 @@
 		},
 		"airflow_extraConfigmapMounts": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Additional configMap volume mounts on the airflow pods."
 			}
 		},
 		"airflow_extraContainers": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "additional containers to run in the scheduler, worker \u0026 web pods"
 			}
 		},
 		"airflow_extraEnv": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "specify additional environment variables to mount"
 			}
 		},
 		"airflow_extraInitContainers": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "additional Init Containers to run in the scheduler pods"
 			}
 		},
 		"airflow_extraVolumeMounts": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "additional volumeMounts to the main container in scheduler, worker \u0026 web pods"
 			}
 		},
 		"airflow_extraVolumes": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "additional volumes for the scheduler, worker \u0026 web pods"
 			}
@@ -218,14 +218,12 @@
 		},
 		"cnab_azure_client_id": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
 		},
 		"cnab_azure_client_secret": {
 			"type": "securestring",
-			"defaultValue": "",
 			"metadata": {
 				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
 			}
@@ -801,7 +799,7 @@
 		},
 		"tolerations": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "Toleration labels for pod assignment"
 			}
@@ -885,7 +883,7 @@
 		},
 		"web_secrets": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "secrets to mount as volumes on webserver nodes"
 			}
@@ -934,7 +932,7 @@
 		},
 		"workers_secrets": {
 			"type": "string",
-			"defaultValue": "[]",
+			"defaultValue": "[[]",
 			"metadata": {
 				"description": "secrets to mount as volumes on worker nodes"
 			}
@@ -1005,7 +1003,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.22.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.24.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
