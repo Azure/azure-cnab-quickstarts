@@ -2,10 +2,38 @@
 
 This repository contains [CNAB](https://cnab.io/) quickstart solutions for deploying applications to Azure.
 
-For more information about authoring quickstarts, see [this guide](/docs/authoring.md).
+We currently support application bundles built using [Porter](https://porter.sh).
 
-For more information about consuming quickstarts, see [this guide](/docs/consuming.md).
+The following videos are good resources for getting started with learning about CNAB and Porter:
 
+## Porter: an Opionated CNAB Authoring Experience - from [@jeremyrickard](https://github.com/jeremyrickard)
+
+[![Porter: an Opionated CNAB Authoring Experience](./images/porter-an-opinionated-cnab-authoring-experience.png)](https://www.youtube.com/watch?v=__fim6RIW1s)
+
+
+## GitOps at the edge of the envelope: Radical app deployment at the edge with Porter - from [@squillace](https://github.com/squillace)
+
+[![GitOps at the edge of the envelope: Radical app deployment at the edge with Porter](./images/radical-app-deployment-with-porter.png)](https://myignite.techcommunity.microsoft.com/sessions/87493?source=sessions)
+
+# Repository Structure
+
+- `.github` - Contains GitHub repo related files, such as issue templates and GitHub Actions workflow definitions
+- `docs` - Overview documentation for Azure CNAB Quickstarts
+- `images` - Images used in readme and documentation
+- `porter` - Contains Porter-based quickstarts (currently only supported tool for quickstarts). Each quickstart is contained within its own sub-directory.
+- `porter-template` - Template files for building a new Porter-based quickstart (see [Authoring Quickstarts](./docs/authoring.md))
+
+# Quickstarts Table of Contents
+
+A list of all available Porter-based quickstarts can be found [here](porter/TOC.md).
+
+# Consuming quickstarts
+
+For more information about consuming quickstarts, see [this guide](./docs/consuming.md).
+
+# Authoring quickstarts
+
+For more information about authoring quickstarts, see [this guide](./docs/authoring.md).
 
 # Contributing
 
