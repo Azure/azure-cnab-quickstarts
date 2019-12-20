@@ -169,11 +169,18 @@ jobs:
           name: README.md
           path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md
 
+      - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && github.event_name == 'push'
+        name: Generate Porter Quickstarts Table of Contents
+        uses: endjin/CNAB.Quickstarts.GitHub.Actions/generate-porter-quickstarts-toc@v1
+        with:
+          porter_bundles_path: porter
+          output_path: porter/TOC.md
+
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && env.RUN_PUBLISH_STEPS == 'true'
         name: Commit & push ARM template & readme (if updated)
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/git-commit-updates@v1
         with:
-          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json'
+          add_path_spec: '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/README.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/DEPLOYMENT.md ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json porter/TOC.md'
           commit_message: "Update ARM template / readme for bundle '${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}'"
           branch: ${{ steps.get_branch_name.outputs.branch_name }}
         env:
