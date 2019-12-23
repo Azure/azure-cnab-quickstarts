@@ -1,0 +1,335 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"aci_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location in which the bootstrapper ACI resources will be created."
+			}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().Location]",
+			"allowedValues": [
+				"westus",
+				"eastus",
+				"westeurope",
+				"westus2",
+				"northeurope",
+				"southeastasia",
+				"eastus2",
+				"centralus",
+				"australiaeast",
+				"uksouth",
+				"southcentralus",
+				"centralindia",
+				"southindia",
+				"northcentralus",
+				"eastasia",
+				"canadacentral",
+				"japaneast"
+			],
+			"metadata": {
+				"description": "The location which the cnab-azure driver will use to create ACI."
+			}
+		},
+		"cnab_azure_state_fileshare": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The file share name in the storage account for the CNAB state to be stored in"
+			}
+		},
+		"cnab_azure_state_storage_account_name": {
+			"type": "string",
+			"defaultValue": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+			"metadata": {
+				"description": "The storage account name for the account for the CNAB state to be stored in, by default this will be in the current resource group and will be created if it does not exist"
+			}
+		},
+		"cnab_azure_subscription_id": {
+			"type": "string",
+			"defaultValue": "[subscription().subscriptionId]",
+			"metadata": {
+				"description": "Azure Subscription Id - this is the subscription to be used for ACI creation, if not specified the first (random) subscription is used."
+			}
+		},
+		"cnab_azure_tenant_id": {
+			"type": "string",
+			"defaultValue": "[subscription().tenantId]",
+			"metadata": {
+				"description": "Azure AAD Tenant Id Azure account authentication - used to authenticate to Azure using Service Principal or Device Code for ACI creation."
+			}
+		},
+		"cnab_installation_name": {
+			"type": "string",
+			"defaultValue": "dapr",
+			"metadata": {
+				"description": "The name of the application instance."
+			}
+		},
+		"containerGroupName": {
+			"type": "string",
+			"defaultValue": "[concat('cg-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container group"
+			}
+		},
+		"containerName": {
+			"type": "string",
+			"defaultValue": "[concat('cn-',uniqueString(resourceGroup().id, newGuid()))]",
+			"metadata": {
+				"description": "Name for the container"
+			}
+		},
+		"global_imagePullPolicy": {
+			"type": "string",
+			"defaultValue": "Always",
+			"metadata": {
+				"description": "Container image pull policy"
+			}
+		},
+		"global_repository": {
+			"type": "string",
+			"defaultValue": "docker.io/daprio",
+			"metadata": {
+				"description": "Container image repository"
+			}
+		},
+		"global_tag": {
+			"type": "string",
+			"defaultValue": "0.3.0",
+			"metadata": {
+				"description": "Container image tag"
+			}
+		},
+		"helm_chart_version": {
+			"type": "string",
+			"defaultValue": "0.1.0",
+			"metadata": {
+				"description": "Version of the dapr/dapr Helm chart to use for deployment"
+			}
+		},
+		"installation_name": {
+			"type": "string",
+			"defaultValue": "dapr",
+			"metadata": {
+				"description": "Installation name for Helm deployment"
+			}
+		},
+		"kubeconfig": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"namespace": {
+			"type": "string",
+			"defaultValue": "dapr-system",
+			"metadata": {
+				"description": "Kubernetes namespace for installation"
+			}
+		}
+	},
+	"variables": {
+		"aci_location": "[parameters('aci_location')]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[parameters('cnab_azure_location')]",
+		"cnab_azure_state_fileshare": "[parameters('cnab_azure_state_fileshare')]",
+		"cnab_azure_state_storage_account_name": "[parameters('cnab_azure_state_storage_account_name')]",
+		"cnab_azure_subscription_id": "[parameters('cnab_azure_subscription_id')]",
+		"cnab_azure_tenant_id": "[parameters('cnab_azure_tenant_id')]",
+		"cnab_installation_name": "[parameters('cnab_installation_name')]",
+		"containerGroupName": "[parameters('containerGroupName')]",
+		"containerName": "[parameters('containerName')]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_azure_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('cnab_azure_state_storage_account_name'), 'default', variables('cnab_azure_state_fileshare'))]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_azure_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_FILESHARE",
+									"value": "[variables('cnab_azure_state_fileshare')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "dapr"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-39-merge.1-151"
+								},
+								{
+									"name": "CNAB_PARAM_global_imagePullPolicy",
+									"value": "[parameters('global_imagePullPolicy')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_repository",
+									"value": "[parameters('global_repository')]"
+								},
+								{
+									"name": "CNAB_PARAM_global_tag",
+									"value": "[parameters('global_tag')]"
+								},
+								{
+									"name": "CNAB_PARAM_helm_chart_version",
+									"value": "[parameters('helm_chart_version')]"
+								},
+								{
+									"name": "CNAB_PARAM_installation_name",
+									"value": "[parameters('installation_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_namespace",
+									"value": "[parameters('namespace')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_kubeconfig",
+									"secureValue": "[parameters('kubeconfig')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
