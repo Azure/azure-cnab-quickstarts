@@ -4,6 +4,7 @@
 [aks](aks) | 0.1.3 | Azure Kubernetes Service (AKS)
 [aks-aad-oauth-proxy](aks-aad-oauth-proxy) | 0.1.1 | Installs an OAuth2 Proxy into an AKS cluster, configured with Azure Active Directory
 [aks-nginx-ingress](aks-nginx-ingress) | 0.1.1 | Installs an nginx ingress controller to an AKS cluster
+[dapr](dapr) | 0.1.0 | Installs Dapr on a Kubernetes cluster, using the official Dapr Helm chart
 [ghost](ghost) | 0.1.1 | Ghost on Kubernetes
 [kubeflow](kubeflow) | 0.1.0 | KubeFlow on Kubernetes
 [mattermost-team-edition](mattermost-team-edition) | 0.1.0 | Mattermost Team Edition on Kubernetes
