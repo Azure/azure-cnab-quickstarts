@@ -1,0 +1,18 @@
+FROM debian:stretch
+
+ARG BUNDLE_DIR
+
+RUN apt-get update
+RUN apt-get install openssh-client -y
+
+RUN apt-get update && \
+ apt-get install -y curl && \
+ curl -o helm.tgz https://get.helm.sh/helm-v2.16.1-linux-amd64.tar.gz && \
+ tar -xzf helm.tgz && \
+ mv linux-amd64/helm /usr/local/bin && \
+ rm helm.tgz
+RUN helm init --client-only
+
+# PORTER_MIXINS
+
+COPY scripts/ $BUNDLE_DIR
