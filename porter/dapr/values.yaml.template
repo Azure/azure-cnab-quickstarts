@@ -1,0 +1,4 @@
+global:
+  repository: $GLOBAL_REPOSITORY
+  tag: $GLOBAL_TAG
+  imagePullPolicy: $GLOBAL_IMAGEPULLPOLICY
