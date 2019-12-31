@@ -50,3 +50,8 @@ nginx_ingress_helm_chart_version | Version number for the nginx-ingress Helm cha
 nginx_ingress_installation_name | Installation name for nginx-ingress Helm deployment |  | No
 nginx_ingress_namespace | Kubernetes namespace for nginx-ingress installation |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No | 
+
+
+## Known issues
+
+- [Bundle install fails when specifying a Helm chart version](https://github.com/Azure/azure-cnab-quickstarts/issues/40)
