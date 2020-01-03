@@ -13,12 +13,12 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ### Simple deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Faks%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2master%2Fporter%2Faks%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 ### Advanced deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Faks%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2master%2Fporter%2Faks%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 
 ## Deploy from Cloud Shell
@@ -51,4 +51,4 @@ vm_set_type | Agent pool VM set type |  | No |
 ## Known issues
 
 - ~~[ERROR instead of WARNING on cluster name doesn't exist](https://github.com/Azure/azure-cnab-quickstarts/issues/28)~~
-- [portal says template not available](https://github.com/Azure/azure-cnab-quickstarts/issues/30)
+- ~~[portal says template not available](https://github.com/Azure/azure-cnab-quickstarts/issues/30)~~
