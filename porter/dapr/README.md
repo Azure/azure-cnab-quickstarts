@@ -48,3 +48,8 @@ installation_name | Installation name for Helm deployment |  | No
 kubeconfig |  |  | Yes
 namespace | Kubernetes namespace for installation |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No | 
+
+
+## Known issues
+
+- [won't uninstall](https://github.com/Azure/azure-cnab-quickstarts/issues/42)
