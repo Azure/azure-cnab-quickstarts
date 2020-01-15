@@ -228,6 +228,16 @@
 			}
 		},
 		{
+			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/porter')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
 			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
 			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
 			"apiVersion": "2019-04-01",
@@ -250,7 +260,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.30.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -309,6 +319,10 @@
 								{
 									"name": "CNAB_BUNDLE_TAG",
 									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.1"
+								},
+								{
+									"name": "AZURE_STORAGE_CONNECTION_STRING",
+									"secureValue": "[concat('AccountName=', variables('cnab_azure_state_storage_account_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value)]"
 								},
 								{
 									"name": "CNAB_PARAM_aad_application_name",
