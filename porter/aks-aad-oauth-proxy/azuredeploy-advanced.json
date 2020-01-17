@@ -67,6 +67,11 @@
 		"cnab_action": {
 			"type": "string",
 			"defaultValue": "install",
+			"allowedValues": [
+				"install",
+				"upgrade",
+				"uninstall"
+			],
 			"metadata": {
 				"description": "The name of the action to be performed on the application instance."
 			}
@@ -260,7 +265,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.30.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.32.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
