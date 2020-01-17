@@ -120,7 +120,7 @@
 		},
 		"cnab_azure_state_fileshare": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "aks-nginx-ingress",
 			"metadata": {
 				"description": "The file share name in the storage account for the CNAB state to be stored in"
 			}

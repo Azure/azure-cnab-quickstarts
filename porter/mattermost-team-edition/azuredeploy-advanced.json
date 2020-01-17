@@ -75,7 +75,7 @@
 		},
 		"cnab_azure_state_fileshare": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "mattermost-team-edition",
 			"metadata": {
 				"description": "The file share name in the storage account for the CNAB state to be stored in"
 			}
