@@ -178,13 +178,13 @@
 			}
 		},
 		"mysql_mysqlPassword": {
-			"type": "string",
+			"type": "securestring",
 			"metadata": {
 				"description": "User Password for Mysql (Required)"
 			}
 		},
 		"mysql_mysqlRootPassword": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Root Password for Mysql (Optional)"
@@ -279,7 +279,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.32.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",

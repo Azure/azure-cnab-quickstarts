@@ -55,7 +55,7 @@
 			}
 		},
 		"externalDatabase_password": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Password for the above username"
@@ -104,7 +104,7 @@
 			}
 		},
 		"ghostPassword": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Application password"
@@ -292,7 +292,7 @@
 			}
 		},
 		"mariadb_db_password": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "MariaDB Password for user"
@@ -313,7 +313,7 @@
 			}
 		},
 		"mariadb_rootUser_password": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "MariaDB admin password"
@@ -453,7 +453,7 @@
 			}
 		},
 		"smtpPassword": {
-			"type": "string",
+			"type": "securestring",
 			"defaultValue": "",
 			"metadata": {
 				"description": "SMTP password"
@@ -577,7 +577,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.32.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
