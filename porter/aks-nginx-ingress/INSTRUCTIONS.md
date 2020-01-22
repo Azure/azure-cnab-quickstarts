@@ -1,1 +1,0 @@
-This Quickstart installs an nginx ingress controller onto an existing AKS cluster, and configures a cert-manager with a Let's Encrypt certificate issuer.

@@ -1,5 +1,0 @@
-.gitignore
-Dockerfile.tmpl
-*.md
-azuredeploy-*.json
-example-params.txt

@@ -1,9 +1,0 @@
-FROM debian:stretch
-
-ARG BUNDLE_DIR
-
-# PORTER_MIXINS
-
-COPY . $BUNDLE_DIR
-
-RUN apt-get update && apt-get install gettext-base
