@@ -29,7 +29,7 @@ function waitForSsh {
     do
         echo "Waiting for reboot on $host..."
         sleep 5
-        ssh -o StrictHostKeyChecking=no $username@$host -p $port echo
+        ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port echo
     done
 
     echo "Node at $host started"
