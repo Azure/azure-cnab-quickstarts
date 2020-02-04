@@ -1,14 +1,17 @@
 #!/bin/bash
 
-master_ipAddress=$1
-master_username=$2
-workers_ipAddress=$3
-workers_username=$4
+master_internal_IP=$1
+master_host=$2
+master_port=$3
+master_username=$4
+workers_host=$5
+workers_port=$6
+workers_username=$7
 
 
 # Install master
 
-ssh -o StrictHostKeyChecking=no $master_username@$master_ipAddress /bin/bash << EOF
+ssh -o StrictHostKeyChecking=no $master_username@$master_host -p $master_port /bin/bash << EOF
 curl -sfL https://get.k3s.io | sh -
 
 systemctl is-active --quiet k3s
@@ -22,7 +25,7 @@ echo "k3s service is active"
 EOF
 
 
-token=$(ssh -o StrictHostKeyChecking=no $master_username@$master_ipAddress /bin/bash << EOF
+token=$(ssh -o StrictHostKeyChecking=no $master_username@$master_host -p $master_port /bin/bash << EOF
 sudo cat /var/lib/rancher/k3s/server/node-token
 EOF
 )
@@ -31,18 +34,20 @@ echo "Join token is: $token"
 
 # Install workers
 
-IFS=',' read -r -a ipAddresses <<< "$workers_ipAddress"
+IFS=',' read -r -a hosts <<< "$workers_host"
+IFS=',' read -r -a ports <<< "$workers_port"
 IFS=',' read -r -a usernames <<< "$workers_username"
 
-for index in "${!ipAddresses[@]}"
+for index in "${!hosts[@]}"
 do
     username=${usernames[index]} 
-    ipAddress=${ipAddresses[index]}
+    port=${ports[index]} 
+    host=${hosts[index]}
 
-    echo "Installing worker node at $username@$ipAddress"
+    echo "Installing worker node at $username@$host"
 
-    ssh -o StrictHostKeyChecking=no $username@$ipAddress /bin/bash << EOF
-export K3S_URL="https://${master_ipAddress}:6443"
+    ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port /bin/bash << EOF
+export K3S_URL="https://${master_internal_IP}:6443"
 export K3S_TOKEN="${token}"
 curl -sfL https://get.k3s.io | sh -
 EOF
