@@ -102,8 +102,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "pi-k-three-s",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'pi-k-three-s', 'cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -207,7 +207,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_master_host",
