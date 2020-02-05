@@ -13,7 +13,7 @@ function enableContainerFeatures {
     host=$3
 
     # Enable container features and reboot
-    ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port /bin/bash << EOF
+    ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port /bin/bash << EOF
 sudo sed -i '$ s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
 sudo reboot
 EOF
@@ -24,12 +24,12 @@ function waitForSsh {
     port=$2
     host=$3
     
-    ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port echo
+    ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port echo
     while test $? -gt 0
     do
         echo "Waiting for reboot on $host..."
         sleep 5
-        ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port echo
+        ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port echo
     done
 
     echo "Node at $host started"

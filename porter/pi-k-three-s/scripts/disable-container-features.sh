@@ -13,7 +13,7 @@ function disableContainerFeatures {
     host=$3
 
     # Enable container features and reboot
-    ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port /bin/bash << EOF
+    ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port /bin/bash << EOF
 sudo sed -i 's/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory//g' /boot/cmdline.txt
 EOF
 }

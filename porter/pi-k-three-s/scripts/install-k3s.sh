@@ -46,7 +46,7 @@ do
 
     echo "Installing worker node at $username@$host"
 
-    ssh -o StrictHostKeyChecking=no -J $master_username@$master_host:$master_port $username@$host -p $port /bin/bash << EOF
+    ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port /bin/bash << EOF
 export K3S_URL="https://${master_internal_IP}:6443"
 export K3S_TOKEN="${token}"
 curl -sfL https://get.k3s.io | sh -
