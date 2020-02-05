@@ -59,7 +59,7 @@ scp <path-to-public-key> pi@<hostname>:~\.ssh\authorized_keys
 
 Once the Raspberry Pi devices are setup according the instructions above, the bundle can be installed.
 
-It's important to note that unless the Raspberry Pi devices are accessible via the Internet, then you will have to run this bundle locally on a device connected to the same network as the Pis, and use the Docker driver for Porter (rather than the Azure driver).
+It's important to note that unless the Raspberry Pi devices are accessible via the Internet (see [Tunnelling to Pis](#tunneling-to-pis) below), then you will have to run this bundle locally on a device connected to the same network as the Pis, and use the Docker driver for Porter (rather than the Azure driver).
 
 You will need to have Porter and Docker installed locally, then you can use the following commands:
 
@@ -70,6 +70,21 @@ porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:lates
 ```
 
 See [Parameters and Credentials](#parameters-and-credentials) below for more details on the parameters.
+
+## Tunneling to Pis
+
+If you want to use the 'Deploy from Azure button' or 'Deploy from Cloud Shell' options below, you need to ensure that the master Raspberry Pi in your cluster is accessible from the Internet. The bundle uses the master Pi as a jumpbox to the worker Pi nodes, so only the master needs to be exposed.
+
+Specifically, port 22 needs to be accessible for SSH and port 6443 for accessing the kubernetes API.
+
+One option is to use a tunneling service, such as [PiTunnel](https://www.pitunnel.com/) or [ngrok](https://ngrok.com/), to create tunnels from the Pi for the 2 ports. If using PiTunnel, the steps would be as follows:
+
+1. Create a PiTunnel account at [PiTunnel.com](https://www.pitunnel.com/)
+2. Upgrade to the Standard account (this enables static port numbers for tunnerls; this is necessary as the Pi will reboot as part of the installation, causing the port number to change if static port numbers aren't enabled)
+3. Install PiTunnel on the master Pi - `curl https://pitunnel.com/install/b5KgouUVv | sudo python`
+4. Create a (persistent) tunnel for SSH - `pitunnel --port=22 --name=ssh --persist`
+5. Create a (persistent) tunnel for kubernetes API - `pitunnel --port=6443 --name=k8s --http --persist`
+6. Go to the [PiTunnel dashboard](https://www.pitunnel.com/active) to find the tunnel URLs/ports
 
 ## Deploy from Azure
 
@@ -96,7 +111,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-177 -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179 -d azure```
 
 
 ## Parameters and Credentials
