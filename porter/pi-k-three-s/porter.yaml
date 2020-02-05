@@ -12,18 +12,38 @@ credentials:
     description: Private ssh key for authenticating with all Raspberry Pis
 
 parameters:
-- name: master_ipAddress
+- name: master_internal_IP
   type: string
-  description: "IP address of the master Raspberry Pi node"
+  description: "Internal IP address of the master Raspberry Pi node"
   default: 192.168.0.64
+- name: master_host
+  type: string
+  description: "IP address or DNS name of the master Raspberry Pi node"
+  default: 192.168.0.64
+- name: master_port
+  type: integer
+  description: "SSH port of the master Raspberry Pi node"
+  default: 22
+- name: master_kubernetes_host
+  type: string
+  description: "Host to use in kubeconfig file"
+  default: 192.168.0.64
+- name: master_kubernetes_port
+  type: integer
+  description: "Port to use in kubeconfig file"
+  default: 6443
 - name: master_username
   type: string
   description: "Username for the master Raspberry Pi node"
   default: pi
-- name: workers_ipAddress
+- name: workers_host
   type: string
-  description: "Comma-separated array of IP addresses of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
+  description: "Comma-separated array of IP addresses or DNS names of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
   default: 192.168.0.66,192.168.0.67,192.168.0.68,192.168.0.69
+- name: workers_port
+  type: string
+  description: "Comma-separated array of ports of the worker Raspberry Pi nodes, e.g. '22,22,22,22'"
+  default: 22,22,22,22
 - name: workers_username
   type: string
   description: "Comma-separated array of usernames for the worker Raspberry Pi nodes, e.g. 'pi,pi,pi'"
@@ -54,9 +74,11 @@ install:
       command: "bash"
       arguments:
         - "enable-container-features.sh"
-        - "{{ bundle.parameters.master_ipAddress }}"
+        - "{{ bundle.parameters.master_host }}"
+        - "{{ bundle.parameters.master_port }}"
         - "{{ bundle.parameters.master_username }}"
-        - "{{ bundle.parameters.workers_ipAddress }}"
+        - "{{ bundle.parameters.workers_host }}"
+        - "{{ bundle.parameters.workers_port }}"
         - "{{ bundle.parameters.workers_username }}"
 
   - exec:
@@ -64,9 +86,12 @@ install:
       command: "bash"
       arguments:
         - "install-k3s.sh"
-        - "{{ bundle.parameters.master_ipAddress }}"
+        - "{{ bundle.parameters.master_internal_IP }}"
+        - "{{ bundle.parameters.master_host }}"
+        - "{{ bundle.parameters.master_port }}"
         - "{{ bundle.parameters.master_username }}"
-        - "{{ bundle.parameters.workers_ipAddress }}"
+        - "{{ bundle.parameters.workers_host }}"
+        - "{{ bundle.parameters.workers_port }}"
         - "{{ bundle.parameters.workers_username }}"
 
   - exec:
@@ -74,8 +99,11 @@ install:
       command: "bash"
       arguments:
         - "get-kubeconfig.sh"
-        - "{{ bundle.parameters.master_ipAddress }}"
+        - "{{ bundle.parameters.master_host }}"
+        - "{{ bundle.parameters.master_port }}"
         - "{{ bundle.parameters.master_username }}"
+        - "{{ bundle.parameters.master_kubernetes_host }}"
+        - "{{ bundle.parameters.master_kubernetes_port }}"
       outputs:
         - name: kubeconfig
           path: /root/.kube/config
@@ -104,9 +132,11 @@ uninstall:
       command: "bash"
       arguments:
         - "disable-container-features.sh"
-        - "{{ bundle.parameters.master_ipAddress }}"
+        - "{{ bundle.parameters.master_host }}"
+        - "{{ bundle.parameters.master_port }}"
         - "{{ bundle.parameters.master_username }}"
-        - "{{ bundle.parameters.workers_ipAddress }}"
+        - "{{ bundle.parameters.workers_host }}"
+        - "{{ bundle.parameters.workers_port }}"
         - "{{ bundle.parameters.workers_username }}"
 
   - exec:
@@ -114,7 +144,9 @@ uninstall:
       command: "bash"
       arguments:
         - "uninstall-k3s.sh"
-        - "{{ bundle.parameters.master_ipAddress }}"
+        - "{{ bundle.parameters.master_host }}"
+        - "{{ bundle.parameters.master_port }}"
         - "{{ bundle.parameters.master_username }}"
-        - "{{ bundle.parameters.workers_ipAddress }}"
+        - "{{ bundle.parameters.workers_host }}"
+        - "{{ bundle.parameters.workers_port }}"
         - "{{ bundle.parameters.workers_username }}"

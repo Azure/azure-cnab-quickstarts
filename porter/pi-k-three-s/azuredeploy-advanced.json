@@ -31,11 +31,6 @@
 		"cnab_action": {
 			"type": "string",
 			"defaultValue": "install",
-			"allowedValues": [
-				"install",
-				"upgrade",
-				"uninstall"
-			],
 			"metadata": {
 				"description": "The name of the action to be performed on the application instance."
 			}
@@ -80,7 +75,7 @@
 		},
 		"cnab_azure_state_fileshare": {
 			"type": "string",
-			"defaultValue": "pi-k-three-s",
+			"defaultValue": "",
 			"metadata": {
 				"description": "The file share name in the storage account for the CNAB state to be stored in"
 			}
@@ -127,11 +122,39 @@
 				"description": "Name for the container"
 			}
 		},
-		"master_ipAddress": {
+		"master_host": {
 			"type": "string",
 			"defaultValue": "192.168.0.64",
 			"metadata": {
-				"description": "IP address of the master Raspberry Pi node"
+				"description": "IP address or DNS name of the master Raspberry Pi node"
+			}
+		},
+		"master_internal_IP": {
+			"type": "string",
+			"defaultValue": "192.168.0.64",
+			"metadata": {
+				"description": "Internal IP address of the master Raspberry Pi node"
+			}
+		},
+		"master_kubernetes_host": {
+			"type": "string",
+			"defaultValue": "192.168.0.64",
+			"metadata": {
+				"description": "Host to use in kubeconfig file"
+			}
+		},
+		"master_kubernetes_port": {
+			"type": "int",
+			"defaultValue": 6443,
+			"metadata": {
+				"description": "Port to use in kubeconfig file"
+			}
+		},
+		"master_port": {
+			"type": "int",
+			"defaultValue": 22,
+			"metadata": {
+				"description": "SSH port of the master Raspberry Pi node"
 			}
 		},
 		"master_username": {
@@ -147,11 +170,18 @@
 				"description": "Private ssh key for authenticating with all Raspberry Pis (Enter base64 encoded representation of file)"
 			}
 		},
-		"workers_ipAddress": {
+		"workers_host": {
 			"type": "string",
 			"defaultValue": "192.168.0.66,192.168.0.67,192.168.0.68,192.168.0.69",
 			"metadata": {
-				"description": "Comma-separated array of IP addresses of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
+				"description": "Comma-separated array of IP addresses or DNS names of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62'"
+			}
+		},
+		"workers_port": {
+			"type": "string",
+			"defaultValue": "22,22,22,22",
+			"metadata": {
+				"description": "Comma-separated array of ports of the worker Raspberry Pi nodes, e.g. '22,22,22,22'"
 			}
 		},
 		"workers_username": {
@@ -198,16 +228,6 @@
 			}
 		},
 		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/porter')]",
-			"apiVersion": "2019-04-01",
-			"location": "[variables('aci_location')]",
-			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
-			],
-			"properties": null
-		},
-		{
 			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
 			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
 			"apiVersion": "2019-04-01",
@@ -230,7 +250,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -288,23 +308,39 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179"
 								},
 								{
-									"name": "AZURE_STORAGE_CONNECTION_STRING",
-									"secureValue": "[concat('AccountName=', variables('cnab_azure_state_storage_account_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value)]"
+									"name": "CNAB_PARAM_master_host",
+									"value": "[parameters('master_host')]"
 								},
 								{
-									"name": "CNAB_PARAM_master_ipAddress",
-									"value": "[parameters('master_ipAddress')]"
+									"name": "CNAB_PARAM_master_internal_IP",
+									"value": "[parameters('master_internal_IP')]"
+								},
+								{
+									"name": "CNAB_PARAM_master_kubernetes_host",
+									"value": "[parameters('master_kubernetes_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_master_kubernetes_port",
+									"value": "[parameters('master_kubernetes_port')]"
+								},
+								{
+									"name": "CNAB_PARAM_master_port",
+									"value": "[parameters('master_port')]"
 								},
 								{
 									"name": "CNAB_PARAM_master_username",
 									"value": "[parameters('master_username')]"
 								},
 								{
-									"name": "CNAB_PARAM_workers_ipAddress",
-									"value": "[parameters('workers_ipAddress')]"
+									"name": "CNAB_PARAM_workers_host",
+									"value": "[parameters('workers_host')]"
+								},
+								{
+									"name": "CNAB_PARAM_workers_port",
+									"value": "[parameters('workers_port')]"
 								},
 								{
 									"name": "CNAB_PARAM_workers_username",

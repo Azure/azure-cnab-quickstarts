@@ -59,7 +59,7 @@ scp <path-to-public-key> pi@<hostname>:~\.ssh\authorized_keys
 
 Once the Raspberry Pi devices are setup according the instructions above, the bundle can be installed.
 
-It's important to note that unless the Raspberry Pi devices are accessible via the Internet, then you will have to run this bundle locally on a device connected to the same network as the Pis, and use the Docker driver for Porter (rather than the Azure driver).
+It's important to note that unless the Raspberry Pi devices are accessible via the Internet (see [Tunnelling to Pis](#tunneling-to-pis) below), then you will have to run this bundle locally on a device connected to the same network as the Pis, and use the Docker driver for Porter (rather than the Azure driver).
 
 You will need to have Porter and Docker installed locally, then you can use the following commands:
 
@@ -70,6 +70,21 @@ porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:lates
 ```
 
 See [Parameters and Credentials](#parameters-and-credentials) below for more details on the parameters.
+
+## Tunneling to Pis
+
+If you want to use the 'Deploy from Azure button' or 'Deploy from Cloud Shell' options below, you need to ensure that the master Raspberry Pi in your cluster is accessible from the Internet. The bundle uses the master Pi as a jumpbox to the worker Pi nodes, so only the master needs to be exposed.
+
+Specifically, port 22 needs to be accessible for SSH and port 6443 for accessing the kubernetes API.
+
+One option is to use a tunneling service, such as [PiTunnel](https://www.pitunnel.com/) or [ngrok](https://ngrok.com/), to create tunnels from the Pi for the 2 ports. If using PiTunnel, the steps would be as follows:
+
+1. Create a PiTunnel account at [PiTunnel.com](https://www.pitunnel.com/)
+2. Upgrade to the Standard account (this enables static port numbers for tunnerls; this is necessary as the Pi will reboot as part of the installation, causing the port number to change if static port numbers aren't enabled)
+3. Install PiTunnel on the master Pi - `curl https://pitunnel.com/install/b5KgouUVv | sudo python`
+4. Create a (persistent) tunnel for SSH - `pitunnel --port=22 --name=ssh --persist`
+5. Create a (persistent) tunnel for kubernetes API - `pitunnel --port=6443 --name=k8s --http --persist`
+6. Go to the [PiTunnel dashboard](https://www.pitunnel.com/active) to find the tunnel URLs/ports
 
 ## Deploy from Azure
 
@@ -82,12 +97,12 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ### Simple deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fpi-k-three-s%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fpi-k3s-update%2Fporter%2Fpi-k-three-s%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 ### Advanced deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fpi-k-three-s%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fpi-k3s-update%2Fporter%2Fpi-k-three-s%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 
 ## Deploy from Cloud Shell
@@ -96,16 +111,21 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:latest -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-179 -d azure```
 
 
 ## Parameters and Credentials
 
  | Name | Description | Default | Required | 
  | --- | --- | --- | --- | 
- | master_ipAddress | IP address of the master Raspberry Pi node |  | No
+ | master_host | IP address or DNS name of the master Raspberry Pi node |  | No
+master_internal_IP | Internal IP address of the master Raspberry Pi node |  | No
+master_kubernetes_host | Host to use in kubeconfig file |  | No
+master_kubernetes_port | Port to use in kubeconfig file |  | No
+master_port | SSH port of the master Raspberry Pi node |  | No
 master_username | Username for the master Raspberry Pi node |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No
 ssh_key | Private ssh key for authenticating with all Raspberry Pis |  | Yes
-workers_ipAddress | Comma-separated array of IP addresses of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62' |  | No
+workers_host | Comma-separated array of IP addresses or DNS names of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62' |  | No
+workers_port | Comma-separated array of ports of the worker Raspberry Pi nodes, e.g. '22,22,22,22' |  | No
 workers_username | Comma-separated array of usernames for the worker Raspberry Pi nodes, e.g. 'pi,pi,pi' |  | No | 
