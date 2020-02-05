@@ -308,7 +308,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-171"
+									"value": "cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0-pull-45-merge.1-174"
 								},
 								{
 									"name": "CNAB_PARAM_master_host",
