@@ -44,7 +44,7 @@ do
     port=${ports[index]} 
     host=${hosts[index]}
 
-    echo "Installing worker node at $username@$host"
+    echo "Installing worker node at $username@$host:$port"
 
     ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port /bin/bash << EOF
 export K3S_URL="https://${master_internal_IP}:6443"

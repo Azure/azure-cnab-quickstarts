@@ -27,7 +27,7 @@ function waitForSsh {
     ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port echo
     while test $? -gt 0
     do
-        echo "Waiting for reboot on $host..."
+        echo "Waiting for reboot on $host:$port..."
         sleep 5
         ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port echo
     done

@@ -28,7 +28,7 @@ do
     port=${ports[index]} 
     host=${hosts[index]}
 
-    echo "Uninstalling worker node at $username@$host"
+    echo "Uninstalling worker node at $username@$host:$port"
 
     ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p $master_username@$master_host -p $master_port" $username@$host -p $port /bin/bash << EOF
 /usr/local/bin/k3s-killall.sh
