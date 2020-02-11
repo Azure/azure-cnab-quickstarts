@@ -1,0 +1,9 @@
+FROM quay.io/deis/lightweight-docker-go:v0.2.0
+FROM cnab-ansible-base
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+ARG BUNDLE_DIR
+
+COPY playbook $BUNDLE_DIR/ansible
+
+#ENV ANSIBLE_STDOUT_CALLBACK debug

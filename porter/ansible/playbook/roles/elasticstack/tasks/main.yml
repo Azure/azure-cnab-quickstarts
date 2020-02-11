@@ -1,0 +1,7 @@
+---
+# file: roles/elasticsearch/tasks/main.yml
+
+# Installation tasks
+- include: install.yml
+  tags:
+  - install
