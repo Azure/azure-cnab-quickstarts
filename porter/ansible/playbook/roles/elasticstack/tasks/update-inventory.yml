@@ -1,0 +1,42 @@
+---
+# file: roles/elasticsearch/tasks/update-inventory.yml
+
+- name: Azure-CLI login
+  command: |
+    az login --service-principal -u {{ lookup('env', 'AZURE_CLIENT_ID') }} --tenant {{ lookup('env', 'AZURE_TENANT') }} -p {{ lookup('env', 'AZURE_SECRET') }}
+
+- name: Lookup VMSS instance PIPs
+  command: |
+    az vmss list-instance-public-ips --name {{ vmss_name }} --resource-group {{ resource_group_name }} --query "[].{id: id,ipAddress: ipAddress}"
+  register: output_vmss_instance_pips
+  changed_when: false
+
+- set_fact:
+    vmss_instance_pips: "{{ output_vmss_instance_pips.stdout | from_json }}"
+
+- debug:
+    var: vmss_instance_pips
+    verbosity: 2
+
+- name: Add VMSS hosts to inventory
+  add_host:
+    groups: elasticsearch
+    hostname: "{{ '%s%06d' | format(vmss_name, (item['id'].split('/')[10])|int) }}"
+    ansible_host: "{{ item['ipAddress'] }}"
+    ansible_port: 22
+    ansible_ssh_user: "{{ admin_username }}"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+  loop: "{{ vmss_instance_pips }}"
+  loop_control:
+    label: "{{ item.ipAddress }}"
+
+- name: Wait for SSH port to be ready on VMSS hosts
+  wait_for:
+    port: 22
+    host: "{{ item['ipAddress'] }}"
+    search_regex: OpenSSH
+    timeout: 300
+    delay: 10
+  loop: "{{ vmss_instance_pips }}"
+  loop_control:
+    label: "{{ item.ipAddress }}"

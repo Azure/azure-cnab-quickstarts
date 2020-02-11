@@ -1,0 +1,18 @@
+name: ElasticstackAzure
+credentials:
+- name: azure_client_id
+  source:
+    env: AZURE_CLIENT_ID
+- name: azure_secret
+  source:
+    env: AZURE_SECRET
+- name: azure_subscription_id
+  source:
+    env: AZURE_SUBSCRIPTION_ID
+- name: azure_tenant
+  source:
+    env: AZURE_TENANT
+# Uses the included key (only use for local testing!)
+- name: ssh_private_key
+  source:
+    path: playbook/environments/example_sshkey_id

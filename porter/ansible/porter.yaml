@@ -1,0 +1,78 @@
+# This Porter configuration uses limited CNAB parameters and instead relies on
+# an existing Ansible inventory for configuration management
+
+name: ElasticstackAzure
+version: 0.2.0
+description: "An Elasticstack Porter configuration"
+invocationImage: cnabquickstarts.azurecr.io/porter/elasticstack-azure:0.2.0
+tag: cnabquickstarts.azurecr.io/porter/elasticstack-azure/bundle:0.2.0
+dockerfile: Dockerfile.tmpl
+
+mixins:
+  - exec
+
+credentials:
+  # put the SSH key for accessing the VMs in the default location so we don't need send Ansible extra arguments
+  # NOTE: this will need its file permissions fixed inside the invocation image
+  - name: ssh_private_key
+    path: /root/.ssh/id_rsa
+  # ensure the standard enviroment variables for Azure SPN auth are injected into the image
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+  - name: azure_secret
+    env: AZURE_SECRET
+  - name: azure_tenant
+    env: AZURE_TENANT
+
+parameters:
+  # this value relates to an Ansible 'environment'
+  - name: environment_name
+    type: string
+
+install:
+  - exec:
+      description: "Fix the file permissions of the injected SSH key"
+      command: /bin/bash
+      flags:
+        c: chmod 600 /root/.ssh/id_rsa
+  - exec:
+      description: "Run installation playbook"
+      command: ansible-playbook
+      arguments:
+        - ansible/install.yml
+      flags:
+        i: ansible/environments/{{ bundle.parameters.environment_name }}
+        # uncomment for more logging
+        # v:
+
+
+upgrade:
+  - exec:
+      description: "Fix the file permissions of the injected SSH key"
+      command: /bin/bash
+      flags:
+        c: chmod 600 /root/.ssh/id_rsa
+  - exec:
+      description: "Run installation playbook (upgrade)"
+      command: ansible-playbook
+      arguments:
+        - ansible/install.yml
+      flags:
+        i: ansible/environments/{{ bundle.parameters.environment_name }}
+        e:
+          - skip_provision=true
+        # uncomment for more logging
+        # v:          
+
+uninstall:
+  - exec:
+      description: "Run uninstallation playbook"
+      command: ansible-playbook
+      arguments:
+        - ansible/uninstall.yml
+      flags:
+        i: ansible/environments/{{ bundle.parameters.environment_name }}
+        # uncomment for more logging
+        # v:
