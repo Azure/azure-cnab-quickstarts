@@ -51,7 +51,6 @@
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "ansible",
 		"bundle_version": "0.2.0",
-		// "bundle_tag": "[concat('cnabquickstarts.azurecr.io/porter/ansible/bundle:', variables('bundle_version'))]",
 		"bundle_tag": "[concat('readsourceacr.azurecr.io/porter/ansible/bundle:', variables('bundle_version'))]",
 		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, variables('cnab_installation_name'), variables('bundle_tag')))]",
 		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, variables('cnab_installation_name'), variables('bundle_tag')))]",
