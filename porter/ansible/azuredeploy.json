@@ -35,7 +35,13 @@
 		"ssh_private_key_base64": {
 			"type": "securestring",
 			"metadata": {
-				"description": "The Base64 encoded SSH private keyfile that will have root access to the provisioned VMs"
+				"description": "A PEM format SSH private keyfile that will have root access to the provisioned VMs - this keyfile must be base64-encoded to remove the line-breaks used by the PEM format"
+			}
+		},
+		"ssh_public_key": {
+			"type": "string",
+			"metadata": {
+				"description": "A PEM format SSH public keyfile that will have root access to the provisioned VMs - this must be the counterpart of the above private keyfile"
 			}
 		}
 	},
@@ -177,6 +183,10 @@
 								{
 									"name": "CNAB_PARAM_environment_name",
 									"value": "[parameters('environment_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_ssh_public_key",
+									"value": "[parameters('ssh_public_key')]"
 								},
 								{
 									"name": "CNAB_CRED_azure_client_id",

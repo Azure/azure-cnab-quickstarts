@@ -30,6 +30,11 @@ parameters:
   # this value relates to an Ansible 'environment'
   - name: environment_name
     type: string
+  # this value allows the SSH public key to be easily overriden when using a custom 'ssh_private_key'
+  - name: ssh_public_key
+    type: string
+    # replicate the default value from the Ansible playbook
+    default: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwbhzZV8LoiJoiYSIKbcP8dUdF0ptvyDRZ+BD3claOx599wIIAOK0m/PvlBwa1Mg0oj7+LlTIlxVJQfq2i1/i6qADalzdKWikLWcAALEgVxMfXbHty1NL2KZfW8QQkj2+kqg/+1tDLmA2xwXcoW2kodUYEwo3Ldl60ZgRSldWvs1H8nmY9qUqvpO/XIFAnPv+qtDZNurmO+I2z6hwpozeYLeVpIvpU0cuyjJIAfnu9mJzhHNC+H8mS1n73VtPh2EAaxRgWeHA9HxJqOLQ/r3AwOYjk6JL2UYTSzI7oeoK1LV1773/FkjlV3BHOwzD/8G/o8syxk9+c84cg8I6aQKp1 esadmin"
 
 install:
   - exec:
@@ -44,6 +49,8 @@ install:
         - ansible/install.yml
       flags:
         i: ansible/environments/{{ bundle.parameters.environment_name }}
+        e:
+          - admin_public_key="{{ bundle.parameters.ssh_public_key }}"
         # uncomment for more logging
         # v:
 
