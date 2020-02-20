@@ -12,7 +12,7 @@ For detailed instructions on deploying from Cloud Shell, including how to setup 
 ```porter install --tag cnabquickstarts.azurecr.io/porter/ansible/bundle:latest --param environment_name=example -d azure```
 
 
-## Deploy from your local machine (uses PowerShell & Docker)
+## Deploy from your local machine
 
 The provided PowerShell script [test.ps1](./test.ps1) can be used to build & test the bundle provided you have the following pre-requisites:
 

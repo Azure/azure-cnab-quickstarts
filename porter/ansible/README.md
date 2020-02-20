@@ -1,6 +1,6 @@
 # Ansible
 
-This Bundle demonstrates wrapping an existing automated process inside a CNAB bundle - in this example, it's an Ansible playbook performing a partial Elasticsearch installation on a VM ScaleSet.
+This Bundle demonstrates wrapping an existing automated process inside a CNAB bundle - in this example, it's an Ansible playbook performing a rudimentary Elasticsearch installation on a VM ScaleSet.
 
 You will need to create a service principal in order to use this bundle, as both Ansible and the 'Deploy from Azure' buttons.
 
@@ -18,10 +18,26 @@ For detailed instructions on deploying from Azure, including how to setup the se
 
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/ansible/bundle:latest --param environment_name=example -d azure```
+Generate a new SSH keypair:
+
+```
+ssh-keygen -f id_porter_ansible
+porter credentials generate --tag cnabquickstarts.azurecr.io/porter/ansible/bundle:latest
+```
+
+When prompted to provide a value for the 'ssh_private_key' credential, choose the 'file path' option and enter the path to key generated above (i.e. `./id_porter_ansible`)
+
+Now you can install the bundle:
+
+```
+porter install --tag cnabquickstarts.azurecr.io/porter/ansible/bundle:latest \
+               --param environment_name=example \
+               --param ssh_public_key="$(cat ./id_porter_ansible.pub)" \
+               -d azure
+```
 
 
-## Deploy from your local machine (uses PowerShell & Docker)
+## Deploy from your local machine
 
 The provided PowerShell script [test.ps1](./test.ps1) can be used to build & test the bundle provided you have the following pre-requisites:
 
@@ -35,6 +51,7 @@ The provided PowerShell script [test.ps1](./test.ps1) can be used to build & tes
 
 ```./test.ps1 -action install -environmentName example```
 
+>NOTE: By default, this will use the example SSH keys included in the repo.
 
 ## Parameters and Credentials
 
