@@ -1,11 +1,11 @@
 # This Porter configuration uses limited CNAB parameters and instead relies on
 # an existing Ansible inventory for configuration management
 
-name: ElasticstackAzure
+name: ansible
 version: 0.2.0
-description: "An Elasticstack Porter configuration"
-invocationImage: cnabquickstarts.azurecr.io/porter/elasticstack-azure:0.2.0
-tag: cnabquickstarts.azurecr.io/porter/elasticstack-azure/bundle:0.2.0
+description: "Porter configuration using Ansible"
+invocationImage: readsourceacr.azurecr.io/porter/ansible:0.2.0
+tag: readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0
 dockerfile: Dockerfile.tmpl
 
 mixins:
