@@ -1,0 +1,209 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"azure_secret": {
+			"type": "securestring",
+			"metadata": {}
+		},
+		"azure_tenant": {
+			"type": "securestring",
+			"metadata": {}
+		},
+		"cnab_action": {
+			"type": "string",
+			"defaultValue": "install",
+			"metadata": {
+				"description": "The name of the action to be performed on the application instance."
+			}
+		},
+		"cnab_azure_client_id": {
+			"type": "string",
+			"metadata": {
+				"description": "AAD Client ID for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"cnab_azure_client_secret": {
+			"type": "securestring",
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used to authenticate to Azure using Service Principal for ACI creation."
+			}
+		},
+		"environment_name": {
+			"type": "string",
+			"metadata": {}
+		},
+		"ssh_private_key": {
+			"type": "securestring",
+			"metadata": {
+				"description": "(Enter base64 encoded representation of file)"
+			}
+		},
+		"ssh_public_key": {
+			"type": "string",
+			"defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwbhzZV8LoiJoiYSIKbcP8dUdF0ptvyDRZ+BD3claOx599wIIAOK0m/PvlBwa1Mg0oj7+LlTIlxVJQfq2i1/i6qADalzdKWikLWcAALEgVxMfXbHty1NL2KZfW8QQkj2+kqg/+1tDLmA2xwXcoW2kodUYEwo3Ldl60ZgRSldWvs1H8nmY9qUqvpO/XIFAnPv+qtDZNurmO+I2z6hwpozeYLeVpIvpU0cuyjJIAfnu9mJzhHNC+H8mS1n73VtPh2EAaxRgWeHA9HxJqOLQ/r3AwOYjk6JL2UYTSzI7oeoK1LV1773/FkjlV3BHOwzD/8G/o8syxk9+c84cg8I6aQKp1 esadmin",
+			"metadata": {}
+		}
+	},
+	"variables": {
+		"aci_location": "[resourceGroup().Location]",
+		"cnab_action": "[parameters('cnab_action')]",
+		"cnab_azure_client_id": "[parameters('cnab_azure_client_id')]",
+		"cnab_azure_client_secret": "[parameters('cnab_azure_client_secret')]",
+		"cnab_azure_location": "[resourceGroup().Location]",
+		"cnab_azure_state_fileshare": "ansible",
+		"cnab_azure_state_storage_account_name": "[concat('cnabstate',uniqueString(resourceGroup().id))]",
+		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
+		"cnab_azure_tenant_id": "[subscription().tenantId]",
+		"cnab_installation_name": "ansible",
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ansible', 'readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-176'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ansible', 'readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-176'))]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[variables('cnab_azure_state_storage_account_name')]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				"encryption": {
+					"keySource": "Microsoft.Storage",
+					"services": {
+						"file": {
+							"enabled": true
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
+			"apiVersion": "2019-04-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[variables('cnab_azure_state_storage_account_name')]"
+			],
+			"properties": null
+		},
+		{
+			"type": "Microsoft.ContainerInstance/containerGroups",
+			"name": "[variables('containerGroupName')]",
+			"apiVersion": "2018-10-01",
+			"location": "[variables('aci_location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('cnab_azure_state_storage_account_name'), 'default', variables('cnab_azure_state_fileshare'))]"
+			],
+			"properties": {
+				"containers": [
+					{
+						"name": "[variables('containerName')]",
+						"properties": {
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
+							"resources": {
+								"requests": {
+									"cpu": "1.0",
+									"memoryInGb": "1.5"
+								}
+							},
+							"environmentVariables": [
+								{
+									"name": "CNAB_ACTION",
+									"value": "[variables('cnab_action')]"
+								},
+								{
+									"name": "CNAB_INSTALLATION_NAME",
+									"value": "[variables('cnab_installation_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_LOCATION",
+									"value": "[variables('cnab_azure_location')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_ID",
+									"value": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_CLIENT_SECRET",
+									"secureValue": "[variables('cnab_azure_client_secret')]"
+								},
+								{
+									"name": "CNAB_AZURE_SUBSCRIPTION_ID",
+									"value": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_TENANT_ID",
+									"value": "[variables('cnab_azure_tenant_id')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_NAME",
+									"value": "[variables('cnab_azure_state_storage_account_name')]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_STORAGE_ACCOUNT_KEY",
+									"secureValue": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value]"
+								},
+								{
+									"name": "CNAB_AZURE_STATE_FILESHARE",
+									"value": "[variables('cnab_azure_state_fileshare')]"
+								},
+								{
+									"name": "VERBOSE",
+									"value": "false"
+								},
+								{
+									"name": "CNAB_BUNDLE_NAME",
+									"value": "ansible"
+								},
+								{
+									"name": "CNAB_BUNDLE_TAG",
+									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-176"
+								},
+								{
+									"name": "CNAB_PARAM_environment_name",
+									"value": "[parameters('environment_name')]"
+								},
+								{
+									"name": "CNAB_PARAM_ssh_public_key",
+									"value": "[parameters('ssh_public_key')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_client_id",
+									"secureValue": "[variables('cnab_azure_client_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_secret",
+									"secureValue": "[parameters('azure_secret')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_subscription_id",
+									"secureValue": "[variables('cnab_azure_subscription_id')]"
+								},
+								{
+									"name": "CNAB_CRED_azure_tenant",
+									"secureValue": "[parameters('azure_tenant')]"
+								},
+								{
+									"name": "CNAB_CRED_FILE_ssh_private_key",
+									"secureValue": "[parameters('ssh_private_key')]"
+								}
+							]
+						}
+					}
+				],
+				"osType": "Linux",
+				"restartPolicy": "Never"
+			}
+		}
+	],
+	"outputs": {
+		"CNAB Package Action Logs Command": {
+			"type": "string",
+			"value": "[concat('az container logs -g ',resourceGroup().name,' -n ',variables('containerGroupName'),'  --container-name ',variables('containerName'), ' --follow')]"
+		}
+	}
+}
