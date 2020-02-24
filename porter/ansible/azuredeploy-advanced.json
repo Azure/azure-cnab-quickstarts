@@ -32,7 +32,7 @@
 			"type": "securestring",
 			"metadata": {}
 		},
-		"azure_secret": {
+		"azure_client_secret": {
 			"type": "securestring",
 			"metadata": {}
 		},
@@ -40,7 +40,7 @@
 			"type": "securestring",
 			"metadata": {}
 		},
-		"azure_tenant": {
+		"azure_tenant_id": {
 			"type": "securestring",
 			"metadata": {}
 		},
@@ -142,11 +142,9 @@
 			"type": "string",
 			"metadata": {}
 		},
-		"ssh_private_key": {
+		"ssh_private_key_base64": {
 			"type": "securestring",
-			"metadata": {
-				"description": "(Enter base64 encoded representation of file)"
-			}
+			"metadata": {}
 		},
 		"ssh_public_key": {
 			"type": "string",
@@ -270,7 +268,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-176"
+									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-178"
 								},
 								{
 									"name": "CNAB_PARAM_environment_name",
@@ -285,20 +283,20 @@
 									"secureValue": "[parameters('azure_client_id')]"
 								},
 								{
-									"name": "CNAB_CRED_azure_secret",
-									"secureValue": "[parameters('azure_secret')]"
+									"name": "CNAB_CRED_azure_client_secret",
+									"secureValue": "[parameters('azure_client_secret')]"
 								},
 								{
 									"name": "CNAB_CRED_azure_subscription_id",
 									"secureValue": "[parameters('azure_subscription_id')]"
 								},
 								{
-									"name": "CNAB_CRED_azure_tenant",
-									"secureValue": "[parameters('azure_tenant')]"
+									"name": "CNAB_CRED_azure_tenant_id",
+									"secureValue": "[parameters('azure_tenant_id')]"
 								},
 								{
-									"name": "CNAB_CRED_FILE_ssh_private_key",
-									"secureValue": "[parameters('ssh_private_key')]"
+									"name": "CNAB_CRED_ssh_private_key_base64",
+									"secureValue": "[parameters('ssh_private_key_base64')]"
 								}
 							]
 						}
