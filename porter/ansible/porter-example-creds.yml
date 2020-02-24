@@ -1,17 +1,17 @@
-name: ElasticstackAzure
+name: ansible
 credentials:
 - name: azure_client_id
   source:
     env: AZURE_CLIENT_ID
-- name: azure_secret
+- name: azure_client_secret
   source:
     env: AZURE_SECRET
 - name: azure_subscription_id
   source:
     env: AZURE_SUBSCRIPTION_ID
-- name: azure_tenant
+- name: azure_tenant_id
   source:
     env: AZURE_TENANT
-- name: ssh_private_key
+- name: ssh_private_key_base64
   source:
-    env: SSH_PRIVATE_KEY
+    env: SSH_PRIVATE_KEY_BASE64
