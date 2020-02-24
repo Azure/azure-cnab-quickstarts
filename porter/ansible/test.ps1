@@ -11,6 +11,9 @@ param
     [ValidateNotNullOrEmpty()]
     [string] $sshPrivateKey = "$(Split-Path -Parent $PSCommandPath)/playbook/environments/example_sshkey_id",
 
+    [ValidateNotNullOrEmpty()]
+    [string] $sshPublicKey = "$(Split-Path -Parent $PSCommandPath)/playbook/environments/example_sshkey_id.pub",
+
     [ValidateSet("install","upgrade","uninstall", ignorecase=$true)]
     [string] $action = "install",
 
@@ -56,6 +59,13 @@ if ( -not $sshKeyToValidate.StartsWith("-----BEGIN") )
     Write-Error "The provided SSH private key information does not seem to be valid"
 }
 
+if (Test-Path $sshPublicKey)
+{
+    # Assume we have been given a path to a keyfile
+    Write-Host "Reading 'ssh_public_key' from file: $sshPublicKey"    
+    $sshPublicKey = Get-Content -Raw $sshPublicKey
+}
+
 # Store the SSH keyfile contents in the environment variable expected by the example credential file
 $env:SSH_PRIVATE_KEY_BASE64 = $sshPrivateKeyBase64
 
@@ -63,6 +73,8 @@ Write-Host "***************" -ForegroundColor Green
 Write-Host "** Target Env: $environmentName" -ForegroundColor Green
 Write-Host "** Credential: $credentialFile" -ForegroundColor Green
 Write-Host "***************" -ForegroundColor Green
-porter $action --param environment_name=$environmentName --cred $credentialFile
+porter $action --param environment_name=$environmentName `
+               --param ssh_public_key=$sshPublicKey `
+               --cred $credentialFile
 
 Pop-Location
