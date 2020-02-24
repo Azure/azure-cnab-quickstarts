@@ -28,10 +28,11 @@ if ( !(Test-Path env:AZURE_SECRET) )
 Push-Location $here
 if (!$skipBuild)
 {
-    # ensure the base image is built
-    docker build -t cnab-ansible-base -f Dockerfile.base .
-    # build the porter bundle (under linux)
-    docker run -it --rm -v "$(pwd):/src" -v "/var/run/docker.sock:/var/run/docker.sock" -w /src cnab-ansible-base porter build
+    porter build
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Error "There was an error whilst trying to build the Porter bundle, check preceding output"
+    }
 }
 
 # Prepare SSH private key for use as Porter credential
@@ -55,12 +56,13 @@ if ( -not $sshKeyToValidate.StartsWith("-----BEGIN") )
     Write-Error "The provided SSH private key information does not seem to be valid"
 }
 
-# Store the SSH keyfile contents in the expected environment variable
-$env:SSH_PRIVATE_KEY = $sshKeyToValidate
+# Store the SSH keyfile contents in the environment variable expected by the example credential file
+$env:SSH_PRIVATE_KEY_BASE64 = $sshPrivateKeyBase64
 
 Write-Host "***************" -ForegroundColor Green
 Write-Host "** Target Env: $environmentName" -ForegroundColor Green
 Write-Host "** Credential: $credentialFile" -ForegroundColor Green
 Write-Host "***************" -ForegroundColor Green
 porter $action --param environment_name=$environmentName --cred $credentialFile
+
 Pop-Location
