@@ -42,14 +42,8 @@ RUN pip3 install --no-cache-dir --upgrade \
     && pip install --no-cache-dir \
         ansible[azure]
 
-# Install porter
-#RUN curl https://cdn.deislabs.io/porter/latest/install-linux.sh | bash \
-#    && mv ~/.porter/* /usr/local/bin
-
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
 
 ARG BUNDLE_DIR
 
 COPY playbook $BUNDLE_DIR/ansible
-
-#ENV ANSIBLE_STDOUT_CALLBACK debug
