@@ -268,7 +268,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-178"
+									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-180"
 								},
 								{
 									"name": "CNAB_PARAM_environment_name",

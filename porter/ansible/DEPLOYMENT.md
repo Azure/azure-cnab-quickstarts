@@ -23,7 +23,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-178 -d azure```
+```porter install --tag readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-180 -d azure```
 
 
 ## Parameters and Credentials
