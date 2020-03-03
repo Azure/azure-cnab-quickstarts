@@ -6,6 +6,10 @@ We currently support application bundles built using [Porter](https://porter.sh)
 
 The following videos are good resources for getting started with learning about CNAB and Porter:
 
+## Introduction to Azure CNAB Quickstarts - from [@MikeLarah](https://github.com/MikeLarah)
+
+[![Introduction to Azure CNAB Quickstarts](./images/introduction-to-azure-cnab-quickstarts.png)](https://youtu.be/z1lnQfaAVeg)
+
 ## Porter: an Opionated CNAB Authoring Experience - from [@jeremyrickard](https://github.com/jeremyrickard)
 
 [![Porter: an Opionated CNAB Authoring Experience](./images/porter-an-opinionated-cnab-authoring-experience.png)](https://www.youtube.com/watch?v=__fim6RIW1s)
