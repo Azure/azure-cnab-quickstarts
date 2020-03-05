@@ -61,7 +61,7 @@ install:
         servicePrincipalClientSecret: "{{ bundle.credentials.azure_client_secret}}"
         location: "{{ bundle.parameters.azure_location }}"
         agentCount: 4
-        kubernetesVersion: "1.14.6"
+        kubernetesVersion: "1.15.7"
 
   - az: 
       description: "Azure CLI login"
