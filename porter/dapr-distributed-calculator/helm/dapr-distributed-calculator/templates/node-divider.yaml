@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: divideapp
+  labels:
+    app: divide
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: divide
+  template:
+    metadata:
+      labels:
+        app: divide
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "divideapp"
+        dapr.io/port: "4000"
+    spec:
+      containers:
+      - name: divide
+        image: '{{ .Values.nodeDivider.image.repository }}:{{ .Values.nodeDivider.image.tag }}'
+        ports:
+        - containerPort: 4000
+        imagePullPolicy: Always

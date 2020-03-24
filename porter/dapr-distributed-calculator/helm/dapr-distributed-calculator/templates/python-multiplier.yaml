@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multiplyapp
+  labels:
+    app: multiply
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multiply
+  template:
+    metadata:
+      labels:
+        app: multiply
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "multiplyapp"
+        dapr.io/port: "5000"
+    spec:
+      containers:
+      - name: multiply
+        image: '{{ .Values.pythonMultiplier.image.repository }}:{{ .Values.pythonMultiplier.image.tag }}'
+        ports:
+        - containerPort: 5000
+        imagePullPolicy: Always

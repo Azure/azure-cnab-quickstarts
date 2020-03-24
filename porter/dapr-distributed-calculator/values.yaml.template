@@ -1,0 +1,23 @@
+dotnetSubtractor:
+  image:
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator-sample/csharp
+    tag: 0.5.0-arm
+goAdder:
+  image:
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator-sample/go
+    tag: 0.5.0-arm
+nodeDivider:
+  image:
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator-sample/node
+    tag: 0.5.0-arm
+pythonMultiplier:
+  image:
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator-sample/python
+    tag: 0.5.0-arm
+reactCalculator:
+  image:
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator-sample/react-calculator
+    tag: 0.5.0-arm
+redis:
+  host: <host>
+  password: <password>

@@ -1,0 +1,187 @@
+name: dapr-distributed-calculator
+version: 0.1.0
+description: A sample dapr application, running a distributed calculator with C#, Go, Node, Python, and React
+invocationImage: cnabquickstarts.azurecr.io/porter/dapr-distributed-calculator:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/dapr-distributed-calculator/bundle:0.1.0
+
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+
+parameters:
+  - name: namespace
+    type: string
+    default: dapr-distributed-calculator
+    description: Kubernetes namespace for installation
+  - name: installation_name
+    type: string
+    default: dapr-distributed-calculator
+    description: Installation name for Helm deployment
+    destination:
+      env: $INSTALLATION_NAME
+  - name: platform
+    type: string
+    default: amd64
+    description: Target platform architecture
+    enum: [ "amd64", "arm"]
+  - name: redis_host
+    type: string
+    description: Host name for the Redis cache
+    default: redishost
+  - name: redis_password
+    type: string
+    description: Password for the Redis cache
+    default: redispassword
+    sensitive: true
+
+outputs:
+  - name: ip
+    type: string
+    sensitive: false
+    applyTo:
+      - install
+      - upgrade
+    description: "External IP address for the calculator front-end"
+
+mixins:
+  - exec
+  - helm3
+  - kubernetes
+
+install:
+  - exec:
+      description: Create Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+  - helm3:
+      description: "Install Dapr distributed calculator"
+      arguments: 
+        - install
+        - "{{ bundle.parameters.installation_name }}"
+        - ./helm/dapr-distributed-calculator
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+        replace:
+        set:
+          - "dotnetSubtractor.image.repository={{ bundle.images.dotnetSubtractor.repository }}"
+          - "dotnetSubtractor.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "goAdder.image.repository={{ bundle.images.goAdder.repository }}"
+          - "goAdder.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "nodeDivider.image.repository={{ bundle.images.nodeDivider.repository }}"
+          - "nodeDivider.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "pythonMultiplier.image.repository={{ bundle.images.pythonMultiplier.repository }}"
+          - "pythonMultiplier.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "reactCalculator.image.repository={{ bundle.images.reactCalculator.repository }}"
+          - "reactCalculator.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "redis.host={{ bundle.parameters.redis_host }}"
+          - "redis.password={{ bundle.parameters.redis_password }}"
+  - exec:
+      description: "Get IP address"
+      command: "bash"
+      arguments:
+        - "scripts/get-ip-address.sh"
+        - "{{ bundle.parameters.namespace }}"
+      outputs:
+        - name: ip
+          path: IP
+
+upgrade:
+  - helm3:
+      description: "Upgrade Dapr distributed calculator"
+      arguments: 
+        - upgrade
+        - "{{ bundle.parameters.installation_name }}"
+        - ./helm/dapr-distributed-calculator
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+        set:
+          - "dotnetSubtractor.image.repository={{ bundle.images.dotnetSubtractor.repository }}"
+          - "dotnetSubtractor.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "goAdder.image.repository={{ bundle.images.goAdder.repository }}"
+          - "goAdder.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "nodeDivider.image.repository={{ bundle.images.nodeDivider.repository }}"
+          - "nodeDivider.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "pythonMultiplier.image.repository={{ bundle.images.pythonMultiplier.repository }}"
+          - "pythonMultiplier.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "reactCalculator.image.repository={{ bundle.images.reactCalculator.repository }}"
+          - "reactCalculator.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "redis.host={{ bundle.parameters.redis_host }}"
+          - "redis.password={{ bundle.parameters.redis_password }}"
+  - exec:
+      description: "Get IP address"
+      command: "bash"
+      arguments:
+        - "scripts/get-ip-address.sh"
+        - "{{ bundle.parameters.namespace }}"
+      outputs:
+        - name: ip
+          path: IP
+
+uninstall:
+  - helm3:
+      description: "Uninstall Dapr distributed calculator"
+      arguments:
+        - "uninstall"
+        - "{{ bundle.parameters.installation_name }}"
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+  - exec:
+      description: Delete Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+      
+images:
+  dotnetSubtractor:
+    description: dotnetSubtractor
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/csharp
+    tag: 0.5.0-amd64
+  dotnetSubtractor-arm:
+    description: dotnetSubtractor-arm
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/csharp
+    tag: 0.5.0-arm
+  goAdder:
+    description: goAdder
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/go
+    tag: 0.5.0-amd64
+  goAdder-arm:
+    description: goAdder-arm
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/go
+    tag: 0.5.0-arm
+  nodeDivider:
+    description: nodeDivider
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/node
+    tag: 0.5.0-amd64
+  nodeDivider-arm:
+    description: nodeDivider-arm
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/node
+    tag: 0.5.0-arm
+  pythonMultiplier:
+    description: pythonMultiplier
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/python
+    tag: 0.5.0-amd64
+  pythonMultiplier-arm:
+    description: pythonMultiplier-arm
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/python
+    tag: 0.5.0-arm
+  reactCalculator:
+    description: reactCalculator
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/react-calculator
+    tag: 0.5.0-amd64
+  reactCalculator-arm:
+    description: reactCalculator-arm
+    imageType: docker
+    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/react-calculator
+    tag: 0.5.0-arm
