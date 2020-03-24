@@ -47,6 +47,7 @@ parameters:
 mixins:
   - exec
   - helm3
+  - kubernetes
 
 install:
   - exec:
@@ -61,6 +62,12 @@ install:
       arguments:
         - "-c"
         - "cat /cnab/app/values.yaml && echo \n\n"
+  - exec:
+      description: Create Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl create namespace {{ bundle.parameters.namespace }}"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
