@@ -12,7 +12,7 @@ workers_username=$7
 # Install master
 
 ssh -o StrictHostKeyChecking=no $master_username@$master_host -p $master_port /bin/bash << EOF
-curl -sfL https://get.k3s.io | sh -
+curl -sfL https://get.k3s.io | sh -s - --no-deploy=traefik
 
 systemctl is-active --quiet k3s
 while test $? -gt 0
