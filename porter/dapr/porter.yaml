@@ -136,3 +136,9 @@ uninstall:
         - "{{ bundle.parameters.installation_name }}"
       flags:
         namespace: "{{ bundle.parameters.namespace }}"
+  - exec:
+      description: Delete Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
