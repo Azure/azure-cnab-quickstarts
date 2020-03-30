@@ -74,8 +74,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "dapr",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-190'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-190'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193'))]"
 	},
 	"resources": [
 		{
@@ -179,7 +179,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-190"
+									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193"
 								},
 								{
 									"name": "CNAB_PARAM_global_imagePullPolicy",
