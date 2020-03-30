@@ -19,20 +19,29 @@ parameters:
     description: Installation name for Helm deployment
     destination:
       env: $INSTALLATION_NAME
-  - name: platform
-    type: string
-    default: amd64
-    description: Target platform architecture
-    enum: [ "amd64", "arm"]
-  - name: redis_host
-    type: string
-    description: Host name for the Redis cache
-    default: redishost
-  - name: redis_password
-    type: string
-    description: Password for the Redis cache
-    default: redispassword
-    sensitive: true
+  # - name: redis_resource_group
+  #   type: string
+  #   description: Azure resource group name for Redis instance
+  # - name: redis_name
+  #   type: string
+  #   description: Name for Redis instance
+  # - name: redis_name
+  #   type: string
+  #   description: Name for Redis instance
+  # - name: redis_location
+  #   type: string
+  #   description: Azure location for Redis instance
+  # - name: redis_sku
+  #   type: string
+  #   description: SKU for Redis instance
+  #   default: Basic
+  #   enum: ["Basic", "Premium", "Standard"]
+  # - name: redis_vm_size
+  #   type: string
+  #   description: VM size for Redis instance
+  #   default: c0
+  #   enum: ["c0", "c1", "c2", "c3", "c4", "c5", "c6", "p1", "p2", "p3", "p4", "p5"]
+
 
 outputs:
   - name: ip
@@ -47,8 +56,29 @@ mixins:
   - exec
   - helm3
   - kubernetes
+  - az
 
 install:
+  # - az: 
+  #     description: "Create Azure Redis instance"
+  #     arguments: 
+  #       - "redis" 
+  #       - "create" 
+  #     flags:
+  #       resource-group: "{{ bundle.parameters.redis_resource_group }}"
+  #       name: "{{ bundle.parameters.redis_name }}"
+  #       location: "{{ bundle.parameters.redis_location }}"
+  #       sku: "{{ bundle.parameters.redis_sku }}"
+  #       vm-size: "{{ bundle.parameters.redis_vm_size }}"
+  # - az: 
+  #     description: "Create Azure Redis instance"
+  #     arguments: 
+  #       - "redis" 
+  #       - "list-keys" 
+  #     flags:
+  #       resource-group: "{{ bundle.parameters.redis_resource_group }}"
+  #       name: "{{ bundle.parameters.redis_name }}"
+
   - exec:
       description: Create Kubernetes namespace
       command: bash
@@ -66,17 +96,19 @@ install:
         replace:
         set:
           - "dotnetSubtractor.image.repository={{ bundle.images.dotnetSubtractor.repository }}"
-          - "dotnetSubtractor.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "dotnetSubtractor.image.tag={{ bundle.images.dotnetSubtractor.tag }}"
           - "goAdder.image.repository={{ bundle.images.goAdder.repository }}"
-          - "goAdder.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "goAdder.image.tag={{ bundle.images.goAdder.tag }}"
           - "nodeDivider.image.repository={{ bundle.images.nodeDivider.repository }}"
-          - "nodeDivider.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "nodeDivider.image.tag={{ bundle.images.nodeDivider.tag }}"
           - "pythonMultiplier.image.repository={{ bundle.images.pythonMultiplier.repository }}"
-          - "pythonMultiplier.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "pythonMultiplier.image.tag={{ bundle.images.pythonMultiplier.tag }}"
           - "reactCalculator.image.repository={{ bundle.images.reactCalculator.repository }}"
-          - "reactCalculator.image.tag=0.5.0-{{ bundle.parameters.platform }}"
-          - "redis.host={{ bundle.parameters.redis_host }}"
-          - "redis.password={{ bundle.parameters.redis_password }}"
+          - "reactCalculator.image.tag={{ bundle.images.reactCalculator.tag }}"
+          # - "redis.host={{ bundle.parameters.redis_host }}"
+          # - "redis.password={{ bundle.outputs.redis_password }}"
+          - "redis.host=redishost"
+          - "redis.password=redispassword"
   - exec:
       description: "Get IP address"
       command: "bash"
@@ -98,17 +130,19 @@ upgrade:
         namespace: "{{ bundle.parameters.namespace }}"
         set:
           - "dotnetSubtractor.image.repository={{ bundle.images.dotnetSubtractor.repository }}"
-          - "dotnetSubtractor.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "dotnetSubtractor.image.tag={{ bundle.images.dotnetSubtractor.tag }}"
           - "goAdder.image.repository={{ bundle.images.goAdder.repository }}"
-          - "goAdder.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "goAdder.image.tag={{ bundle.images.goAdder.tag }}"
           - "nodeDivider.image.repository={{ bundle.images.nodeDivider.repository }}"
-          - "nodeDivider.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "nodeDivider.image.tag={{ bundle.images.nodeDivider.tag }}"
           - "pythonMultiplier.image.repository={{ bundle.images.pythonMultiplier.repository }}"
-          - "pythonMultiplier.image.tag=0.5.0-{{ bundle.parameters.platform }}"
+          - "pythonMultiplier.image.tag={{ bundle.images.pythonMultiplier.tag }}"
           - "reactCalculator.image.repository={{ bundle.images.reactCalculator.repository }}"
-          - "reactCalculator.image.tag=0.5.0-{{ bundle.parameters.platform }}"
-          - "redis.host={{ bundle.parameters.redis_host }}"
-          - "redis.password={{ bundle.parameters.redis_password }}"
+          - "reactCalculator.image.tag={{ bundle.images.reactCalculator.tag }}"
+          # - "redis.host={{ bundle.parameters.redis_host }}"
+          # - "redis.password={{ bundle.outputs.redis_password }}"
+          - "redis.host=redishost"
+          - "redis.password=redispassword"
   - exec:
       description: "Get IP address"
       command: "bash"
@@ -139,49 +173,24 @@ images:
     description: dotnetSubtractor
     imageType: docker
     repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/csharp
-    tag: 0.5.0-amd64
-  dotnetSubtractor-arm:
-    description: dotnetSubtractor-arm
-    imageType: docker
-    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/csharp
-    tag: 0.5.0-arm
+    tag: 0.5.0
   goAdder:
     description: goAdder
     imageType: docker
     repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/go
-    tag: 0.5.0-amd64
-  goAdder-arm:
-    description: goAdder-arm
-    imageType: docker
-    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/go
-    tag: 0.5.0-arm
+    tag: 0.5.0
   nodeDivider:
     description: nodeDivider
     imageType: docker
     repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/node
-    tag: 0.5.0-amd64
-  nodeDivider-arm:
-    description: nodeDivider-arm
-    imageType: docker
-    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/node
-    tag: 0.5.0-arm
+    tag: 0.5.0
   pythonMultiplier:
     description: pythonMultiplier
     imageType: docker
     repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/python
-    tag: 0.5.0-amd64
-  pythonMultiplier-arm:
-    description: pythonMultiplier-arm
-    imageType: docker
-    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/python
-    tag: 0.5.0-arm
+    tag: 0.5.0
   reactCalculator:
     description: reactCalculator
     imageType: docker
     repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/react-calculator
-    tag: 0.5.0-amd64
-  reactCalculator-arm:
-    description: reactCalculator-arm
-    imageType: docker
-    repository: cnabquickstarts.azurecr.io/dapr-distributed-calculator/react-calculator
-    tag: 0.5.0-arm
+    tag: 0.5.0

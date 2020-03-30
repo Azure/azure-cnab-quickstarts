@@ -4,7 +4,7 @@ NAMESPACE=$1
 
 RETRIES=0
 while [ -z $IP ]; do
-    if [[ $RETRIES -gt 100 ]]; then
+    if [[ $RETRIES -gt 20 ]]; then
         echo "Exceeded number of retries for getting external IP address."
         exit 1    
     fi
