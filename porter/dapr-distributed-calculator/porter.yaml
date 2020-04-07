@@ -83,8 +83,9 @@ install:
       description: Create Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+        - "scripts/dapr-calculator.sh"
+        - "create-namespace"
+        - "{{ bundle.parameters.namespace }}"
   - helm3:
       description: "Install Dapr distributed calculator"
       arguments: 
@@ -165,8 +166,9 @@ uninstall:
       description: Delete Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+        - "scripts/dapr-calculator.sh"
+        - "delete-namespace"
+        - "{{ bundle.parameters.namespace }}"
       
 images:
   dotnetSubtractor:
