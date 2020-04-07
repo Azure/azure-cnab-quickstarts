@@ -4,9 +4,9 @@ This bundle bootstraps all of [Dapr](https://dapr.io/) Operator components into 
 
 The bundle is based on the official Helm chart for Dapr (more information about the Helm chart can be found on the [GitHub page](https://github.com/dapr/dapr/tree/master/charts/dapr)).
 
-To install on AKS, keep all parameters as defaults.
+The bundle works for amd64 platforms (e.g. AKS) or arm platforms (e.g. Raspberry Pi), using default parameters.
 
-To install on Kubernetes cluster running on ARM based devices (e.g. Raspberry Pi), set the `global_tag` parameter for the bundle to `0.3.0-arm`. If you are installing on a Raspberry Pi cluster, you may also find the [Pi K3s bundle](https://github.com/Azure/azure-cnab-quickstarts/tree/master/porter/pi-k-three-s) useful for setting up Kubernetes on the devices.
+If you are installing on a Raspberry Pi cluster, you may also find the [Pi K3s bundle](https://github.com/Azure/azure-cnab-quickstarts/tree/master/porter/pi-k-three-s) useful for setting up Kubernetes on the devices.
 
 ## Deploy from Azure
 
@@ -19,12 +19,12 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ### Simple deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fdapr%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fdapr-update%2Fporter%2Fdapr%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 ### Advanced deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fdapr%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fdapr-update%2Fporter%2Fdapr%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 
 ## Deploy from Cloud Shell
@@ -33,7 +33,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/dapr/bundle:latest -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193 -d azure```
 
 
 ## Parameters and Credentials

@@ -33,7 +33,7 @@ parameters:
   - name: global_tag
     type: string
     description: Container image tag
-    default: '0.3.0'
+    default: '0.5.0'
     destination:
       env: GLOBAL_TAG
   - name: global_imagePullPolicy
@@ -46,7 +46,8 @@ parameters:
 
 mixins:
   - exec
-  - helm
+  - helm3
+  - kubernetes
 
 install:
   - exec:
@@ -62,21 +63,34 @@ install:
         - "-c"
         - "cat /cnab/app/values.yaml && echo \n\n"
   - exec:
+      description: Create Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+  - helm3:
       description: "Add dapr Helm repository"
-      command: "helm"
       arguments:
         - "repo"
         - "add"
         - "dapr"
         - "https://daprio.azurecr.io/helm/v1/repo"
-  - helm:
+  - helm3:
+      description: "Update Helm repositories"
+      arguments:
+        - "repo"
+        - "update"
+  - helm3:
       description: "Install Dapr"
-      name: "{{ bundle.parameters.installation_name }}"
-      chart: dapr/dapr
-      namespace: "{{ bundle.parameters.namespace }}"
-      replace: true
-      values:
-        - /cnab/app/values.yaml
+      arguments:
+        - "install"
+        - "{{ bundle.parameters.installation_name }}"
+        - dapr/dapr
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+        replace:
+        values:
+          - /cnab/app/values.yaml
 
 upgrade:
   - exec:
@@ -91,25 +105,40 @@ upgrade:
       arguments:
         - "-c"
         - "cat /cnab/app/values.yaml && echo \n\n"
-  - exec:
-      description: "Add Dapr Helm repository"
-      command: "helm"
+  - helm3:
+      description: "Add dapr Helm repository"
       arguments:
         - "repo"
         - "add"
         - "dapr"
         - "https://daprio.azurecr.io/helm/v1/repo"
-  - helm:
+  - helm3:
+      description: "Update Helm repositories"
+      arguments:
+        - "repo"
+        - "update"
+  - helm3:
       description: "Upgrade Dapr"
-      name: "{{ bundle.parameters.installation_name }}"
-      chart: dapr/dapr
-      namespace: "{{ bundle.parameters.namespace }}"
-      values:
-        - /cnab/app/values.yaml
+      arguments:
+        - "upgrade"
+        - "{{ bundle.parameters.installation_name }}"
+        - dapr/dapr
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+        values:
+          - /cnab/app/values.yaml
      
 uninstall:
-  - helm:
+  - helm3:
       description: "Uninstall Dapr"
-      purge: true
-      releases:
+      arguments:
+        - "uninstall"
         - "{{ bundle.parameters.installation_name }}"
+      flags:
+        namespace: "{{ bundle.parameters.namespace }}"
+  - exec:
+      description: Delete Kubernetes namespace
+      command: bash
+      arguments:
+        - "-c"
+        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
