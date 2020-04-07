@@ -20,28 +20,6 @@ parameters:
     description: Installation name for Helm deployment
     destination:
       env: $INSTALLATION_NAME
-  - name: helm_chart_version
-    type: string
-    default: 0.1.0
-    description: Version of the dapr/dapr Helm chart to use for deployment
-  - name: global_repository
-    type: string
-    description: Container image repository
-    default: 'docker.io/daprio'
-    destination:
-      env: GLOBAL_REPOSITORY
-  - name: global_tag
-    type: string
-    description: Container image tag
-    default: '0.6.0'
-    destination:
-      env: GLOBAL_TAG
-  - name: global_imagePullPolicy
-    type: string
-    description: Container image pull policy
-    default: 'Always'
-    destination:
-      env: GLOBAL_IMAGEPULLPOLICY
 
 
 mixins:
@@ -50,12 +28,6 @@ mixins:
   - kubernetes
 
 install:
-  - exec:
-      description: "Replace tokens in values.yaml.template"
-      command: "bash"
-      arguments: 
-        - "dapr.sh" 
-        - "replace-tokens"
   - exec:
       description: Create Kubernetes namespace
       command: bash
@@ -84,16 +56,8 @@ install:
       flags:
         namespace: "{{ bundle.parameters.namespace }}"
         replace:
-        values:
-          - /cnab/app/values.yaml
 
 upgrade:
-  - exec:
-      description: "Replace tokens in values.yaml.template"
-      command: "bash"
-      arguments: 
-        - "dapr.sh" 
-        - "replace-tokens"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
@@ -114,8 +78,6 @@ upgrade:
         - dapr/dapr
       flags:
         namespace: "{{ bundle.parameters.namespace }}"
-        values:
-          - /cnab/app/values.yaml
      
 uninstall:
   - helm3:
