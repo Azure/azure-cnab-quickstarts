@@ -33,7 +33,7 @@ parameters:
   - name: global_tag
     type: string
     description: Container image tag
-    default: '0.5.0'
+    default: '0.6.0'
     destination:
       env: GLOBAL_TAG
   - name: global_imagePullPolicy
