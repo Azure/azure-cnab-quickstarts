@@ -54,20 +54,15 @@ install:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
+        - "dapr.sh" 
+        - "replace-tokens"
   - exec:
       description: Create Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+        - "dapr.sh" 
+        - "create-kubernetes-namespace"
+        - "{{ bundle.parameters.namespace }}"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
@@ -97,14 +92,8 @@ upgrade:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
+        - "dapr.sh" 
+        - "replace-tokens"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
@@ -140,5 +129,6 @@ uninstall:
       description: Delete Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+        - "dapr.sh" 
+        - "delete-kubernetes-namespace"
+        - "{{ bundle.parameters.namespace }}"
