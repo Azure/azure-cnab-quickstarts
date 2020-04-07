@@ -31,11 +31,6 @@
 		"cnab_action": {
 			"type": "string",
 			"defaultValue": "install",
-			"allowedValues": [
-				"install",
-				"upgrade",
-				"uninstall"
-			],
 			"metadata": {
 				"description": "The name of the action to be performed on the application instance."
 			}
@@ -80,7 +75,7 @@
 		},
 		"cnab_azure_state_fileshare": {
 			"type": "string",
-			"defaultValue": "kubeflow",
+			"defaultValue": "",
 			"metadata": {
 				"description": "The file share name in the storage account for the CNAB state to be stored in"
 			}
@@ -142,7 +137,7 @@
 		},
 		"kustomize_manifest": {
 			"type": "string",
-			"defaultValue": "https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.0.yaml",
+			"defaultValue": "https://raw.githubusercontent.com/kubeflow/manifests/v1.0-branch/kfdef/kfctl_k8s_istio.v1.0.1.yaml",
 			"metadata": {
 				"description": "The URL to the Kustomize manifest to use as the configuration file"
 			}
@@ -184,16 +179,6 @@
 			}
 		},
 		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/porter')]",
-			"apiVersion": "2019-04-01",
-			"location": "[variables('aci_location')]",
-			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
-			],
-			"properties": null
-		},
-		{
 			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
 			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
 			"apiVersion": "2019-04-01",
@@ -216,7 +201,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -274,11 +259,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/kubeflow/bundle:0.1.0"
-								},
-								{
-									"name": "AZURE_STORAGE_CONNECTION_STRING",
-									"secureValue": "[concat('AccountName=', variables('cnab_azure_state_storage_account_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value)]"
+									"value": "cnabquickstarts.azurecr.io/porter/kubeflow/bundle:0.1.0-pull-49-merge.1-186"
 								},
 								{
 									"name": "CNAB_PARAM_kubeflow_name",
