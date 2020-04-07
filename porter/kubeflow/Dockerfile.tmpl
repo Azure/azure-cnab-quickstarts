@@ -3,11 +3,12 @@ FROM debian:stretch
 ARG BUNDLE_DIR
 
 ENV KUBEFLOW_REPO=https://github.com/kubeflow/kubeflow
-ENV KUBEFLOW_VERSION=v0.7.0-rc.8
+ENV KUBEFLOW_VERSION=v1.0
+ENV KFCTL_VERSION=v1.0-0-g94c35cf
 ENV TOOLHOME="/usr/bin"
 
 COPY . $BUNDLE_DIR
 
 RUN apt-get update && apt-get -y install wget
-RUN wget ${KUBEFLOW_REPO}/releases/download/${KUBEFLOW_VERSION}/kfctl_${KUBEFLOW_VERSION}_linux.tar.gz
-RUN tar -xvf kfctl_${KUBEFLOW_VERSION}_linux.tar.gz -C ${TOOLHOME} && chmod +x "${TOOLHOME}/kfctl"
+RUN wget ${KUBEFLOW_REPO}/releases/download/${KUBEFLOW_VERSION}/kfctl_${KFCTL_VERSION}_linux.tar.gz
+RUN tar -xvf kfctl_${KFCTL_VERSION}_linux.tar.gz -C ${TOOLHOME} && chmod +x "${TOOLHOME}/kfctl"
