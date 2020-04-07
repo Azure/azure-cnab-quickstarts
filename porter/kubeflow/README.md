@@ -40,3 +40,8 @@ For detailed instructions on deploying from Cloud Shell, including how to setup 
 kubeflow_name | The name of the KubeFlow deployment |  | No
 kustomize_manifest | The URL to the Kustomize manifest to use as the configuration file |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No | 
+
+
+## Known issues
+
+- [Kubeflow installation fails](https://github.com/Azure/azure-cnab-quickstarts/issues/50)
