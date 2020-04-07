@@ -11,7 +11,24 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8080
-  type: LoadBalancer
+  type: ClusterIP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: calculator-front-end-ingress
+  labels:
+    app: calculator-front-end
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /
+          backend:
+            serviceName: calculator-front-end
+            servicePort: 80
 
 ---
 apiVersion: apps/v1
