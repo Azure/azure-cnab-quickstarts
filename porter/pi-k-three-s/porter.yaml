@@ -1,5 +1,5 @@
 name: pi-k-three-s
-version: 0.1.0
+version: 0.1.1
 description: Setups up Kubernetes and Tiller on a Raspberry Pi cluster using k3s
 invocationImage: cnabquickstarts.azurecr.io/porter/pi-k-three-s:0.1.0
 tag: cnabquickstarts.azurecr.io/porter/pi-k-three-s/bundle:0.1.0
