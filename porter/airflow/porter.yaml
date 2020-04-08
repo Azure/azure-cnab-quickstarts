@@ -713,8 +713,8 @@ install:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
+        - "airflow.sh" 
+        - "replace-tokens"
   - helm:
       description: "Install Airflow"
       name: "{{ bundle.parameters.airflow_name }}"
@@ -729,8 +729,8 @@ upgrade:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
+        - "airflow.sh" 
+        - "replace-tokens"
   - helm:
       description: "Upgrade Airflow"
       name: "{{ bundle.parameters.airflow_name }}"
