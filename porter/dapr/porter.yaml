@@ -20,28 +20,6 @@ parameters:
     description: Installation name for Helm deployment
     destination:
       env: $INSTALLATION_NAME
-  - name: helm_chart_version
-    type: string
-    default: 0.1.0
-    description: Version of the dapr/dapr Helm chart to use for deployment
-  - name: global_repository
-    type: string
-    description: Container image repository
-    default: 'docker.io/daprio'
-    destination:
-      env: GLOBAL_REPOSITORY
-  - name: global_tag
-    type: string
-    description: Container image tag
-    default: '0.5.0'
-    destination:
-      env: GLOBAL_TAG
-  - name: global_imagePullPolicy
-    type: string
-    description: Container image pull policy
-    default: 'Always'
-    destination:
-      env: GLOBAL_IMAGEPULLPOLICY
 
 
 mixins:
@@ -51,23 +29,12 @@ mixins:
 
 install:
   - exec:
-      description: "Replace tokens in values.yaml.template"
-      command: "bash"
-      arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
-  - exec:
       description: Create Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+        - "dapr.sh" 
+        - "create-kubernetes-namespace"
+        - "{{ bundle.parameters.namespace }}"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
@@ -89,22 +56,8 @@ install:
       flags:
         namespace: "{{ bundle.parameters.namespace }}"
         replace:
-        values:
-          - /cnab/app/values.yaml
 
 upgrade:
-  - exec:
-      description: "Replace tokens in values.yaml.template"
-      command: "bash"
-      arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
   - helm3:
       description: "Add dapr Helm repository"
       arguments:
@@ -125,8 +78,6 @@ upgrade:
         - dapr/dapr
       flags:
         namespace: "{{ bundle.parameters.namespace }}"
-        values:
-          - /cnab/app/values.yaml
      
 uninstall:
   - helm3:
@@ -140,5 +91,6 @@ uninstall:
       description: Delete Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+        - "dapr.sh" 
+        - "delete-kubernetes-namespace"
+        - "{{ bundle.parameters.namespace }}"
