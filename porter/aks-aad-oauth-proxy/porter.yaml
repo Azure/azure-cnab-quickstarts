@@ -84,42 +84,36 @@ install:
       description: Create AAD app registration and add permission to sign in and read profile information
       command: bash
       arguments:
-        - "-c"
-        - |
-          az ad app create --display-name "{{ bundle.parameters.aad_application_name}}" --identifier-uris "http://{{ bundle.parameters.aad_application_name}}" --password "{{ bundle.parameters.aad_application_secret }}" --reply-url "https://{{ bundle.parameters.fqdn }}/oauth2/callback"
-          AAD_CLIENT_ID=$(az ad app list --display-name {{ bundle.parameters.aad_application_name}} --query "[0].appId" -o tsv)
-          az ad app permission add --id $AAD_CLIENT_ID --api 00000002-0000-0000-c000-000000000000 --api-permissions 311a71cc-e848-46a1-bdf8-97ff7156d8e6=Scope
+        - "aks-aad-oauth-proxy.sh"
+        - "create-AAD-app-registration"
+        - "{{ bundle.parameters.aad_application_name}}"
+        - "{{ bundle.parameters.aad_application_secret}}"
+        - "{{ bundle.parameters.fqdn }}"
 
   - exec:
       description: Get AAD app ID, Generate cookie secret, Replace tokens in oauth2-proxy-azure.yaml
       command: bash
       arguments:
-      - -c
-      - |
-        export AAD_CLIENT_ID=$(az ad app list --display-name {{ bundle.parameters.aad_application_name}} --query "[0].appId" -o tsv)
-        export COOKIE_SECRET=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
-        envsubst < oauth2-proxy-azure.yaml > manifest.yaml
-
-  - exec:
-      description: Log out manifest.yaml
-      command: bash
-      arguments:
-      - -c
-      - "cat manifest.yaml && echo \n\n"
+        - "aks-aad-oauth-proxy.sh"
+        - "replace-tokens"
+        - "{{ bundle.parameters.aad_application_name}}"
 
   - exec:
       description: Create Kubernetes namespace
       command: bash
       arguments:
-        - "-c"
-        - "kubectl create namespace {{ bundle.parameters.namespace }}"
+        - "aks-aad-oauth-proxy.sh"
+        - "create-namespace"
+        - "{{ bundle.parameters.namespace }}"
 
   - exec:
       description: Create oauth2 secret
       command: bash
       arguments:
-        - "-c"
-        - "kubectl create secret generic oauth2-secrets --namespace {{ bundle.parameters.namespace }} --from-literal=clientSecret={{ bundle.parameters.aad_application_secret }}"
+        - "aks-aad-oauth-proxy.sh"
+        - "create-oauth2-secret"
+        - "{{ bundle.parameters.namespace }}"
+        - "{{ bundle.parameters.aad_application_secret }}"
 
   - kubernetes:
       description: "Deploy OAuth2 proxy"
@@ -151,8 +145,9 @@ uninstall:
       description: "Delete namespace"
       command: "bash"
       arguments:
-        - "-c"
-        - "kubectl delete namespace {{ bundle.parameters.namespace }}"
+        - "aks-aad-oauth-proxy.sh"
+        - "delete-namespace"
+        - "{{ bundle.parameters.namespace }}"
 
   - az: 
       description: "Delete AAD app registration"

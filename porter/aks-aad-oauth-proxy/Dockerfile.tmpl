@@ -7,3 +7,4 @@ ARG BUNDLE_DIR
 RUN apt-get update && apt-get install gettext-base
 
 COPY manifests/ $BUNDLE_DIR
+COPY aks-aad-oauth-proxy.sh $BUNDLE_DIR
