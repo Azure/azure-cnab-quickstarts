@@ -341,7 +341,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.1-pull-54-merge.1-192"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.2-pull-54-merge.1-202"
 								},
 								{
 									"name": "CNAB_PARAM_cert_manager_helm_chart_version",
