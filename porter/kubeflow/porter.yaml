@@ -17,7 +17,7 @@ parameters:
   description: The name of the KubeFlow deployment
 - name: kustomize_manifest
   type: string
-  default: "https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.0.yaml"
+  default: "https://raw.githubusercontent.com/kubeflow/manifests/v1.0-branch/kfdef/kfctl_k8s_istio.v1.0.1.yaml"
   description: The URL to the Kustomize manifest to use as the configuration file
     
 mixins:
@@ -26,29 +26,17 @@ mixins:
 install:
   - exec:
       description: "Install KubeFlow"
-      command: "bash"
+      command: "./kubeflow.sh"
       arguments: 
-        - "-c" 
-        - |
-          export KF_NAME={{ bundle.parameters.kubeflow_name }}
-          export BASE_DIR=/kubeflow
-          export KF_DIR=${BASE_DIR}/${KF_NAME}
-          export CONFIG_URI={{ bundle.parameters.kustomize_manifest }}
-          mkdir -p ${KF_DIR}
-          cd ${KF_DIR}
-          kfctl apply -V -f ${CONFIG_URI}
+        - "install-kubeflow"
+        - "{{ bundle.parameters.kubeflow_name }}"
+        - "{{ bundle.parameters.kustomize_manifest }}"
 
 uninstall:
   - exec:
       description: "Uninstall KubeFlow"
-      command: "bash"
+      command: "./kubeflow.sh"
       arguments: 
-        - "-c" 
-        - |
-          export KF_NAME={{ bundle.parameters.kubeflow_name }}
-          export BASE_DIR=/kubeflow
-          export KF_DIR=${BASE_DIR}/${KF_NAME}
-          export CONFIG_URI={{ bundle.parameters.kustomize_manifest }}
-          mkdir -p ${KF_DIR}
-          cd ${KF_DIR}
-          kfctl delete -f ${CONFIG_URI}
+        - "uninstall-kubeflow"
+        - "{{ bundle.parameters.kubeflow_name }}"
+        - "{{ bundle.parameters.kustomize_manifest }}"
