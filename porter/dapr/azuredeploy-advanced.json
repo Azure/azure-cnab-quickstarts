@@ -122,34 +122,6 @@
 				"description": "Name for the container"
 			}
 		},
-		"global_imagePullPolicy": {
-			"type": "string",
-			"defaultValue": "Always",
-			"metadata": {
-				"description": "Container image pull policy"
-			}
-		},
-		"global_repository": {
-			"type": "string",
-			"defaultValue": "docker.io/daprio",
-			"metadata": {
-				"description": "Container image repository"
-			}
-		},
-		"global_tag": {
-			"type": "string",
-			"defaultValue": "0.5.0",
-			"metadata": {
-				"description": "Container image tag"
-			}
-		},
-		"helm_chart_version": {
-			"type": "string",
-			"defaultValue": "0.1.0",
-			"metadata": {
-				"description": "Version of the dapr/dapr Helm chart to use for deployment"
-			}
-		},
 		"installation_name": {
 			"type": "string",
 			"defaultValue": "dapr",
@@ -287,23 +259,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193"
-								},
-								{
-									"name": "CNAB_PARAM_global_imagePullPolicy",
-									"value": "[parameters('global_imagePullPolicy')]"
-								},
-								{
-									"name": "CNAB_PARAM_global_repository",
-									"value": "[parameters('global_repository')]"
-								},
-								{
-									"name": "CNAB_PARAM_global_tag",
-									"value": "[parameters('global_tag')]"
-								},
-								{
-									"name": "CNAB_PARAM_helm_chart_version",
-									"value": "[parameters('helm_chart_version')]"
+									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-52-merge.1-204"
 								},
 								{
 									"name": "CNAB_PARAM_installation_name",

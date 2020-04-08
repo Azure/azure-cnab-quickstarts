@@ -33,18 +33,14 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-48-merge.1-193 -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-52-merge.1-204 -d azure```
 
 
 ## Parameters and Credentials
 
  | Name | Description | Default | Required | 
  | --- | --- | --- | --- | 
- | global_imagePullPolicy | Container image pull policy |  | No
-global_repository | Container image repository |  | No
-global_tag | Container image tag |  | No
-helm_chart_version | Version of the dapr/dapr Helm chart to use for deployment |  | No
-installation_name | Installation name for Helm deployment |  | No
+ | installation_name | Installation name for Helm deployment |  | No
 kubeconfig |  |  | Yes
 namespace | Kubernetes namespace for installation |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No | 
