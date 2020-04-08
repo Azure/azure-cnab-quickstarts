@@ -1,6 +1,6 @@
  | Name | Version | Description | 
  | --- | --- | --- | 
- | [airflow](airflow) | 0.1.0 | Apache Airflow on Kubernetes
+ | [airflow](airflow) | 0.1.1 | Apache Airflow on Kubernetes
 [aks](aks) | 0.1.3 | Azure Kubernetes Service (AKS)
 [aks-aad-oauth-proxy](aks-aad-oauth-proxy) | 0.1.1 | Installs an OAuth2 Proxy into an AKS cluster, configured with Azure Active Directory
 [aks-nginx-ingress](aks-nginx-ingress) | 0.1.1 | Installs an nginx ingress controller to an AKS cluster
