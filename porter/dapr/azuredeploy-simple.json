@@ -46,8 +46,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "dapr",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.1-pull-58-merge.1-197'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.1-pull-58-merge.1-197'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'dapr', 'cnabquickstarts.azurecr.io/porter/dapr/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -151,7 +151,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.1-pull-58-merge.1-197"
+									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_installation_name",
