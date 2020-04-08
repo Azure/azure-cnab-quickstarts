@@ -13,22 +13,22 @@ spec:
     targetPort: 8080
   type: ClusterIP
 
----
+# ---
 
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: calculator-front-end-ingress
-  labels:
-    app: calculator-front-end
-spec:
-  rules:
-  - http:
-      paths:
-        - path: /
-          backend:
-            serviceName: calculator-front-end
-            servicePort: 80
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: calculator-front-end-ingress
+#   labels:
+#     app: calculator-front-end
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#         - path: /
+#           backend:
+#             serviceName: calculator-front-end
+#             servicePort: 80
 
 ---
 apiVersion: apps/v1
