@@ -112,7 +112,8 @@ install:
       description: "Configure DNS name"
       command: "bash"
       arguments:
-        - "configure-dns-name.sh"
+        - "aks-nginx-ingress.sh"
+        - "configure-dns-name"
         - "{{ bundle.parameters.nginx_ingress_namespace }}"
         - "{{ bundle.parameters.nginx_ingress_installation_name }}"
         - "{{ bundle.parameters.dns_name }}"
@@ -124,18 +125,16 @@ install:
       description: "Add Jetstack Helm repo"
       command: "bash"
       arguments:
-        - "-c"
-        - "helm repo add jetstack https://charts.jetstack.io"
+        - "aks-nginx-ingress.sh"
+        - "add-jetstack-helm-repo"
 
   - exec:
       description: "Run cert-manager pre-reqs"
       command: "bash"
       arguments:
-        - "-c"
-        - |
-          kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
-          kubectl create namespace {{ bundle.parameters.cert_manager_namespace }}
-          kubectl label namespace {{ bundle.parameters.cert_manager_namespace }} certmanager.k8s.io/disable-validation=true
+        - "aks-nginx-ingress.sh"
+        - "run-cert-manage-pre-reqs"
+        - "{{ bundle.parameters.cert_manager_namespace }}"
 
   - helm:
       description: "Install cert-manager"
@@ -151,8 +150,9 @@ install:
       description: Replace tokens in cluster-issuer.yaml
       command: bash
       arguments:
-      - -c
-      - envsubst < /cnab/app/cluster-issuer-{{ bundle.parameters.letsencrypt_environment }}.yaml > /cnab/app/cluster-issuer.yaml
+        - "aks-nginx-ingress.sh"
+        - "replace-tokens"
+        - "{{ bundle.parameters.letsencrypt_environment }}"
 
   - kubernetes:
       description: "Create a CA cluster issuer"
@@ -177,5 +177,6 @@ uninstall:
       description: "Delete cert-manager namespace"
       command: "bash"
       arguments:
-        - "-c"
-        - "kubectl delete namespace {{ bundle.parameters.cert_manager_namespace }}"
+        - "aks-nginx-ingress.sh"
+        - "delete-certmanager-namespace"
+        - "{{ bundle.parameters.cert_manager_namespace }}"
