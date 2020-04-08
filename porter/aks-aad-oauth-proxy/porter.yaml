@@ -1,5 +1,5 @@
 name: aks-aad-oauth-proxy
-version: 0.1.1
+version: 0.1.2
 dockerfile: Dockerfile.tmpl
 description: "Installs an OAuth2 Proxy into an AKS cluster, configured with Azure Active Directory"
 invocationImage: cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy:0.1.1
