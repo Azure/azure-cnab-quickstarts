@@ -1,5 +1,5 @@
 name: airflow
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: "Apache Airflow on Kubernetes"
 invocationImage: cnabquickstarts.azurecr.io/porter/airflow:0.1.0
