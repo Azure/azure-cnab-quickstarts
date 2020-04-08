@@ -45,7 +45,7 @@ parameters:
   - name: cert_manager_helm_chart_version
     type: string
     description: Version number for the cert-manager Helm chart
-    default: 'v0.8.0'
+    default: 'v0.14.2'
   - name: controller_replica_count
     type: integer
     description: Replica count for ingress controller
