@@ -1,5 +1,6 @@
 function create-kubernetes-namespace() {
-    kubectl create namespace $1
+    manifest="{\"apiVersion\": \"v1\", \"kind\": \"Namespace\", \"metadata\": { \"name\": \"$1\" }}"
+    echo $manifest | kubectl apply -f -
 }
 
 function delete-kubernetes-namespace() {
