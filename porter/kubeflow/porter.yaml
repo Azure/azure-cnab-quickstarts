@@ -1,5 +1,5 @@
 name: kubeflow
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: "KubeFlow on Kubernetes"
 invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow:0.1.0
