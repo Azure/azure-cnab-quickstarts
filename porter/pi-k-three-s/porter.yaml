@@ -66,8 +66,7 @@ install:
       description: "Set permissions for ssh key"
       command: "bash"
       arguments:
-        - "-c"
-        - "chmod 400 /root/.ssh/id_rsa"
+        - "set-permissions-for-ssh-key.sh"
 
   - exec: 
       description: "Enable container features"
@@ -112,11 +111,7 @@ install:
       description: "Install Tiller"
       command: "bash"
       arguments:
-        - "-c"
-        - |
-          kubectl create serviceaccount tiller --namespace kube-system --dry-run=true -o yaml | kubectl apply -f -
-          kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller --dry-run=true -o yaml | kubectl apply -f -
-          helm init --tiller-image=jessestuart/tiller --service-account tiller --upgrade
+        - "install-tiller.sh"
 
  
 uninstall:
@@ -124,8 +119,7 @@ uninstall:
       description: "Set permissions for ssh key"
       command: "bash"
       arguments:
-        - "-c"
-        - "chmod 400 /root/.ssh/id_rsa"
+        - "set-permissions-for-ssh-key.sh"
 
   - exec: 
       description: "Disable container features"
