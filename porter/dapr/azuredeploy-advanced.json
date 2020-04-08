@@ -259,7 +259,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.0-pull-52-merge.1-204"
+									"value": "cnabquickstarts.azurecr.io/porter/dapr/bundle:0.1.1-pull-58-merge.1-197"
 								},
 								{
 									"name": "CNAB_PARAM_installation_name",

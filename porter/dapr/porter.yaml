@@ -1,5 +1,5 @@
 name: dapr
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: Installs Dapr on a Kubernetes cluster, using the official Dapr Helm chart
 invocationImage: cnabquickstarts.azurecr.io/porter/dapr:0.1.0
