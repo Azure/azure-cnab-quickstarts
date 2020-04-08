@@ -111,8 +111,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "aks-nginx-ingress",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.2-pull-54-merge.1-202'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.2-pull-54-merge.1-202'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-nginx-ingress', 'cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -216,7 +216,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.2-pull-54-merge.1-202"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_cert_manager_helm_chart_version",
