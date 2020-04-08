@@ -1,5 +1,5 @@
 name: aks-nginx-ingress
-version: 0.1.1
+version: 0.1.2
 dockerfile: Dockerfile.tmpl
 description: "Installs an nginx ingress controller to an AKS cluster"
 invocationImage: cnabquickstarts.azurecr.io/porter/aks-nginx-ingress:0.1.1
