@@ -23,11 +23,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: '[WORKAROUND] Fetch required tags for GitVersion'
-        run: |
-          git fetch --tags
-          git branch --create-reflog master origin/master
-
       - name: '[WORKAROUND] Get branch name'
         id: get_branch_name
         uses: endjin/CNAB.Quickstarts.GitHub.Actions/get-branch-name@v1
