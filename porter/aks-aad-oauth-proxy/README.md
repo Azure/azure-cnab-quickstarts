@@ -62,3 +62,4 @@ tls_secret_name | Name for TLS secret for oauth2-proxy ingress |  | No |
 ## Known issues
 
 - [Expand instructions](https://github.com/Azure/azure-cnab-quickstarts/issues/62)
+- [Test bundle](https://github.com/Azure/azure-cnab-quickstarts/issues/75)
