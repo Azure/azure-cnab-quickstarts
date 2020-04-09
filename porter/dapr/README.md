@@ -49,3 +49,4 @@ porter-debug | Print debug information from Porter when executing the bundle |  
 ## Known issues
 
 - ~~[won't uninstall](https://github.com/Azure/azure-cnab-quickstarts/issues/42)~~
+- [Test bundle](https://github.com/Azure/azure-cnab-quickstarts/issues/78)
