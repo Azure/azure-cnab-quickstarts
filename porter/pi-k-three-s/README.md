@@ -129,3 +129,8 @@ ssh_key | Private ssh key for authenticating with all Raspberry Pis |  | Yes
 workers_host | Comma-separated array of IP addresses or DNS names of the worker Raspberry Pi nodes, e.g. '192.168.0.60,192.168.0.61,192.168.0.62' |  | No
 workers_port | Comma-separated array of ports of the worker Raspberry Pi nodes, e.g. '22,22,22,22' |  | No
 workers_username | Comma-separated array of usernames for the worker Raspberry Pi nodes, e.g. 'pi,pi,pi' |  | No | 
+
+
+## Known issues
+
+- [Test bundle](https://github.com/Azure/azure-cnab-quickstarts/issues/81)
