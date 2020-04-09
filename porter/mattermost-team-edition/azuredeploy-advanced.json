@@ -430,7 +430,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0.1.1-pull-67-merge.1-219"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_externalDB_enabled",
