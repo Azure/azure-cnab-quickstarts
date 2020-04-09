@@ -26,11 +26,6 @@
 		"cnab_action": {
 			"type": "string",
 			"defaultValue": "install",
-			"allowedValues": [
-				"install",
-				"upgrade",
-				"uninstall"
-			],
 			"metadata": {
 				"description": "The name of the action to be performed on the application instance."
 			}
@@ -69,7 +64,7 @@
 			}
 		},
 		"externalDatabase_password": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Password for the above username"
@@ -306,7 +301,7 @@
 			}
 		},
 		"mariadb_db_password": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Password for the database"
@@ -327,7 +322,7 @@
 			}
 		},
 		"mariadb_rootUser_password": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "MariaDB admin password"
@@ -649,7 +644,7 @@
 			}
 		},
 		"smtpPassword": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "SMTP password"
@@ -726,7 +721,7 @@
 			}
 		},
 		"wordpressPassword": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Application password"
@@ -772,8 +767,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "wordpress",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222'))]"
 	},
 	"resources": [
 		{
@@ -795,16 +790,6 @@
 					}
 				}
 			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/porter')]",
-			"apiVersion": "2019-04-01",
-			"location": "[variables('aci_location')]",
-			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
-			],
-			"properties": null
 		},
 		{
 			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
@@ -829,7 +814,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -887,11 +872,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.0"
-								},
-								{
-									"name": "AZURE_STORAGE_CONNECTION_STRING",
-									"secureValue": "[concat('AccountName=', variables('cnab_azure_state_storage_account_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value)]"
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
