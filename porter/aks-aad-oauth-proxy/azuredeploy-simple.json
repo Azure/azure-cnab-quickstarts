@@ -78,8 +78,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "aks-aad-oauth-proxy",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.2-origin-aks-aad-oauth-proxy-exec-fix.1-193'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.2-origin-aks-aad-oauth-proxy-exec-fix.1-193'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks-aad-oauth-proxy', 'cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -183,7 +183,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:0.1.2-origin-aks-aad-oauth-proxy-exec-fix.1-193"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-aad-oauth-proxy/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_aad_application_name",
