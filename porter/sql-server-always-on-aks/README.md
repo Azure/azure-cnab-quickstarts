@@ -54,3 +54,8 @@ azure_tenant_id | Azure AAD Tenant Id for Azure account authentication - used to
 porter-debug | Print debug information from Porter when executing the bundle |  | No
 sql_masterkeypassword | The Password for the SQL Server Master Key |  | Yes
 sql_sapassword | The Password for the sa user in SQL Server |  | Yes | 
+
+
+## Known issues
+
+- [SQL Server pods error on startup](https://github.com/Azure/azure-cnab-quickstarts/issues/71)
