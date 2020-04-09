@@ -59,3 +59,4 @@ sql_sapassword | The Password for the sa user in SQL Server |  | Yes |
 ## Known issues
 
 - [SQL Server pods error on startup](https://github.com/Azure/azure-cnab-quickstarts/issues/71)
+- [Test bundle](https://github.com/Azure/azure-cnab-quickstarts/issues/82)
