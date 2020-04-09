@@ -54,7 +54,7 @@
 		},
 		"cert_manager_helm_chart_version": {
 			"type": "string",
-			"defaultValue": "v0.8.0",
+			"defaultValue": "v0.14.2",
 			"metadata": {
 				"description": "Version number for the cert-manager Helm chart"
 			}
