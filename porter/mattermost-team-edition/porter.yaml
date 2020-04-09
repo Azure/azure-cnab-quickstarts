@@ -1,9 +1,9 @@
 name: mattermost-team-edition
-version: 0.1.0
+version: 0.1.1
 dockerfile: Dockerfile.tmpl
 description: "Mattermost Team Edition on Kubernetes"
-invocationImage: cnabquickstarts.azurecr.io/porter/mattermost-team-edition:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/mattermost-team-edition:0.1.1
+tag: cnabquickstarts.azurecr.io/porter/mattermost-team-edition/bundle:0.1.1
 
 credentials:
   - name: kubeconfig
