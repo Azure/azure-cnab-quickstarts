@@ -512,8 +512,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "ghost",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -617,7 +617,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219"
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
