@@ -57,3 +57,8 @@ kubeconfig |  |  | Yes
 namespace | Kubernetes namespace for installation |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No
 tls_secret_name | Name for TLS secret for oauth2-proxy ingress |  | No | 
+
+
+## Known issues
+
+- [Expand instructions](https://github.com/Azure/azure-cnab-quickstarts/issues/62)
