@@ -767,8 +767,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "wordpress",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'wordpress', 'cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -872,7 +872,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:0.1.1-pull-69-merge.1-222"
+									"value": "cnabquickstarts.azurecr.io/porter/wordpress/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",

@@ -10,4 +10,4 @@
 [mattermost-team-edition](mattermost-team-edition) | 0.1.1 | Mattermost Team Edition on Kubernetes
 [pi-k-three-s](pi-k-three-s) | 0.1.1 | Setups up Kubernetes and Tiller on a Raspberry Pi cluster using k3s
 [sql-server-always-on-aks](sql-server-always-on-aks) | 0.6.1 | SQL Server Always On for AKS
-[wordpress](wordpress) | 0.1.0 | Wordpress on Kubernetes | 
+[wordpress](wordpress) | 0.1.1 | Wordpress on Kubernetes | 
