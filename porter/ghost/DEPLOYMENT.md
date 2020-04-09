@@ -9,12 +9,12 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ### Simple deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fghost%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fghost-exec-fix%2Fporter%2Fghost%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 ### Advanced deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmaster%2Fporter%2Fghost%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fghost-exec-fix%2Fporter%2Fghost%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 
 ## Deploy from Cloud Shell
@@ -23,7 +23,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/ghost/bundle:latest -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1-pull-64-merge.1-209 -d azure```
 
 
 ## Parameters and Credentials
@@ -41,7 +41,7 @@ fullnameOverride | String to fully override ghost.fullname template with a strin
 ghostBlogTitle | Ghost Blog name |  | No
 ghostEmail | Admin email |  | No
 ghostHost | Ghost host to create application URLs |  | No
-ghostPassword | Application password |  | No
+ghostPassword | Application password |  | Yes
 ghostPath | Ghost path to create application URLs |  | No
 ghostPort | Ghost port to use in application URLs |  | No
 ghostProtocol | Protocol (http or https) to use in the application URLs |  | No
@@ -69,10 +69,10 @@ ingress_secrets_0_name | TLS Secret Name |  | No
 installation_name | Installation name for Helm deployment |  | No
 kubeconfig |  |  | Yes
 mariadb_db_name | MariaDB Database name to create |  | No
-mariadb_db_password | MariaDB Password for user |  | No
+mariadb_db_password | MariaDB Password for user |  | Yes
 mariadb_db_user | MariaDB Database user to create |  | No
 mariadb_enabled | Whether or not to install MariaDB (disable if using external) |  | No
-mariadb_rootUser_password | MariaDB admin password |  | No
+mariadb_rootUser_password | MariaDB admin password |  | Yes
 nameOverride | String to partially override ghost.fullname template with a string (will prepend the release name) |  | No
 namespace | Kubernetes namespace for installation |  | No
 persistence_accessMode | PVC Access Mode for Ghost volume |  | No

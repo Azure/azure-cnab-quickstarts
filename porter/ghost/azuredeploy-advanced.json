@@ -37,7 +37,7 @@
 		},
 		"allowEmptyPassword": {
 			"type": "bool",
-			"defaultValue": true,
+			"defaultValue": false,
 			"metadata": {
 				"description": "Allow DB blank passwords"
 			}
@@ -45,11 +45,6 @@
 		"cnab_action": {
 			"type": "string",
 			"defaultValue": "install",
-			"allowedValues": [
-				"install",
-				"upgrade",
-				"uninstall"
-			],
 			"metadata": {
 				"description": "The name of the action to be performed on the application instance."
 			}
@@ -94,7 +89,7 @@
 		},
 		"cnab_azure_state_fileshare": {
 			"type": "string",
-			"defaultValue": "ghost",
+			"defaultValue": "",
 			"metadata": {
 				"description": "The file share name in the storage account for the CNAB state to be stored in"
 			}
@@ -156,7 +151,7 @@
 			}
 		},
 		"externalDatabase_password": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "Password for the above username"
@@ -205,8 +200,7 @@
 			}
 		},
 		"ghostPassword": {
-			"type": "securestring",
-			"defaultValue": "",
+			"type": "string",
 			"metadata": {
 				"description": "Application password"
 			}
@@ -400,8 +394,7 @@
 			}
 		},
 		"mariadb_db_password": {
-			"type": "securestring",
-			"defaultValue": "",
+			"type": "string",
 			"metadata": {
 				"description": "MariaDB Password for user"
 			}
@@ -421,8 +414,7 @@
 			}
 		},
 		"mariadb_rootUser_password": {
-			"type": "securestring",
-			"defaultValue": "",
+			"type": "string",
 			"metadata": {
 				"description": "MariaDB admin password"
 			}
@@ -436,7 +428,7 @@
 		},
 		"namespace": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "ghost",
 			"metadata": {
 				"description": "Kubernetes namespace for installation"
 			}
@@ -561,7 +553,7 @@
 			}
 		},
 		"smtpPassword": {
-			"type": "securestring",
+			"type": "string",
 			"defaultValue": "",
 			"metadata": {
 				"description": "SMTP password"
@@ -653,16 +645,6 @@
 			}
 		},
 		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/porter')]",
-			"apiVersion": "2019-04-01",
-			"location": "[variables('aci_location')]",
-			"dependsOn": [
-				"[variables('cnab_azure_state_storage_account_name')]"
-			],
-			"properties": null
-		},
-		{
 			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
 			"name": "[concat(variables('cnab_azure_state_storage_account_name'), '/default/', variables('cnab_azure_state_fileshare'))]",
 			"apiVersion": "2019-04-01",
@@ -685,7 +667,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.33.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.25.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -743,11 +725,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1"
-								},
-								{
-									"name": "AZURE_STORAGE_CONNECTION_STRING",
-									"secureValue": "[concat('AccountName=', variables('cnab_azure_state_storage_account_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('cnab_azure_state_storage_account_name')), '2019-04-01').keys[0].value)]"
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1-pull-64-merge.1-209"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",
