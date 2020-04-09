@@ -42,6 +42,9 @@ parameters:
   description: The Azure location to create the resources in
   destination:
     env: LOCATION
+  applyTo:
+    - install
+    - upgrade
     
 mixins:
   - exec
@@ -50,19 +53,6 @@ mixins:
   - az
 
 install:
-  - azure:
-      description: "Create AKS"
-      type: aks
-      name: "{{ bundle.parameters.aks_cluster_name }}"
-      resourceGroup: "{{ bundle.parameters.aks_resource_group }}"
-      parameters:
-        clusterName: "{{ bundle.parameters.aks_cluster_name }}"
-        servicePrincipalClientId: "{{ bundle.credentials.azure_client_id}}"
-        servicePrincipalClientSecret: "{{ bundle.credentials.azure_client_secret}}"
-        location: "{{ bundle.parameters.azure_location }}"
-        agentCount: 4
-        kubernetesVersion: "1.15.7"
-
   - az: 
       description: "Azure CLI login"
       arguments: 
@@ -80,6 +70,29 @@ install:
         - "set" 
       flags:
         subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - az: 
+      description: "Create resource group if not exists"
+      arguments: 
+        - "group" 
+        - "create" 
+      flags:
+        name: "{{ bundle.parameters.aks_resource_group }}"
+        location: "{{ bundle.parameters.azure_location }}"
+  
+  - exec: 
+      description: "Create AKS if not exists"
+      command: "bash"
+      arguments:
+        - "ssao.sh"
+        - "create-aks"
+        - "{{ bundle.parameters.aks_cluster_name }}"
+        - "{{ bundle.parameters.aks_resource_group }}"
+        - "1.15.7"
+        - "4"
+        - "{{ bundle.credentials.azure_client_id}}"
+        - "{{ bundle.credentials.azure_client_secret}}"
+        - "{{ bundle.parameters.azure_location }}"
 
   - az: 
       description: "Azure CLI AKS get-credentials"
@@ -113,8 +126,8 @@ install:
       description: "Wait for SQL Custom Resource"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "crd='';while [[ -z $crd ]];do crd=$(kubectl get crd --field-selector=metadata.name=sqlservers.mssql.microsoft.com --ignore-not-found=true);echo 'Waiting for sql server CRD to be created'; sleep 30;done" 
+        - "ssao.sh" 
+        - "wait-for-sql-custom-resource"
  
   - kubernetes:
       description: "Create SQL Server"
@@ -132,8 +145,8 @@ install:
       description: "Output Primary IP Address"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "PRIMARY_IP='';while [[ -z $PRIMARY_IP ]];do PRIMARY_IP=$(kubectl get svc/ag1-primary -n ag1 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' --ignore-not-found=true);echo 'Waiting for primary AG IP Address'; sleep 30;done; echo Connect to SQL Primary: sqlcmd -S ${PRIMARY_IP} -U sa;" 
+        - "ssao.sh" 
+        - "output-primary-ip-address"
 
 uninstall:
   - az: 
@@ -147,11 +160,17 @@ uninstall:
         tenant: "{{ bundle.credentials.azure_tenant_id}}"
 
   - az: 
-      description: "Delete App resource group"
+      description: "Azure set subscription Id"
       arguments: 
-        - "group" 
-        - "delete" 
+        - "account" 
+        - "set" 
       flags:
-        name: "{{ bundle.parameters.aks_resource_group }}"
-        yes:
-        
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec: 
+      description: "Delete App resource group"
+      command: bash
+      arguments: 
+        - "ssao.sh" 
+        - "delete-resource-group" 
+        - "{{ bundle.parameters.aks_resource_group }}"
