@@ -64,3 +64,8 @@ mysql_mysqlUser | Username for Mysql (Required) |  | Yes
 namespace | Kubernetes namespace for installation |  | No
 porter-debug | Print debug information from Porter when executing the bundle |  | No
 revisionHistoryLimit | How many old ReplicaSets for Mattermost Deployment you want to retain |  | No | 
+
+
+## Known issues
+
+- [Test bundle](https://github.com/Azure/azure-cnab-quickstarts/issues/80)
