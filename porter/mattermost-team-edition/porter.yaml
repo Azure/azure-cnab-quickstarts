@@ -12,7 +12,7 @@ credentials:
 parameters:
   - name: namespace
     type: string
-    default: ''
+    default: 'mattermost'
     description: Kubernetes namespace for installation
   - name: installation_name
     type: string
@@ -24,85 +24,126 @@ parameters:
     type: string
     default: 3.8.0
     description: Version of the mattermost/mattermost-team-edition Helm chart to use for deployment
-  
+    applyTo:
+      - install
+      - upgrade
   - name: image_repository
     type: string
     description: Container image repository
     default: 'mattermost/mattermost-team-edition'
     destination:
       env: IMAGE_REPOSITORY
+    applyTo:
+      - install
+      - upgrade
   - name: image_tag
     type: string
     description: Container image tag
     default: '5.13.2'
     destination:
       env: IMAGE_TAG
+    applyTo:
+      - install
+      - upgrade
   - name: image_imagePullPolicy
     type: string
     description: Container image pull policy
     default: 'IfNotPresent'
     destination:
       env: IMAGE_IMAGEPULLPOLICY
+    applyTo:
+      - install
+      - upgrade
   - name: initContainerImage_repository
     type: string
     description: Init container image repository
     default: 'appropriate/curl'
     destination:
       env: INITCONTAINERIMAGE_REPOSITORY
+    applyTo:
+      - install
+      - upgrade
   - name: initContainerImage_tag
     type: string
     description: Init container image tag
     default: 'latest'
     destination:
       env: INITCONTAINERIMAGE_TAG
+    applyTo:
+      - install
+      - upgrade
   - name: initContainerImage_imagePullPolicy
     type: string
     description: Container image pull policy
     default: 'IfNotPresent'
     destination:
       env: INITCONTAINERIMAGE_IMAGEPULLPOLICY
+    applyTo:
+      - install
+      - upgrade
   - name: revisionHistoryLimit
     type: integer
     description: How many old ReplicaSets for Mattermost Deployment you want to retain
     default: 1
     destination:
       env: REVISIONHISTORYLIMIT
+    applyTo:
+      - install
+      - upgrade
   - name: ingress_enabled
     type: boolean
     description: If true, an ingress is created
     default: false
     destination:
       env: INGRESS_ENABLED
+    applyTo:
+      - install
+      - upgrade
   - name: ingress_path
     type: string
     description: Path of the web server
     default: '/'
     destination:
       env: INGRESS_PATH
+    applyTo:
+      - install
+      - upgrade
   - name: ingress_annotations
     type: string
     description: Annotations for the ingress
     default: '{}'
     destination:
       env: INGRESS_ANNOTATIONS
+    applyTo:
+      - install
+      - upgrade
   - name: ingress_hosts
     type: string
     description: A list of ingress hosts
     default: '["mattermost.example.com"]'
     destination:
       env: INGRESS_HOSTS
+    applyTo:
+      - install
+      - upgrade
   - name: ingress_tls
     type: string
     description: A list of ingress tls items
     default: '[]'
     destination:
       env: INGRESS_TLS
+    applyTo:
+      - install
+      - upgrade
   - name: mysql_enabled
     type: boolean
     description: Enables deployment of a mysql server
     default: true
     destination:
       env: MYSQL_ENABLED
+    applyTo:
+      - install
+      - upgrade
   - name: mysql_mysqlRootPassword
     type: string
     description: Root Password for Mysql (Optional)
@@ -110,29 +151,44 @@ parameters:
     sensitive: true
     destination:
       env: MYSQL_MYSQLROOTPASSWORD
+    applyTo:
+      - install
+      - upgrade
   - name: mysql_mysqlUser
     type: string
     description: Username for Mysql (Required)
     destination:
       env: MYSQL_MYSQLUSER
+    applyTo:
+      - install
+      - upgrade
   - name: mysql_mysqlPassword
     type: string
     description: User Password for Mysql (Required)
     sensitive: true
     destination:
       env: MYSQL_MYSQLPASSWORD
+    applyTo:
+      - install
+      - upgrade
   - name: mysql_mysqlDatabase
     type: string
     description: Database name (Required)
     default: 'mattermost'
     destination:
       env: MYSQL_MYSQLDATABASE
+    applyTo:
+      - install
+      - upgrade
   - name: externalDB_enabled
     type: boolean
     description: Enables use of an preconfigured external database server
     default: false
     destination:
       env: EXTERNALDB_ENABLED
+    applyTo:
+      - install
+      - upgrade
   - name: externalDB_externalDriverType
     type: string
     enum: ["postgres", "mysql", ""]
@@ -140,30 +196,45 @@ parameters:
     default: ''
     destination:
       env: EXTERNALDB_EXTERNALDRIVERTYPE
+    applyTo:
+      - install
+      - upgrade
   - name: externalDB_externalConnectionString
     type: string
     description: See the section about external databases.
     default: ''
     destination:
       env: EXTERNALDB_EXTERNALCONNECTIONSTRING
+    applyTo:
+      - install
+      - upgrade
   - name: extraPodAnnotations
     type: string
     description: Extra pod annotations to be used in the deployments
     default: '{}'
     destination:
       env: EXTRAPODANNOTATIONS
+    applyTo:
+      - install
+      - upgrade
   - name: extraEnvVars
     type: string
     description: Extra environments variables to be used in the deployments
     default: '[]'
     destination:
       env: EXTRAENVVARS
+    applyTo:
+      - install
+      - upgrade
   - name: extraInitContainers
     type: string
     description: Additional init containers
     default: '[]'
     destination:
       env: EXTRAINITCONTAINERS
+    applyTo:
+      - install
+      - upgrade
 
 
 
@@ -176,14 +247,8 @@ install:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
+        - "mattermost.sh"
+        - "replace-tokens"
   - exec:
       description: "Add Matterhost Helm repository"
       command: "helm"
@@ -206,14 +271,8 @@ upgrade:
       description: "Replace tokens in values.yaml.template"
       command: "bash"
       arguments: 
-        - "-c" 
-        - "envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml"
-  - exec:
-      description: "Log out values.yaml"
-      command: "bash"
-      arguments:
-        - "-c"
-        - "cat /cnab/app/values.yaml && echo \n\n"
+        - "mattermost.sh"
+        - "replace-tokens"
   - exec:
       description: "Add Matterhost Helm repository"
       command: "helm"
