@@ -59,8 +59,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "sql-server-always-on-aks",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:latest'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:latest'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0.6.1-pull-70-merge.1-224'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'sql-server-always-on-aks', 'cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0.6.1-pull-70-merge.1-224'))]"
 	},
 	"resources": [
 		{
@@ -164,7 +164,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/sql-server-always-on-aks/bundle:0.6.1-pull-70-merge.1-224"
 								},
 								{
 									"name": "CNAB_PARAM_aks_cluster_name",
