@@ -11,7 +11,7 @@
 		},
 		"allowEmptyPassword": {
 			"type": "bool",
-			"defaultValue": true,
+			"defaultValue": false,
 			"metadata": {
 				"description": "Allow DB blank passwords"
 			}
@@ -100,7 +100,6 @@
 		},
 		"ghostPassword": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "Application password"
 			}
@@ -288,7 +287,6 @@
 		},
 		"mariadb_db_password": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "MariaDB Password for user"
 			}
@@ -309,7 +307,6 @@
 		},
 		"mariadb_rootUser_password": {
 			"type": "string",
-			"defaultValue": "",
 			"metadata": {
 				"description": "MariaDB admin password"
 			}
@@ -323,7 +320,7 @@
 		},
 		"namespace": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "ghost",
 			"metadata": {
 				"description": "Kubernetes namespace for installation"
 			}
@@ -515,8 +512,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "ghost",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:latest'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:latest'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ghost', 'cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219'))]"
 	},
 	"resources": [
 		{
@@ -620,7 +617,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219"
 								},
 								{
 									"name": "CNAB_PARAM_affinity",

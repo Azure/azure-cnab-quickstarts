@@ -1,17 +1,19 @@
 name: ghost
-version: 0.1.1
+version: 0.1.2
 dockerfile: Dockerfile.tmpl
 description: Ghost on Kubernetes
-invocationImage: cnabquickstarts.azurecr.io/porter/ghost:0.1.1
-tag: cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1
+invocationImage: cnabquickstarts.azurecr.io/porter/ghost:0.1.2
+tag: cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2
+
 credentials:
 - name: kubeconfig
   path: /root/.kube/config
+
 parameters:
 - name: namespace
   type: string
   description: Kubernetes namespace for installation
-  default: ''
+  default: 'ghost'
 - name: installation_name
   type: string
   description: Installation name for Helm deployment
@@ -20,157 +22,234 @@ parameters:
   type: string
   description: Version number for the Helm chart
   default: '8.0.5'
+  applyTo:
+    - install
+    - upgrade
 - name: global_imageRegistry
   type: string
   description: Global Docker image registry
   default: ''
   destination:
     env: GLOBAL_IMAGEREGISTRY
+  applyTo:
+    - install
+    - upgrade
 - name: global_imagePullSecrets
   type: string
   description: Global Docker registry secret names as an array
   default: '[]'
   destination:
     env: GLOBAL_IMAGEPULLSECRETS
+  applyTo:
+    - install
+    - upgrade
 - name: global_storageClass
   type: string
   description: Global storage class for dynamic provisioning
   default: ''
   destination:
     env: GLOBAL_STORAGECLASS
+  applyTo:
+    - install
+    - upgrade
 - name: image_registry
   type: string
   description: Ghost image registry
   default: docker.io
   destination:
     env: IMAGE_REGISTRY
+  applyTo:
+    - install
+    - upgrade
 - name: image_repository
   type: string
   description: Ghost Image name
   default: bitnami/ghost
   destination:
     env: IMAGE_REPOSITORY
+  applyTo:
+    - install
+    - upgrade
 - name: image_tag
   type: string
   description: Ghost Image tag
   default: '3.0.2-debian-9-r2'
   destination:
     env: IMAGE_TAG
+  applyTo:
+    - install
+    - upgrade
 - name: image_pullPolicy
   type: string
   description: Image pull policy
   default: IfNotPresent
   destination:
     env: IMAGE_PULLPOLICY
+  applyTo:
+    - install
+    - upgrade
 - name: image_pullSecrets
   type: string
   description: Specify docker-registry secret names as an array
   default: '[]'
   destination:
     env: IMAGE_PULLSECRETS
+  applyTo:
+    - install
+    - upgrade
 - name: nameOverride
   type: string
   description: String to partially override ghost.fullname template with a string (will prepend the release name)
   default: ''
   destination:
     env: NAMEOVERRIDE
+  applyTo:
+    - install
+    - upgrade
 - name: fullnameOverride
   type: string
   description: String to fully override ghost.fullname template with a string
   default: ''
   destination:
     env: FULLNAMEOVERRIDE
+  applyTo:
+    - install
+    - upgrade
 - name: volumePermissions_image_registry
   type: string
   description: Init container volume-permissions image registry
   default: docker.io
   destination:
     env: VOLUMEPERMISSIONS_IMAGE_REGISTRY
+  applyTo:
+    - install
+    - upgrade
 - name: volumePermissions_image_repository
   type: string
   description: Init container volume-permissions image name
   default: bitnami/minideb
   destination:
     env: VOLUMEPERMISSIONS_IMAGE_REPOSITORY
+  applyTo:
+    - install
+    - upgrade
 - name: volumePermissions_image_tag
   type: string
   description: Init container volume-permissions image tag
   default: stretch
   destination:
     env: VOLUMEPERMISSIONS_IMAGE_TAG
+  applyTo:
+    - install
+    - upgrade
 - name: volumePermissions_image_pullPolicy
   type: string
   description: Init container volume-permissions image pull policy
   default: Always
   destination:
     env: VOLUMEPERMISSIONS_IMAGE_PULLPOLICY
+  applyTo:
+    - install
+    - upgrade
 - name: ghostHost
   type: string
   description: Ghost host to create application URLs
   default: ''
   destination:
     env: GHOSTHOST
+  applyTo:
+    - install
+    - upgrade
 - name: ghostPort
   type: integer
   description: Ghost port to use in application URLs
   default: 80
   destination:
     env: GHOSTPORT
+  applyTo:
+    - install
+    - upgrade
 - name: ghostProtocol
   type: string
   description: Protocol (http or https) to use in the application URLs
   default: http
   destination:
     env: GHOSTPROTOCOL
+  applyTo:
+    - install
+    - upgrade
 - name: ghostPath
   type: string
   description: Ghost path to create application URLs
   default: /
   destination:
     env: GHOSTPATH
+  applyTo:
+    - install
+    - upgrade
 - name: ghostUsername
   type: string
   description: User of the application
   default: user@example.com
   destination:
     env: GHOSTUSERNAME
+  applyTo:
+    - install
+    - upgrade
 - name: ghostPassword
   type: string
   description: Application password
-  default: ''
   sensitive: true
   destination:
     env: GHOSTPASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: ghostEmail
   type: string
   description: Admin email
   default: user@example.com
   destination:
     env: GHOSTEMAIL
+  applyTo:
+    - install
+    - upgrade
 - name: ghostBlogTitle
   type: string
   description: Ghost Blog name
   default: User's Blog
   destination:
     env: GHOSTBLOGTITLE
+  applyTo:
+    - install
+    - upgrade
 - name: smtpHost
   type: string
   description: SMTP host
   default: ''
   destination:
     env: SMTPHOST
+  applyTo:
+    - install
+    - upgrade
 - name: smtpPort
   type: string
   description: SMTP port
   default: ''
   destination:
     env: SMTPPORT
+  applyTo:
+    - install
+    - upgrade
 - name: smtpUser
   type: string
   description: SMTP user
   default: ''
   destination:
     env: SMTPUSER
+  applyTo:
+    - install
+    - upgrade
 - name: smtpPassword
   type: string
   description: SMTP password
@@ -178,162 +257,243 @@ parameters:
   sensitive: true
   destination:
     env: SMTPPASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: smtpFromAddress
   type: string
   description: SMTP from address
   default: ''
   destination:
     env: SMTPFROMADDRESS
+  applyTo:
+    - install
+    - upgrade
 - name: smtpService
   type: string
   description: SMTP service
   default: ''
   destination:
     env: SMTPSERVICE
+  applyTo:
+    - install
+    - upgrade
 - name: allowEmptyPassword
   type: boolean
   description: Allow DB blank passwords
-  default: true
+  default: false
   destination:
     env: ALLOWEMPTYPASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: securityContext_enabled
   type: boolean
   description: Enable security context
   default: true
   destination:
     env: SECURITYCONTEXT_ENABLED
+  applyTo:
+    - install
+    - upgrade
 - name: securityContext_fsGroup
   type: integer
   description: Group ID for the container
   default: 1001
   destination:
     env: SECURITYCONTEXT_FSGROUP
+  applyTo:
+    - install
+    - upgrade
 - name: securityContext_runAsUser
   type: integer
   description: User ID for the container
   default: 1001
   destination:
     env: SECURITYCONTEXT_RUNASUSER
+  applyTo:
+    - install
+    - upgrade
 - name: service_type
   type: string
   description: Kubernetes Service type
   default: LoadBalancer
   destination:
     env: SERVICE_TYPE
+  applyTo:
+    - install
+    - upgrade
 - name: service_port
   type: integer
   description: Service HTTP port
   default: 80
   destination:
     env: SERVICE_PORT
+  applyTo:
+    - install
+    - upgrade
 - name: service_nodePorts_http
   type: string
   description: Kubernetes http node port
   default: ''
   destination:
     env: SERVICE_NODEPORTS_HTTP
+  applyTo:
+    - install
+    - upgrade
 - name: service_externalTrafficPolicy
   type: string
   description: Enable client source IP preservation
   default: Cluster
   destination:
     env: SERVICE_EXTERNALTRAFFICPOLICY
+  applyTo:
+    - install
+    - upgrade
 - name: service_loadBalancerIP
   type: string
   description: LoadBalancerIP for the Ghost service
   default: ''
   destination:
     env: SERVICE_LOADBALANCERIP
+  applyTo:
+    - install
+    - upgrade
 - name: service_annotations
   type: string
   description: Service annotations
   default: ''
   destination:
     env: SERVICE_ANNOTATIONS
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_enabled
   type: boolean
   description: Enable ingress controller resource
   default: false
   destination:
     env: INGRESS_ENABLED
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_annotations
   type: string
   description: Ingress annotations
   default: '[]'
   destination:
     env: INGRESS_ANNOTATIONS
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_certManager
   type: string
   description: Add annotations for cert-manager
   default: ''
   destination:
     env: INGRESS_CERTMANAGER
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_hosts_0_name
   type: string
   description: Hostname to your Ghost installation
   default: ghost.local
   destination:
     env: INGRESS_HOSTS_0_NAME
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_hosts_0_path
   type: string
   description: Path within the url structure
   default: /
   destination:
     env: INGRESS_HOSTS_0_PATH
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_hosts_0_tls
   type: boolean
   description: Utilize TLS backend in ingress
   default: false
   destination:
     env: INGRESS_HOSTS_0_TLS
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_hosts_0_tlsHosts
   type: string
   description: Array of TLS hosts for ingress record (defaults to ingress.hosts[0].name if nil)
   default: ''
   destination:
     env: INGRESS_HOSTS_0_TLSHOSTS
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_hosts_0_tlsSecret
   type: string
   description: TLS Secret (certificates)
   default: ghost.local-tls-secret
   destination:
     env: INGRESS_HOSTS_0_TLSSECRET
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_secrets_0_name
   type: string
   description: TLS Secret Name
   default: ''
   destination:
     env: INGRESS_SECRETS_0_NAME
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_secrets_0_certificate
   type: string
   description: TLS Secret Certificate
   default: ''
   destination:
     env: INGRESS_SECRETS_0_CERTIFICATE
+  applyTo:
+    - install
+    - upgrade
 - name: ingress_secrets_0_key
   type: string
   description: TLS Secret Key
   default: ''
   destination:
     env: INGRESS_SECRETS_0_KEY
+  applyTo:
+    - install
+    - upgrade
 - name: externalDatabase_host
   type: string
   description: Host of the external database
   default: localhost
   destination:
     env: EXTERNALDATABASE_HOST
+  applyTo:
+    - install
+    - upgrade
 - name: externalDatabase_port
   type: integer
   description: Port of the external database
   default: 3306
   destination:
     env: EXTERNALDATABASE_PORT
+  applyTo:
+    - install
+    - upgrade
 - name: externalDatabase_user
   type: string
   description: Existing username in the external db
   default: bn_ghost
   destination:
     env: EXTERNALDATABASE_USER
+  applyTo:
+    - install
+    - upgrade
 - name: externalDatabase_password
   type: string
   description: Password for the above username
@@ -341,102 +501,138 @@ parameters:
   sensitive: true
   destination:
     env: EXTERNALDATABASE_PASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: externalDatabase_database
   type: string
   description: Name of the existing database
   default: bitnami_ghost
   destination:
     env: EXTERNALDATABASE_DATABASE
+  applyTo:
+    - install
+    - upgrade
 - name: mariadb_enabled
   type: boolean
   description: Whether or not to install MariaDB (disable if using external)
   default: true
   destination:
     env: MARIADB_ENABLED
+  applyTo:
+    - install
+    - upgrade
 - name: mariadb_rootUser_password
   type: string
   description: MariaDB admin password
-  default: ''
   sensitive: true
   destination:
     env: MARIADB_ROOTUSER_PASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: mariadb_db_name
   type: string
   description: MariaDB Database name to create
   default: bitnami_ghost
   destination:
     env: MARIADB_DB_NAME
+  applyTo:
+    - install
+    - upgrade
 - name: mariadb_db_user
   type: string
   description: MariaDB Database user to create
   default: bn_ghost
   destination:
     env: MARIADB_DB_USER
+  applyTo:
+    - install
+    - upgrade
 - name: mariadb_db_password
   type: string
   description: MariaDB Password for user
-  default: ''
   sensitive: true
   destination:
     env: MARIADB_DB_PASSWORD
+  applyTo:
+    - install
+    - upgrade
 - name: persistence_enabled
   type: boolean
   description: Enable persistence using PVC
   default: true
   destination:
     env: PERSISTENCE_ENABLED
+  applyTo:
+    - install
+    - upgrade
 - name: persistence_storageClass
   type: string
   description: PVC Storage Class for Ghost volume
   default: ''
   destination:
     env: PERSISTENCE_STORAGECLASS
+  applyTo:
+    - install
+    - upgrade
 - name: persistence_accessMode
   type: string
   description: PVC Access Mode for Ghost volume
   default: ReadWriteOnce
   destination:
     env: PERSISTENCE_ACCESSMODE
+  applyTo:
+    - install
+    - upgrade
 - name: persistence_size
   type: string
   description: PVC Storage Request for Ghost volume
   default: 8Gi
   destination:
     env: PERSISTENCE_SIZE
+  applyTo:
+    - install
+    - upgrade
 - name: persistence_path
   type: string
   description: Path to mount the volume at, to use other images
   default: /bitnami
   destination:
     env: PERSISTENCE_PATH
+  applyTo:
+    - install
+    - upgrade
 - name: resources
   type: string
   description: CPU/Memory resource requests/limits
   default: '{ requests: { memory: 512Mi, cpu: 300m } }'
   destination:
     env: RESOURCES
+  applyTo:
+    - install
+    - upgrade
 - name: affinity
   type: string
   description: Map of node/pod affinities
   default: '{}'
   destination:
     env: AFFINITY
+  applyTo:
+    - install
+    - upgrade
+
 mixins:
 - exec
 - helm
+
 install:
 - exec:
     description: Replace tokens in values.yaml.template
     command: bash
     arguments:
-    - -c
-    - envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml
-- exec:
-    description: Log out values.yaml
-    command: bash
-    arguments:
-    - -c
-    - "cat /cnab/app/values.yaml && echo \n\n"
+    - "ghost.sh"
+    - "replace-tokens"
 - helm:
     description: Install ghost
     name: '{{ bundle.parameters.installation_name }}'
@@ -446,19 +642,14 @@ install:
     replace: true
     values:
     - /cnab/app/values.yaml
+
 upgrade:
 - exec:
     description: Replace tokens in values.yaml.template
     command: bash
     arguments:
-    - -c
-    - envsubst < /cnab/app/values.yaml.template > /cnab/app/values.yaml
-- exec:
-    description: Log out values.yaml
-    command: bash
-    arguments:
-    - -c
-    - "cat /cnab/app/values.yaml && echo \n\n"
+    - "ghost.sh"
+    - "replace-tokens"
 - helm:
     description: Upgrade ghost
     name: '{{ bundle.parameters.installation_name }}'
@@ -468,6 +659,7 @@ upgrade:
     replace: false
     values:
     - /cnab/app/values.yaml
+
 uninstall:
 - helm:
     description: Uninstall ghost
