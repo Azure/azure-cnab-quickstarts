@@ -54,7 +54,7 @@
 		},
 		"cert_manager_helm_chart_version": {
 			"type": "string",
-			"defaultValue": "v0.8.0",
+			"defaultValue": "v0.14.2",
 			"metadata": {
 				"description": "Version number for the cert-manager Helm chart"
 			}
@@ -341,7 +341,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/aks-nginx-ingress/bundle:0.1.2-pull-61-merge.1-206"
 								},
 								{
 									"name": "CNAB_PARAM_cert_manager_helm_chart_version",
