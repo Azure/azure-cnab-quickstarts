@@ -314,7 +314,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-206"
+									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-227"
 								},
 								{
 									"name": "CNAB_PARAM_azure_location",

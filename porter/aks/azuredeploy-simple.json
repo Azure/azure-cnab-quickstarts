@@ -78,8 +78,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "aks",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-206'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-206'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-227'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'aks', 'cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-227'))]"
 	},
 	"resources": [
 		{
@@ -183,7 +183,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-206"
+									"value": "cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.4-pull-60-merge.1-227"
 								},
 								{
 									"name": "CNAB_PARAM_azure_location",
