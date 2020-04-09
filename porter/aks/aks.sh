@@ -17,4 +17,8 @@ function create-aks {
     fi
 }
 
+function delete-aks {
+    az aks delete --name $1 --resource-group $2 --yes
+}
+
 "$@"

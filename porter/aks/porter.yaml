@@ -148,12 +148,11 @@ uninstall:
       flags:
         subscription: "{{ bundle.credentials.azure_subscription_id }}"
 
-  - az: 
+  - exec: 
       description: "Delete AKS"
+      command: bash
       arguments: 
-        - "aks" 
-        - "delete" 
-      flags:
-        name: "{{ bundle.parameters.cluster_name }}"
-        resource-group: "{{ bundle.parameters.resource_group }}"
-        yes:
+        - "aks.sh" 
+        - "delete-aks" 
+        - "{{ bundle.parameters.cluster_name }}"
+        - "{{ bundle.parameters.resource_group }}"
