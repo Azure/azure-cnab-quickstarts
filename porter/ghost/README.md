@@ -29,7 +29,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.1-pull-64-merge.1-209 -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/ghost/bundle:0.1.2-pull-64-merge.1-219 -d azure```
 
 
 ## Parameters and Credentials
