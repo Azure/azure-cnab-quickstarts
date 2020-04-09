@@ -1,5 +1,5 @@
 name: aks
-version: 0.1.3
+version: 0.1.4
 description: "Azure Kubernetes Service (AKS)"
 invocationImage: cnabquickstarts.azurecr.io/porter/aks:0.1.3
 tag: cnabquickstarts.azurecr.io/porter/aks/bundle:0.1.3
@@ -33,7 +33,7 @@ parameters:
 - name: kubernetes_version
   type: string
   description: The Kubernetes version to use
-  default: "1.14.7"
+  default: "1.16.7"
   applyTo:
     - "install"
 - name: node_vm_size
@@ -90,40 +90,30 @@ install:
       flags:
         subscription: "{{ bundle.credentials.azure_subscription_id}}"
 
-  - exec: 
+  - az: 
       description: "Create resource group if not exists"
-      command: "bash"
-      arguments:
-        - "-c"
-        - |
-          if [[ $(az group exists --name {{ bundle.parameters.resource_group }}) == false ]]; then
-              az group create --name {{ bundle.parameters.resource_group }} --location {{ bundle.parameters.azure_location }}
-          else
-            echo "Resource group already exists"
-          fi
+      arguments: 
+        - "group" 
+        - "create" 
+      flags:
+        name: "{{ bundle.parameters.resource_group }}"
+        location: "{{ bundle.parameters.azure_location }}"
   
   - exec: 
       description: "Create AKS if not exists"
       command: "bash"
       arguments:
-        - "-c"
-        - |
-          if [[ -z $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }} 2> /dev/null) ]]
-          then
-              az aks create \
-                --name {{ bundle.parameters.cluster_name }} \
-                --resource-group {{ bundle.parameters.resource_group }} \
-                --kubernetes-version {{ bundle.parameters.kubernetes_version }} \
-                --node-vm-size {{ bundle.parameters.node_vm_size }} \
-                --node-count {{ bundle.parameters.node_count }} \
-                --service-principal {{ bundle.credentials.azure_client_id}} \
-                --client-secret {{ bundle.credentials.azure_client_secret}} \
-                --location {{ bundle.parameters.azure_location }} \
-                --vm-set-type {{ bundle.parameters.vm_set_type }} \
-                --generate-ssh-keys
-          else
-              echo "AKS cluster already exists in specified resource group with specified name"
-          fi
+        - "aks.sh"
+        - "create-aks"
+        - "{{ bundle.parameters.cluster_name }}"
+        - "{{ bundle.parameters.resource_group }}"
+        - "{{ bundle.parameters.kubernetes_version }}"
+        - "{{ bundle.parameters.node_vm_size }}"
+        - "{{ bundle.parameters.node_count }}"
+        - "{{ bundle.credentials.azure_client_id}}"
+        - "{{ bundle.credentials.azure_client_secret}}"
+        - "{{ bundle.parameters.azure_location }}"
+        - "{{ bundle.parameters.vm_set_type }}"
 
   - az: 
       description: "Azure CLI AKS get-credentials"
@@ -160,9 +150,9 @@ uninstall:
 
   - exec: 
       description: "Delete AKS"
-      command: "bash"
-      arguments:
-        - "-c"
-        - |
-          az aks delete --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }} --yes
-        
+      command: bash
+      arguments: 
+        - "aks.sh" 
+        - "delete-aks" 
+        - "{{ bundle.parameters.cluster_name }}"
+        - "{{ bundle.parameters.resource_group }}"
