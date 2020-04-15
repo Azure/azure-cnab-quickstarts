@@ -1,3 +1,4 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', 'porterCredential')]
 param
 (
     [ValidateNotNullOrEmpty()]
@@ -5,14 +6,11 @@ param
     [string] $environmentName = "example",
 
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({Test-Path $_})]
-    [string] $credentialFile = "$(Split-Path -Parent $PSCommandPath)/porter-example-creds.yml",
+    [string] $porterCredential,
 
-    [ValidateNotNullOrEmpty()]
-    [string] $sshPrivateKey = "$(Split-Path -Parent $PSCommandPath)/playbook/environments/example_sshkey_id",
+    [string] $sshPrivateKey,
 
-    [ValidateNotNullOrEmpty()]
-    [string] $sshPublicKey = "$(Split-Path -Parent $PSCommandPath)/playbook/environments/example_sshkey_id.pub",
+    [string] $sshPublicKey,
 
     [ValidateSet("install","upgrade","uninstall", ignorecase=$true)]
     [string] $action = "install",
@@ -22,6 +20,26 @@ param
 
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $PSCommandPath
+
+function validateFileParameterWithDefault($value, $default)
+{
+    if ([string]::IsNullOrEmpty($value))
+    {
+        $value = $default
+    }
+
+    if ( !(Test-Path $value) )
+    {
+        Write-Error ("File not found: {0}" -f $value)
+    }
+    else
+    {
+        return $value
+    }
+}
+
+$sshPrivateKey = validateFileParameterWithDefault $sshPrivateKey ([IO.Path]::Combine($here, 'playbook', 'environments', 'example_sshkey_id'))
+$sshPublicKey = validateFileParameterWithDefault $sshPublicKey ([IO.Path]::Combine($here, 'playbook', 'environments', 'example_sshkey_id.pub'))
 
 if ( !(Test-Path env:AZURE_SECRET) )
 {
@@ -71,10 +89,10 @@ $env:SSH_PRIVATE_KEY_BASE64 = $sshPrivateKeyBase64
 
 Write-Host "***************" -ForegroundColor Green
 Write-Host "** Target Env: $environmentName" -ForegroundColor Green
-Write-Host "** Credential: $credentialFile" -ForegroundColor Green
+Write-Host "** Credential: $porterCredential" -ForegroundColor Green
 Write-Host "***************" -ForegroundColor Green
 porter $action --param environment_name=$environmentName `
                --param ssh_public_key=$sshPublicKey `
-               --cred $credentialFile
+               --cred $porterCredential
 
 Pop-Location

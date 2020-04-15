@@ -2,7 +2,7 @@
 # file: environments/example/group_vars/all.yml
 
 es_cluster: my_es_cluster
-azure_location: WestEurope
+azure_location: eastus
 
 vmss_node_size: Standard_DS1_v2
 source_ip_whitelist:

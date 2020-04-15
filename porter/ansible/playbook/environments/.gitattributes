@@ -1,0 +1,2 @@
+# Keep Unix-style LF for example ssh key file
+example_sshkey_id text eol=lf

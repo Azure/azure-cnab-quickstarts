@@ -1,0 +1,4 @@
+# Keep Unix-style LF for shell scripts
+*.sh text eol=lf
+# Keep Unix-style LF for Ansible yml files to avoid issues with Ansible-Lint
+*.yml text eol=lf

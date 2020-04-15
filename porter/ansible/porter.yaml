@@ -43,48 +43,26 @@ parameters:
 
 install:
   - exec:
-      description: "Generate a keyfile from the provided SSH private key"
-      command: /bin/bash
-      flags:
-        c: mkdir /root/.ssh && echo $SSH_PRIVATE_KEY_BASE64 | base64 --decode - >/root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
-  - exec:
       description: "Run installation playbook"
-      command: ansible-playbook
+      command: ./bundle-script-library.sh
       arguments:
-        - ansible/install.yml
-      flags:
-        i: ansible/environments/{{ bundle.parameters.environment_name }}
-        e:
-          - admin_public_key="{{ bundle.parameters.ssh_public_key }}"
-        # uncomment for more logging
-        # v:
-
+        - install
+        - "{{ bundle.parameters.environment_name }}"
+        - "'{{ bundle.parameters.ssh_public_key }}'"    # this arg will contain a space, hence the quoting
 
 upgrade:
   - exec:
-      description: "Generate a keyfile from the provided SSH private key"
-      command: /bin/bash
-      flags:
-        c: mkdir /root/.ssh && echo $SSH_PRIVATE_KEY_BASE64 | base64 --decode - >/root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
-  - exec:
       description: "Run installation playbook (upgrade)"
-      command: ansible-playbook
+      command: ./bundle-script-library.sh
       arguments:
-        - ansible/install.yml
-      flags:
-        i: ansible/environments/{{ bundle.parameters.environment_name }}
-        e:
-          - skip_provision=true
-        # uncomment for more logging
-        # v:          
+        - upgrade
+        - "{{ bundle.parameters.environment_name }}"
+        - "'{{ bundle.parameters.ssh_public_key }}'"    # this arg will contain a space, hence the quoting
 
 uninstall:
   - exec:
       description: "Run uninstallation playbook"
-      command: ansible-playbook
+      command: ./bundle-script-library.sh
       arguments:
-        - ansible/uninstall.yml
-      flags:
-        i: ansible/environments/{{ bundle.parameters.environment_name }}
-        # uncomment for more logging
-        # v:
+        - uninstall
+        - "{{ bundle.parameters.environment_name }}"

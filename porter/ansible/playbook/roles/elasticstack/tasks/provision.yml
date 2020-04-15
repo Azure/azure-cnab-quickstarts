@@ -3,8 +3,19 @@
 
 - name: Azure-CLI login
   command: |
-    az login --service-principal -u {{ lookup('env', 'AZURE_CLIENT_ID') }} --tenant {{ lookup('env', 'AZURE_TENANT') }} -p {{ lookup('env', 'AZURE_SECRET') }}
-    
+    az login --service-principal -u {{ lookup('env', 'AZURE_CLIENT_ID') }} \
+             --tenant {{ lookup('env', 'AZURE_TENANT') }} \
+             -p {{ lookup('env', 'AZURE_SECRET') }}
+  no_log: true
+
+- name: Decode public key if provided in base64 form
+  set_fact:
+    admin_public_key: "{{ admin_public_key_base64 | b64decode }}"
+  when: ('admin_public_key_base64' not in vars or (vars['admin_public_key_base64'] | length == 0))
+
+- debug:
+    var: admin_public_key
+
 - name: Create resource group
   azure_rm_resourcegroup:
     name: "{{ resource_group_name }}"

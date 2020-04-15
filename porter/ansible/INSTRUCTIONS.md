@@ -1,6 +1,6 @@
 This bundle demonstrates wrapping an existing automated process inside a CNAB bundle.
 
-Specifically, it uses [Ansible](https://docs.ansible.com/ansible/latest/index.html) to orchestrate the install/uninstall actions for a rudimentary deployment of [Elasticsearch](https://www.elastic.co/elasticsearch) on a VM ScaleSet.
+Specifically, it uses [Ansible](https://docs.ansible.com/ansible/latest/index.html) to orchestrate the install/uninstall actions for a rudimentary deployment of [Elasticsearch](https://www.elastic.co/elasticsearch) on an Azure VM ScaleSet.
 
 ## Generate a new SSH keypair
 In order to allow Ansible to configure the provisioned VMs, you will need to generate a new SSH keypair before running the bundle.
@@ -42,15 +42,16 @@ The provided PowerShell script `test.ps1` can be used to easily build & test the
 * Porter [installed locally](https://porter.sh/install/)
 * PowerShell/PowerShell Core
 * Docker (running Linux containers)
-* Service principal details set in the following environment variables:
-    * AZURE_CLIENT_ID
-    * AZURE_SECRET
-    * AZURE_SUBSCRIPTION_ID
-    * AZURE_TENANT
+* Generate a credential for this bundle (e.g. run `porter credential generate`):
+    * azure_client_id
+    * azure_client_secret
+    * azure_subscription_id
+    * azure_tenant_id
+    * ssh_private_key_base64 (see note above re: base46 encoding the SSH private key file)
 
 ### Build & install test with the provided example defaults
 ```
-./test.ps1
+./test.ps1 -credentialName <credential-name>
 ```
 
 >NOTE: By default, this will use the example SSH keys included in the repo.
@@ -59,8 +60,8 @@ The provided PowerShell script `test.ps1` can be used to easily build & test the
 | Name | Description | Default |
 | --- | --- | --- |
 environmentName | Specifies which Ansible inventory to use as configuration | example
-credentialFile | A previously generated Porter credential file to use | porter-example-creds.yml
+credentialName | A previously generated Porter credential to use |  |
 sshPrivateKey | Path to the SSH private key file that has access to the provisioned servers.  Alternatively you can pass the contents of the keyfile as a base64-encoding string | playbook/environments/example_sshkey_id
 sshPublicKey | Path to the SSH public key file that has access to the provisioned servers.  Alternatively you can pass the contents of the keyfile as a string | playbook/environments/example_sshkey_id.pub
-action | The Porter action to perform on the bundle | install |  |
+action | The Porter action to perform on the bundle | install |
 skipBuild | A switch to optionally skip building the bundle | False
