@@ -30,19 +30,27 @@
 		},
 		"azure_client_id": {
 			"type": "securestring",
-			"metadata": {}
+			"metadata": {
+				"description": "AAD Client Id for Azure account authentication - used by Ansible"
+			}
 		},
 		"azure_client_secret": {
 			"type": "securestring",
-			"metadata": {}
+			"metadata": {
+				"description": "AAD Client Secret for Azure account authentication - used by Ansible"
+			}
 		},
 		"azure_subscription_id": {
 			"type": "securestring",
-			"metadata": {}
+			"metadata": {
+				"description": "Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions"
+			}
 		},
 		"azure_tenant_id": {
 			"type": "securestring",
-			"metadata": {}
+			"metadata": {
+				"description": "Azure AAD Tenant Id for Azure account authentication - used by Ansible"
+			}
 		},
 		"cnab_action": {
 			"type": "string",
@@ -140,16 +148,21 @@
 		},
 		"environment_name": {
 			"type": "string",
-			"metadata": {}
+			"metadata": {
+				"description": "Specifies which Ansible inventory/environment to get configuration from"
+			}
 		},
 		"ssh_private_key_base64": {
 			"type": "securestring",
-			"metadata": {}
+			"metadata": {
+				"description": "The SSH private key used by Ansible to connect to the provisioned VMs"
+			}
 		},
 		"ssh_public_key": {
 			"type": "string",
-			"defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwbhzZV8LoiJoiYSIKbcP8dUdF0ptvyDRZ+BD3claOx599wIIAOK0m/PvlBwa1Mg0oj7+LlTIlxVJQfq2i1/i6qADalzdKWikLWcAALEgVxMfXbHty1NL2KZfW8QQkj2+kqg/+1tDLmA2xwXcoW2kodUYEwo3Ldl60ZgRSldWvs1H8nmY9qUqvpO/XIFAnPv+qtDZNurmO+I2z6hwpozeYLeVpIvpU0cuyjJIAfnu9mJzhHNC+H8mS1n73VtPh2EAaxRgWeHA9HxJqOLQ/r3AwOYjk6JL2UYTSzI7oeoK1LV1773/FkjlV3BHOwzD/8G/o8syxk9+c84cg8I6aQKp1 esadmin",
-			"metadata": {}
+			"metadata": {
+				"description": "The SSH public key to be granted admin access to the provisioned VMs"
+			}
 		}
 	},
 	"variables": {
@@ -268,7 +281,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "readsourceacr.azurecr.io/porter/ansible/bundle:0.2.0-pull-1-merge.1-180"
+									"value": "cnabquickstarts.azurecr.io/porter/ansible/bundle:0.2.0-pull-85-merge.1-256"
 								},
 								{
 									"name": "CNAB_PARAM_environment_name",
