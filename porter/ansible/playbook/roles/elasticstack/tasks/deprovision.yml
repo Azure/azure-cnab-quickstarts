@@ -1,0 +1,9 @@
+---
+# file: roles/elasticsearch/tasks/deprovision.yml
+
+- name: Delete resource group
+  azure_rm_resourcegroup:
+    name: "{{ resource_group_name }}"
+    location: "{{ azure_location }}"
+    force_delete_nonempty: true
+    state: absent

@@ -1,0 +1,132 @@
+---
+# file: roles/elasticsearch/tasks/provision.yml
+
+- name: Azure-CLI login
+  command: |
+    az login --service-principal -u {{ lookup('env', 'AZURE_CLIENT_ID') }} \
+             --tenant {{ lookup('env', 'AZURE_TENANT') }} \
+             -p {{ lookup('env', 'AZURE_SECRET') }}
+  no_log: true
+
+- name: Decode public key if provided in base64 form
+  set_fact:
+    admin_public_key: "{{ admin_public_key_base64 | b64decode }}"
+  when: ('admin_public_key_base64' not in vars or (vars['admin_public_key_base64'] | length == 0))
+
+- debug:
+    var: admin_public_key
+
+- name: Create resource group
+  azure_rm_resourcegroup:
+    name: "{{ resource_group_name }}"
+    location: "{{ azure_location }}"
+
+- name: Wait for resource group
+  command: |
+    az group exists -n {{ resource_group_name }}
+  register: rg_exists
+  until: rg_exists.stdout == 'true'
+  retries: 12
+  delay: 5
+  changed_when: false
+  
+- name: Create VNet
+  azure_rm_virtualnetwork:
+    name: "{{ vnet_name }}"
+    resource_group: "{{ resource_group_name }}"
+    address_prefixes_cidr: "{{ vnet_cidr }}"
+
+- name: Create NSG
+  azure_rm_securitygroup:
+    resource_group: "{{ resource_group_name }}"
+    name: "{{ nsg_name }}"
+    purge_rules: yes
+    rules:
+      - name: allow-ssh
+        protocol: Tcp
+        source_address_prefix: "{{ source_ip_whitelist }}"
+        destination_port_range: 22
+        access: Allow
+        priority: 101
+        direction: Inbound
+      - name: elasticsearch-allow-api-server
+        protocol: Tcp
+        source_address_prefix: "{{ source_ip_whitelist }}"
+        destination_port_range: 9200
+        access: Allow
+        priority: 102
+        direction: Inbound
+
+- name: Create Subnet
+  azure_rm_subnet:
+    name: "{{ subnet_name }}"
+    virtual_network_name: "{{ vnet_name }}"
+    resource_group: "{{ resource_group_name }}"
+    address_prefix_cidr: "{{ vnet_cidr }}"
+    security_group: "{{ nsg_name }}"
+
+- name: Create LB PIP
+  azure_rm_publicipaddress:
+    resource_group: "{{ resource_group_name }}"
+    name: "{{ lb_pip_name }}"
+    allocation_method: Static
+  register: output_lb_pip
+
+- name: Create LB
+  azure_rm_loadbalancer:
+    name: "{{ lb_name }}"
+    resource_group: "{{ resource_group_name }}"
+    frontend_ip_configurations:
+      - name: "{{ vmss_name }}-lb-frontend"
+        public_ip_address: "{{ lb_pip_name }}"
+    backend_address_pools:
+      - name: "{{ lb_be_pool_name }}"
+    probes:
+      - name: probe-es-api
+        port: 9200
+    load_balancing_rules:
+      - name: lb-es-api
+        frontend_ip_configuration: "{{ vmss_name }}-lb-frontend"
+        backend_address_pool: "{{ vmss_name }}-lb-pool"
+        frontend_port: 9200
+        backend_port: 9200
+        probe: probe-es-api
+    inbound_nat_pools:
+      - name: inbound-pool-ssh
+        frontend_ip_configuration_name: "{{ vmss_name }}-lb-frontend"
+        protocol: Tcp
+        frontend_port_range_start: 22001
+        frontend_port_range_end: "{{ 22000 + (vmss_node_count * 2) }}"
+        backend_port: 22
+
+# Use ARM template as Ansible VMSS module doesn't seem to support assigning public IPs
+- name: Deploy VMSS ARM template
+  azure_rm_deployment:
+    state: present
+    resource_group_name: "{{ resource_group_name }}"
+    location: "{{ azure_location }}"
+    template: "{{ lookup('file', vmss_arm_template_path) | from_json }}"
+    parameters:
+      vmSku:
+        value: "{{ vmss_node_size }}"
+      imageReference:
+        value: "{{ vm_image_info }}"
+      vmssName:
+        value: "{{ vmss_name }}"
+      instanceCount:
+        value: "{{ vmss_node_count }}"
+      adminUsername:
+        value: "{{ admin_username }}"
+      sshPublicKey:
+        value: "{{ admin_public_key }}"
+      virtualNetworkName:
+        value: "{{ vnet_name }}"
+      subnetName:
+        value: "{{ subnet_name }}"
+      loadBalancerName:
+        value: "{{ lb_name }}"
+      bePoolName:
+        value: "{{ lb_be_pool_name }}"
+    deployment_name: "{{ vmss_arm_template_path | to_uuid }}"
+    tags: {}
+  register: output_vmss_arm

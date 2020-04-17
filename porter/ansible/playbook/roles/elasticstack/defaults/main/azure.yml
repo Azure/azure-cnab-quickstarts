@@ -1,0 +1,35 @@
+---
+# file: roles/elasticsearch/defaults/azure.yml
+
+skip_provision: false
+
+resource_prefix: "{{ es_cluster | regex_replace('_', '-') }}"
+
+resource_group_name: "{{ resource_prefix }}-rg"
+azure_location: WestEurope
+
+vnet_name: "{{ resource_prefix }}-vnet"
+vnet_cidr: 10.0.0.0/24
+subnet_name: vmss-subnet
+
+nsg_name: "{{ resource_prefix }}-nsg"
+source_ip_whitelist: []
+
+lb_name: "{{ resource_prefix }}-lb"
+lb_pip_name: "{{ lb_name }}-pip"
+lb_be_pool_name: "{{ vmss_name }}-lb-pool"
+
+
+vmss_arm_template_path: "{{ role_path }}/files/azuredeploy.json"
+vmss_name: "{{ resource_prefix }}"
+vmss_node_size: Standard_DS1_v2
+vmss_node_count: 2
+vm_image_info:
+  offer: UbuntuServer
+  publisher: Canonical
+  sku: 18.04-LTS
+  version: latest
+
+admin_username: esadmin
+# default ssh key included in the repo (only use for local testing!)
+admin_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwbhzZV8LoiJoiYSIKbcP8dUdF0ptvyDRZ+BD3claOx599wIIAOK0m/PvlBwa1Mg0oj7+LlTIlxVJQfq2i1/i6qADalzdKWikLWcAALEgVxMfXbHty1NL2KZfW8QQkj2+kqg/+1tDLmA2xwXcoW2kodUYEwo3Ldl60ZgRSldWvs1H8nmY9qUqvpO/XIFAnPv+qtDZNurmO+I2z6hwpozeYLeVpIvpU0cuyjJIAfnu9mJzhHNC+H8mS1n73VtPh2EAaxRgWeHA9HxJqOLQ/r3AwOYjk6JL2UYTSzI7oeoK1LV1773/FkjlV3BHOwzD/8G/o8syxk9+c84cg8I6aQKp1 devsshkey

@@ -1,0 +1,25 @@
+---
+# file: install.yml
+
+# Azure resource provisioning
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - import_role:
+        name: elasticstack
+        tasks_from: provision
+      when: not skip_provision
+    # always update the in-memory inventory with the current scaleset instances
+    - import_role:
+        name: elasticstack
+        tasks_from: update-inventory
+
+# Main VM configuration
+- hosts: elasticsearch
+  gather_facts: yes
+  become: true
+
+  roles:
+    - elasticstack

@@ -1,0 +1,12 @@
+---
+# file: uninstall.yml
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - import_role:
+        name: elasticstack
+        tasks_from: deprovision
+    

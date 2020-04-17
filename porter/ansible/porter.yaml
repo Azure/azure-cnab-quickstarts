@@ -1,0 +1,68 @@
+# This Porter configuration uses limited CNAB parameters and instead relies on
+# an existing Ansible inventory for configuration management
+
+name: ansible
+version: 0.2.0
+description: "Porter configuration using Ansible"
+invocationImage: cnabquickstarts.azurecr.io/porter/ansible:0.2.0
+tag: cnabquickstarts.azurecr.io/porter/ansible/bundle:0.2.0
+dockerfile: Dockerfile.tmpl
+
+mixins:
+  - exec
+
+credentials:
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client Id for Azure account authentication - used by Ansible
+  - name: azure_client_secret
+    env: AZURE_SECRET
+    description: AAD Client Secret for Azure account authentication - used by Ansible
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+  - name: azure_tenant_id
+    env: AZURE_TENANT
+    description: Azure AAD Tenant Id for Azure account authentication - used by Ansible
+  - name: ssh_private_key_base64
+    env: SSH_PRIVATE_KEY_BASE64
+    description: The SSH private key used by Ansible to connect to the provisioned VMs
+
+parameters:
+  # this value relates to an Ansible 'environment'
+  - name: environment_name
+    type: string
+    description: Specifies which Ansible inventory/environment to get configuration from
+    
+  # this value allows the SSH public key to be easily overriden when using a custom 'ssh_private_key'
+  - name: ssh_public_key
+    type: string
+    description: The SSH public key to be granted admin access to the provisioned VMs
+    applyTo:
+      - install
+
+install:
+  - exec:
+      description: "Run installation playbook"
+      command: ./bundle-script-library.sh
+      arguments:
+        - install
+        - "{{ bundle.parameters.environment_name }}"
+        - "'{{ bundle.parameters.ssh_public_key }}'"    # this arg will contain a space, hence the quoting
+
+upgrade:
+  - exec:
+      description: "Run installation playbook (upgrade)"
+      command: ./bundle-script-library.sh
+      arguments:
+        - upgrade
+        - "{{ bundle.parameters.environment_name }}"
+        - "'{{ bundle.parameters.ssh_public_key }}'"    # this arg will contain a space, hence the quoting
+
+uninstall:
+  - exec:
+      description: "Run uninstallation playbook"
+      command: ./bundle-script-library.sh
+      arguments:
+        - uninstall
+        - "{{ bundle.parameters.environment_name }}"
