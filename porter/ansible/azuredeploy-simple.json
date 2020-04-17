@@ -51,8 +51,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "ansible",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ansible', 'cnabquickstarts.azurecr.io/porter/ansible/bundle:0.2.0-pull-85-merge.1-256'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ansible', 'cnabquickstarts.azurecr.io/porter/ansible/bundle:0.2.0-pull-85-merge.1-256'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'ansible', 'cnabquickstarts.azurecr.io/porter/ansible/bundle:latest'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'ansible', 'cnabquickstarts.azurecr.io/porter/ansible/bundle:latest'))]"
 	},
 	"resources": [
 		{
@@ -156,7 +156,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/ansible/bundle:0.2.0-pull-85-merge.1-256"
+									"value": "cnabquickstarts.azurecr.io/porter/ansible/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_environment_name",
