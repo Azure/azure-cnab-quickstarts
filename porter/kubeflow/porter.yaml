@@ -1,9 +1,9 @@
 name: kubeflow
-version: 0.1.2
+version: 0.1.4
 dockerfile: Dockerfile.tmpl
 description: "KubeFlow on Kubernetes"
-invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow:0.1.0
-tag: cnabquickstarts.azurecr.io/porter/kubeflow/bundle:0.1.0
+invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow:0.1.4
+tag: cnabquickstarts.azurecr.io/porter/kubeflow/bundle:0.1.4
 
 credentials:
   - name: kubeconfig
