@@ -12,3 +12,6 @@ COPY . $BUNDLE_DIR
 RUN apt-get update && apt-get -y install wget
 RUN wget ${KUBEFLOW_REPO}/releases/download/${KUBEFLOW_VERSION}/kfctl_${KFCTL_VERSION}_linux.tar.gz
 RUN tar -xvf kfctl_${KFCTL_VERSION}_linux.tar.gz -C ${TOOLHOME} && chmod +x "${TOOLHOME}/kfctl"
+
+WORKDIR $BUNDLE_DIR
+RUN chmod +x kubeflow.sh
