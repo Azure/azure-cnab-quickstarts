@@ -259,7 +259,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/kubeflow/bundle:latest"
+									"value": "cnabquickstarts.azurecr.io/porter/kubeflow/bundle-installer/bundle:latest"
 								},
 								{
 									"name": "CNAB_PARAM_kubeflow_name",
