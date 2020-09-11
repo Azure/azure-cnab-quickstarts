@@ -113,7 +113,7 @@ If any of the bundle credentials/parameters are file-based, the corresponding se
 
 You can get the base64 representation of a file using the following:
 
-Windows PowerShell - `[Convert]::ToBase64String([System.Text.Encoding]::Utf8.GetBytes($(gc <path-to-file>)))`
+Windows PowerShell - `[Convert]::ToBase64String([System.Text.Encoding]::Utf8.GetBytes($(gc <path-to-file> -Raw)))`
 
 Linux Bash - `cat <path-to-file> | base64`
 
