@@ -1,0 +1,303 @@
+name: mattermost-enterprise-edition-aks
+version: 0.1.0
+dockerfile: Dockerfile.tmpl
+description: "Mattermost Enterprise Edition on AKS"
+tag: cnabquickstarts.azurecr.io/porter/mattermost-enterprise-edition-aks
+
+credentials:
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client ID for Azure account authentication - used for Az CLI
+  - name: azure_tenant_id
+    env: AZURE_TENANT_ID
+    description: Azure AAD Tenant Id for Azure account authentication  - used for Az CLI
+  - name: azure_client_secret
+    env: AZURE_CLIENT_SECRET
+    description: AAD Client Secret for Azure account authentication - used for Az CLI
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+
+parameters:
+  # AKS parameters
+  - name: resource_group
+    type: string
+    description: The name of the resource group to create the AKS Cluster in
+  - name: cluster_name
+    type: string
+    description: The name to use for the AKS Cluster
+  - name: azure_location
+    type: string
+    description: The Azure location to create the resources in
+    applyTo:
+      - "install"
+  - name: kubernetes_version
+    type: string
+    description: The Kubernetes version to use
+    default: "1.18.8"
+    applyTo:
+      - "install"
+  - name: node_vm_size
+    type: string
+    description: The VM size to use for the cluster
+    default: "Standard_D8s_v3"
+    applyTo:
+      - "install"
+  - name: node_count
+    type: integer
+    minimum: 1
+    description: The VM size to use for the cluster
+    default: 4
+    applyTo:
+      - "install"
+
+  # Ingress parameters
+  - name: dns_name
+    type: string
+    description: The DNS name to to associate with public IP address for the FQDN
+  - name: letsencrypt_environment
+    type: string
+    enum: ["staging", "prod"]
+    default: staging
+    description: The environment to use for Let's Encrypt certificates
+  - name: letsencrypt_email
+    type: string
+    description: Valid email address to use for Let's Encrypt certificate
+    destination:
+      env: LETSENCRYPT_EMAIL
+
+  # Mattermost parameters
+  - name: mattermost_license
+    type: string
+    description: License key for Mattermost Enterprise Edition
+    destination:
+      env: MATTERMOST_LICENSE
+    applyTo:
+      - install
+      - upgrade
+  - name: mysql_mysqlUser
+    type: string
+    description: Username for Mysql (Required)
+    destination:
+      env: MYSQL_MYSQLUSER
+    applyTo:
+      - install
+      - upgrade
+  - name: mysql_mysqlPassword
+    type: string
+    description: User Password for Mysql (Required)
+    sensitive: true
+    destination:
+      env: MYSQL_MYSQLPASSWORD
+    applyTo:
+      - install
+      - upgrade
+  - name: mysql_mysqlRootPassword
+    type: string
+    description: Root Password for Mysql (Required)
+    sensitive: true
+    destination:
+      env: MYSQL_MYSQLROOTPASSWORD
+    applyTo:
+      - install
+      - upgrade
+
+outputs:
+  - name: kubeconfig
+    type: string
+    description: "Kubeconfig for the AKS cluster"
+    sensitive: true
+    applyTo:
+      - "install"
+  - name: fqdn
+    type: string
+    applyTo:
+      - install
+    description: "Fully qualified domain name for the ingress controller"
+
+mixins:
+  - exec
+  - helm
+  - az
+  - kubernetes
+
+install:
+
+  # AKS steps
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal:
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - az: 
+      description: "Create resource group if not exists"
+      arguments: 
+        - "group" 
+        - "create" 
+      flags:
+        name: "{{ bundle.parameters.resource_group }}"
+        location: "{{ bundle.parameters.azure_location }}"
+  
+  - exec: 
+      description: "Create AKS if not exists"
+      command: "bash"
+      arguments:
+        - "aks.sh"
+        - "create-aks"
+        - "{{ bundle.parameters.cluster_name }}"
+        - "{{ bundle.parameters.resource_group }}"
+        - "{{ bundle.parameters.kubernetes_version }}"
+        - "{{ bundle.parameters.node_vm_size }}"
+        - "{{ bundle.parameters.node_count }}"
+        - "{{ bundle.credentials.azure_client_id}}"
+        - "{{ bundle.credentials.azure_client_secret}}"
+        - "{{ bundle.parameters.azure_location }}"
+        - "VirtualMachineScaleSets"
+
+  - az: 
+      description: "Azure CLI AKS get-credentials"
+      arguments: 
+        - "aks" 
+        - "get-credentials" 
+      flags:
+        resource-group: "{{ bundle.parameters.resource_group }}"
+        name: "{{ bundle.parameters.cluster_name }}"
+        file: /root/.kube/config
+      outputs:
+        - name: kubeconfig
+          path: /root/.kube/config
+
+  # Ingress steps
+  - exec:
+      description: "Add Helm repos"
+      command: "bash"
+      arguments:
+        - "aks-nginx-ingress.sh"
+        - "add-helm-repos"
+
+  - helm:
+      description: "Install nginx"
+      name: 'nginx-ingress'
+      chart: ingress-nginx/ingress-nginx
+      version: '3.3.0'
+      namespace: 'nginx-ingress'
+      replace: true
+      values:
+        - nginx-ingress-values.yaml
+
+  - exec:
+      description: "Configure DNS name"
+      command: "bash"
+      arguments:
+        - "aks-nginx-ingress.sh"
+        - "configure-dns-name"
+        - "nginx-ingress"
+        - "nginx-ingress"
+        - "{{ bundle.parameters.dns_name }}"
+      outputs:
+        - name: fqdn
+          path: FQDN
+
+  - exec:
+      description: "Create cert-manager namespace"
+      command: "bash"
+      arguments:
+        - "aks-nginx-ingress.sh"
+        - "create-cert-manager-namespace"
+        - "cert-manager"
+
+  - helm:
+      description: "Install cert-manager"
+      name: 'cert-manager'
+      chart: jetstack/cert-manager
+      version: 'v1.0.2'
+      namespace: 'cert-manager'
+      replace: true
+      wait: true
+      set:
+        installCRDs: true
+        ingressShim.defaultIssuerName: "letsencrypt-{{ bundle.parameters.letsencrypt_environment }}"
+        ingressShim.defaultIssuerKind: "ClusterIssuer"
+        ingressShim.defaultIssuerGroup: "cert-manager.io"
+
+  - exec:
+      description: Replace tokens in cluster-issuer.yaml
+      command: bash
+      arguments:
+        - "aks-nginx-ingress.sh"
+        - "replace-tokens"
+        - "{{ bundle.parameters.letsencrypt_environment }}"
+
+  - kubernetes:
+      description: "Create a CA cluster issuer"
+      manifests:
+        - cluster-issuer.yaml
+      wait: true
+
+  # Mattermost steps
+  - exec:
+      description: "Replace tokens in mattermost-values.yaml"
+      command: "bash"
+      arguments: 
+        - "mattermost.sh"
+        - "replace-tokens"
+        - "{{ bundle.outputs.fqdn }}"
+        - "letsencrypt-{{ bundle.parameters.letsencrypt_environment }}"
+  - exec:
+      description: "Add Matterhost Helm repository"
+      command: "helm"
+      arguments:
+        - "repo"
+        - "add"
+        - "mattermost"
+        - "https://helm.mattermost.com"
+  - helm:
+      description: "Install Mattermost"
+      name: "mattermost"
+      chart: mattermost/mattermost-enterprise-edition
+      namespace: "mattermost"
+      version: "1.8.0"
+      replace: true
+      values:
+        - mattermost-values.yaml
+   
+uninstall:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id }}"
+        password: "{{ bundle.credentials.azure_client_secret }}"
+        tenant: "{{ bundle.credentials.azure_tenant_id }}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id }}"
+
+  - exec: 
+      description: "Delete AKS"
+      command: bash
+      arguments: 
+        - "aks.sh" 
+        - "delete-aks" 
+        - "{{ bundle.parameters.cluster_name }}"
+        - "{{ bundle.parameters.resource_group }}"
