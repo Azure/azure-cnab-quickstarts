@@ -31,7 +31,7 @@ externalDB:
 
 mysql:
   enabled: true
-  mysqlRootPassword: 
+  mysqlRootPassword: $MYSQL_MYSQLROOTPASSWORD
   mysqlUser: $MYSQL_MYSQLUSER
   mysqlPassword: $MYSQL_MYSQLPASSWORD
   mysqlDatabase: mattermost

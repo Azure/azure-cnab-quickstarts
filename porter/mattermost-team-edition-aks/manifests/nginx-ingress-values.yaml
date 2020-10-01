@@ -1,6 +1,0 @@
-controller:
-  nodeSelector:
-    beta.kubernetes.io/os: linux
-defaultBackend:
-  nodeSelector:
-    beta.kubernetes.io/os: linux

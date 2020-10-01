@@ -1,8 +1,8 @@
-name: mattermost-enterprise-edition-aks
+name: mattermost-aks
 version: 0.1.0
 dockerfile: Dockerfile.tmpl
-description: "Mattermost Enterprise Edition on AKS"
-tag: cnabquickstarts.azurecr.io/porter/mattermost-enterprise-edition-aks
+description: "Mattermost on AKS"
+tag: cnabquickstarts.azurecr.io/porter/mattermost-aks
 
 credentials:
   - name: azure_client_id
@@ -67,9 +67,15 @@ parameters:
       env: LETSENCRYPT_EMAIL
 
   # Mattermost parameters
+  - name: mattermost_edition
+    type: string
+    enum: ["enterprise", "team"]
+    default: enterprise
+    description: The edition of Mattermost to deploy (enterprise or team)
   - name: mattermost_license
     type: string
     description: License key for Mattermost Enterprise Edition
+    default: ''
     destination:
       env: MATTERMOST_LICENSE
     applyTo:
@@ -254,6 +260,7 @@ install:
       arguments: 
         - "mattermost.sh"
         - "replace-tokens"
+        - "{{ bundle.parameters.mattermost_edition }}"
         - "{{ bundle.outputs.fqdn }}"
         - "letsencrypt-{{ bundle.parameters.letsencrypt_environment }}"
   - exec:
@@ -267,9 +274,8 @@ install:
   - helm:
       description: "Install Mattermost"
       name: "mattermost"
-      chart: mattermost/mattermost-enterprise-edition
+      chart: mattermost/mattermost-{{ bundle.parameters.mattermost_edition }}-edition
       namespace: "mattermost"
-      version: "1.8.0"
       replace: true
       values:
         - mattermost-values.yaml
