@@ -2,7 +2,7 @@ name: mattermost-aks
 version: 0.1.0
 dockerfile: Dockerfile.tmpl
 description: "Mattermost on AKS"
-tag: cnabquickstarts.azurecr.io/porter/mattermost-aks
+tag: cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle
 
 credentials:
   - name: azure_client_id
