@@ -131,8 +131,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "mattermost-aks",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle-installer/bundle:0.1.0-pull-91-merge.1-272'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle-installer/bundle:0.1.0-pull-91-merge.1-272'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-274'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-274'))]"
 	},
 	"resources": [
 		{
@@ -188,7 +188,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.34.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.35.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -246,7 +246,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle-installer/bundle:0.1.0-pull-91-merge.1-272"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-274"
 								},
 								{
 									"name": "AZURE_STORAGE_CONNECTION_STRING",

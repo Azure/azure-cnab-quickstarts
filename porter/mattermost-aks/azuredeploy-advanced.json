@@ -319,7 +319,7 @@
 					{
 						"name": "[variables('containerName')]",
 						"properties": {
-							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.34.0",
+							"image": "cnabquickstarts.azurecr.io/cnabarmdriver:0.35.0",
 							"resources": {
 								"requests": {
 									"cpu": "1.0",
@@ -377,7 +377,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle-installer/bundle:0.1.0-pull-91-merge.1-272"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-274"
 								},
 								{
 									"name": "AZURE_STORAGE_CONNECTION_STRING",
