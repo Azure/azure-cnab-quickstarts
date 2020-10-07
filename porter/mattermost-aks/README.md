@@ -1,6 +1,16 @@
 # Mattermost on AKS
 
-Write the instructions for your quickstart here.
+This bundle installs [Mattermost](https://mattermost.com/) on an [Azure Kubernetes Service](https://azure.microsoft.com/en-gb/services/kubernetes-service/) (AKS) cluster.
+
+The bundle does the following:
+- Deploys AKS cluster
+- Installs [NGINX ingress controller](https://kubernetes.github.io/ingress-nginx/) and configures to use public DNS name
+- Installs [cert-manager](https://github.com/jetstack/cert-manager) and configures to use [Let's Encrypt](https://letsencrypt.org/) to issue free SSL certificates
+- Installs Mattermost (Enterprise or Team edition)
+
+The Mattermost installation step uses the official Helm charts for Mattermost Enterprise/Team Edition (more information about the Helm charts can be found on the [GitHub page](https://github.com/mattermost/mattermost-helm/tree/master/charts)).
+
+Once installed, the output will show the FQDN where you can access the Mattermost application.
 
 ## Deploy from Azure
 
@@ -27,7 +37,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-274 -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-276 -d azure```
 
 
 ## Parameters and Credentials
