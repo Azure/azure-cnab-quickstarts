@@ -377,7 +377,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-285"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-91-merge.1-288"
 								},
 								{
 									"name": "AZURE_STORAGE_CONNECTION_STRING",
