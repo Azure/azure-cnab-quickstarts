@@ -204,13 +204,6 @@
 				"description": "The edition of Mattermost to deploy (enterprise or team)"
 			}
 		},
-		"mattermost_license": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "License key for Mattermost Enterprise Edition"
-			}
-		},
 		"mysql_mysqlPassword": {
 			"type": "securestring",
 			"metadata": {
@@ -377,7 +370,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-main.1-266"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-92-merge.1-269"
 								},
 								{
 									"name": "AZURE_STORAGE_CONNECTION_STRING",
@@ -410,10 +403,6 @@
 								{
 									"name": "CNAB_PARAM_mattermost_edition",
 									"value": "[parameters('mattermost_edition')]"
-								},
-								{
-									"name": "CNAB_PARAM_mattermost_license",
-									"value": "[parameters('mattermost_license')]"
 								},
 								{
 									"name": "CNAB_PARAM_mysql_mysqlPassword",

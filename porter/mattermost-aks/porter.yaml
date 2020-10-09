@@ -72,15 +72,6 @@ parameters:
     enum: ["enterprise", "team"]
     default: enterprise
     description: The edition of Mattermost to deploy (enterprise or team)
-  - name: mattermost_license
-    type: string
-    description: License key for Mattermost Enterprise Edition
-    default: ''
-    destination:
-      env: MATTERMOST_LICENSE
-    applyTo:
-      - install
-      - upgrade
   - name: mysql_mysqlUser
     type: string
     description: Username for Mysql (Required)
