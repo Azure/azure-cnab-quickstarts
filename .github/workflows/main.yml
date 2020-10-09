@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: 'Fetch required tags for GitVersion'	
+      - name: 'Fetch required tags for GitVersion'
         run: git fetch --prune --unshallow
 
       - name: '[WORKAROUND] Get branch name'
@@ -85,7 +85,6 @@ jobs:
         run: porter build
         working-directory: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}
 
-
       - if: steps.validate_and_detect_qs_changes.outputs.build_is_required == 'true' && steps.validate_and_detect_qs_changes.outputs.quickstart_tool == 'porter' && env.RUN_PUBLISH_STEPS == 'true'
         name: Publish Porter bundle and invocation image
         id: publish_porter_bundle
@@ -114,6 +113,7 @@ jobs:
         uses: endjin/CNAB.ARM-Converter.GitHub.Actions/run-cnab-to-arm-tool@v1
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
+          bundle_tag: ${{ steps.replace_version_and_registry.outputs.registry_tag }}
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-simple.json
           simplify: 'true'
 
@@ -130,6 +130,7 @@ jobs:
         uses: endjin/CNAB.ARM-Converter.GitHub.Actions/run-cnab-to-arm-tool@v1
         with:
           bundle_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/.cnab/bundle.json
+          bundle_tag: ${{ steps.replace_version_and_registry.outputs.registry_tag }}
           output_path: ${{ steps.validate_and_detect_qs_changes.outputs.quickstart_solution_path }}/azuredeploy-advanced.json
           simplify: 'false'
 

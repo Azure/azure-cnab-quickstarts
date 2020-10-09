@@ -1,0 +1,15 @@
+controller:
+  nodeSelector:
+    beta.kubernetes.io/os: linux
+  replicaCount: 2
+  extraVolumes:
+  - name: nginx-storage
+    emptyDir: {}
+  extraVolumeMounts: 
+  - name: nginx-storage
+    mountPath: /data/nginx
+  config:
+    http-snippet: "proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=mattermost_cache:10m max_size=3g inactive=120m use_temp_path=off;"
+defaultBackend:
+  nodeSelector:
+    beta.kubernetes.io/os: linux
