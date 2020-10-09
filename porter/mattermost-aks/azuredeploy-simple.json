@@ -73,13 +73,6 @@
 				"description": "The edition of Mattermost to deploy (enterprise or team)"
 			}
 		},
-		"mattermost_license": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "License key for Mattermost Enterprise Edition"
-			}
-		},
 		"mysql_mysqlPassword": {
 			"type": "securestring",
 			"metadata": {
@@ -131,8 +124,8 @@
 		"cnab_azure_subscription_id": "[subscription().subscriptionId]",
 		"cnab_azure_tenant_id": "[subscription().tenantId]",
 		"cnab_installation_name": "mattermost-aks",
-		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-main.1-266'))]",
-		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-main.1-266'))]"
+		"containerGroupName": "[concat('cg-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-92-merge.1-269'))]",
+		"containerName": "[concat('cn-',uniqueString(resourceGroup().id, 'mattermost-aks', 'cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-92-merge.1-269'))]"
 	},
 	"resources": [
 		{
@@ -246,7 +239,7 @@
 								},
 								{
 									"name": "CNAB_BUNDLE_TAG",
-									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-main.1-266"
+									"value": "cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-92-merge.1-269"
 								},
 								{
 									"name": "AZURE_STORAGE_CONNECTION_STRING",
@@ -279,10 +272,6 @@
 								{
 									"name": "CNAB_PARAM_mattermost_edition",
 									"value": "[parameters('mattermost_edition')]"
-								},
-								{
-									"name": "CNAB_PARAM_mattermost_license",
-									"value": "[parameters('mattermost_license')]"
 								},
 								{
 									"name": "CNAB_PARAM_mysql_mysqlPassword",

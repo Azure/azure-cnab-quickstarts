@@ -23,12 +23,12 @@ For detailed instructions on deploying from Azure, including how to setup the se
 ### Simple deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmain%2Fporter%2Fmattermost-aks%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Ffeature%2Fmattermost-aks-update%2Fporter%2Fmattermost-aks%2Fazuredeploy-simple.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 ### Advanced deployment
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Fmain%2Fporter%2Fmattermost-aks%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-cnab-quickstarts%2Ffeature%2Fmattermost-aks-update%2Fporter%2Fmattermost-aks%2Fazuredeploy-advanced.json" target="_blank"><img src="https://raw.githubusercontent.com/endjin/CNAB.Quickstarts/master/images/Deploy-from-Azure.png"/></a>
 
 
 ## Deploy from Cloud Shell
@@ -37,7 +37,7 @@ For detailed instructions on deploying from Azure, including how to setup the se
 For detailed instructions on deploying from Cloud Shell, including how to setup the Cloud Shell environment, see [Consuming: Deploy from Cloud Shell](../../docs/consuming.md#deploy-from-cloud-shell)
 
 
-```porter install --tag cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:latest -d azure```
+```porter install --tag cnabquickstarts.azurecr.io/porter/mattermost-aks/bundle:0.1.0-pull-92-merge.1-269 -d azure```
 
 
 ## Parameters and Credentials
@@ -55,7 +55,6 @@ kubernetes_version | The Kubernetes version to use |  | No
 letsencrypt_email | Valid email address to use for Let's Encrypt certificate |  | Yes
 letsencrypt_environment | The environment to use for Let's Encrypt certificates |  | No
 mattermost_edition | The edition of Mattermost to deploy (enterprise or team) |  | No
-mattermost_license | License key for Mattermost Enterprise Edition |  | No
 mysql_mysqlPassword | User Password for Mysql (Required) |  | Yes
 mysql_mysqlRootPassword | Root Password for Mysql (Required) |  | Yes
 mysql_mysqlUser | Username for Mysql (Required) |  | Yes
