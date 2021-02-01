@@ -1,0 +1,331 @@
+name: kubeflow-azure
+version: 0.1.0
+description: "KubeFlow end-to-end pipeline example on AKS"
+dockerfile: Dockerfile.tmpl
+invocationImage: cnabquickstarts.azurecr.io/porter/kubeflow-azure:0.1.0
+tag: cnabquickstarts.azurecr.io/porter/kubeflow-azure/bundle:0.1.0
+
+credentials:
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client ID for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig
+  - name: azure_tenant_id
+    env: AZURE_TENANT_ID
+    description: Azure AAD Tenant Id for Azure account authentication - used to authenticate to Azure to get KubeConfig 
+  - name: azure_client_secret
+    env: AZURE_CLIENT_SECRET
+    description: AAD Client Secret for Azure account authentication - used for AKS Cluster SPN details and for authentication to azure to get KubeConfig
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
+
+parameters:
+  - name: resource_group
+    type: string
+    description: The name of the resource group to create the AKS Cluster in
+  - name: cluster_name
+    type: string
+    description: The name to use for the AKS Cluster
+  - name: ml_workspace_name
+    type: string
+    description: The name to use for the Azure ML workspace
+  - name: acr_name
+    type: string
+    description: The name to use for the Azure Container Registry
+  - name: service_principal_name
+    type: string
+    description: The name to use for the service principal created 
+  - name: azure_location
+    type: string
+    description: The Azure location to create the resources in
+    applyTo:
+      - "install"
+  - name: kubernetes_version
+    type: string
+    description: The Kubernetes version to use
+    default: "1.15.5"
+    applyTo:
+      - "install"
+  - name: node_vm_size
+    type: string
+    description: The VM size to use for the cluster
+    default: "Standard_DS13_v2"
+    applyTo:
+      - "install"
+  - name: node_count
+    type: integer
+    minimum: 1
+    description: The VM size to use for the cluster
+    default: 2
+    applyTo:
+      - "install"
+  - name: vm_set_type
+    type: string
+    enum: 
+    - VirtualMachineScaleSets
+    - AvailabilitySet
+    description: Agent pool VM set type
+    default: VirtualMachineScaleSets
+    applyTo:
+      - "install"
+  - name: kubeflow_name
+    type: string
+    default: "kubeflow_azure"
+    description: The name of the KubeFlow deployment
+  - name: kustomize_manifest
+    type: string
+    default: "https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.0.yaml"
+    description: The URL to the Kustomize manifest to use as the configuration file
+
+outputs:
+  - name: service_principal_app_id
+    type: string
+    description: "App ID (client ID) for the service principal created"
+    applyTo:
+      - "install"
+  - name: service_principal_secret
+    type: string
+    description: "Secret (password) for the service principal created"
+    sensitive: true
+    applyTo:
+      - "install"
+  - name: external_ip
+    type: string
+    description: "External IP for the Kubeflow dashboard"
+    applyTo:
+      - "install"
+
+mixins:
+  - exec
+  - az
+  - kubernetes
+
+install:
+
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal:
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - az: 
+      description: "Create resource group if not exists"
+      arguments:
+        - "group"
+        - "create"
+      flags:
+        name: "{{ bundle.parameters.resource_group }}"
+        location: "{{ bundle.parameters.azure_location }}"
+  
+  - exec: 
+      description: "Create AKS if not exists"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          if [[ -z $(az aks show --name {{ bundle.parameters.cluster_name }} --resource-group {{ bundle.parameters.resource_group }}) ]]
+          then
+              az aks create \
+                --name {{ bundle.parameters.cluster_name }} \
+                --resource-group {{ bundle.parameters.resource_group }} \
+                --kubernetes-version {{ bundle.parameters.kubernetes_version }} \
+                --node-vm-size {{ bundle.parameters.node_vm_size }} \
+                --node-count {{ bundle.parameters.node_count }} \
+                --service-principal {{ bundle.credentials.azure_client_id}} \
+                --client-secret {{ bundle.credentials.azure_client_secret}} \
+                --location {{ bundle.parameters.azure_location }} \
+                --vm-set-type {{ bundle.parameters.vm_set_type }} \
+                --generate-ssh-keys
+          else
+              echo "AKS cluster already exists in specified resource group with specified name"
+          fi
+
+  - az: 
+      description: "Azure CLI AKS get-credentials"
+      arguments: 
+        - "aks" 
+        - "get-credentials" 
+      flags:
+        resource-group: "{{ bundle.parameters.resource_group }}"
+        name: "{{ bundle.parameters.cluster_name }}"
+        file: /root/.kube/config
+        
+  - exec:
+      description: "Test kubectl"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - kubectl get all
+
+  - exec:
+      description: "Install KubeFlow"
+      command: "bash"
+      arguments: 
+        - "-c" 
+        - |
+          export KF_NAME={{ bundle.parameters.kubeflow_name }}
+          export BASE_DIR=/kubeflow
+          export KF_DIR=${BASE_DIR}/${KF_NAME}
+          export CONFIG_URI={{ bundle.parameters.kustomize_manifest }}
+          mkdir -p ${KF_DIR}
+          cd ${KF_DIR}
+          kfctl apply -V -f ${CONFIG_URI}
+
+  - az:
+      description: "Create Azure ML workspace"
+      arguments:
+        - "ml"
+        - "workspace"
+        - "create"
+      flags:
+        workspace-name: "{{ bundle.parameters.ml_workspace_name }}"
+        location: "{{ bundle.parameters.azure_location }}"
+        resource-group: "{{ bundle.parameters.resource_group }}"
+        exist-ok:
+      
+  - az:
+      description: "Create Azure Container Registry"
+      arguments:
+        - "acr"
+        - "create"
+      flags:
+        name: "{{ bundle.parameters.acr_name }}"
+        sku: "Premium"
+        admin-enabled: true
+        location: "{{ bundle.parameters.azure_location }}"
+        resource-group: "{{ bundle.parameters.resource_group }}"
+
+  - kubernetes:
+      description: "Create PVC"
+      manifests:
+        - manifests/pvc.yaml
+      validate: true
+      wait: true
+
+  - exec:
+      description: "Create service principal"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          sp_secret=$(az ad sp create-for-rbac --name {{ bundle.parameters.service_principal_name }} --scopes /subscriptions/{{ bundle.credentials.azure_subscription_id }}/resourceGroups/{{ bundle.parameters.resource_group }} --output tsv --query password)
+          sp_appid=$(az ad sp show --id http://{{ bundle.parameters.service_principal_name }} --output tsv --query appId)
+          printf $sp_appid >> sp_appid
+          printf $sp_secret >> sp_secret
+      outputs:
+        - name: service_principal_app_id
+          path: sp_appid
+        - name: service_principal_secret
+          path: sp_secret
+
+  - exec:
+      description: "Build example container images"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          ACR_NAME={{ bundle.parameters.acr_name }}
+          git clone https://github.com/kubeflow/examples.git
+          cd examples/pipelines/azurepipeline/code
+          az acr build --registry $ACR_NAME --image preprocess:0.1.0 ./preprocess
+          az acr build --registry $ACR_NAME --image training:0.1.0 ./training
+          az acr build --registry $ACR_NAME --image register:0.1.0 ./register
+          az acr build --registry $ACR_NAME --image profile:0.1.0 ./profile
+          az acr build --registry $ACR_NAME --image deploy:0.1.0 ./deploy
+
+  - exec:
+      description: "Compile and upload pipeline.py"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          cd scripts
+          python pipeline.py {{ bundle.parameters.acr_name }} 0.1.0
+          python upload-pipeline.py pipeline.py.tar.gz tacosandburritos
+
+  - exec:
+      description: "Create pipeline run"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          cd scripts
+          python create-pipeline-run.py tacosandburritos tacosandburritos tacosandburritos01 {{ bundle.credentials.azure_tenant_id }} {{ bundle.outputs.service_principal_app_id }} {{ bundle.outputs.service_principal_secret }} {{ bundle.credentials.azure_subscription_id }} {{ bundle.parameters.resource_group }} {{ bundle.parameters.ml_workspace_name }}
+
+  - exec:
+      description: "Expose dashboard over external IP"
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          kubectl patch svc istio-ingressgateway -p '{"spec": {"type": "LoadBalancer"}}' --namespace istio-system
+          RETRIES=0
+          while [ -z $IP ]; do
+              if [[ $RETRIES -gt 100 ]]; then
+                  echo "Exceeded number of retries for getting external IP address."
+                  exit 1    
+              fi
+
+              IP=$(kubectl get service istio-ingressgateway --namespace istio-system -o=jsonpath='{$.status.loadBalancer.ingress[*].ip}')
+
+              if [[ -z $IP ]]; then
+                  echo "External IP address not ready yet. Trying again in 5 seconds."
+                  sleep 5
+                  RETRIES=$((RETRIES + 1))
+              else
+                  echo "Found external IP address: $IP" 
+              fi
+          done
+          printf $IP >> external_ip
+      outputs:
+        - name: external_ip
+          path: external_ip
+
+
+uninstall:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal:
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+
+  - az: 
+      description: "Azure set subscription Id"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+
+  - exec:
+      description: "Delete resource group"
+      command: "bash"
+      arguments:
+        - "-c"
+        - "az group delete --name {{ bundle.parameters.resource_group }} --yes"
+
+  - az:
+      description: "Delete service principal"
+      arguments:
+        - "ad"
+        - "sp"
+        - "delete"
+      flags:
+        id: http://{{ bundle.parameters.service_principal_name }}
+
