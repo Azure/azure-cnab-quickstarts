@@ -10,9 +10,9 @@ The following videos are good resources for getting started with learning about 
 
 [![Introduction to Azure CNAB Quickstarts](./images/introduction-to-azure-cnab-quickstarts.png)](https://youtu.be/z1lnQfaAVeg)
 
-## Porter: an Opionated CNAB Authoring Experience - from [@jeremyrickard](https://github.com/jeremyrickard)
+## Porter: an Opinionated CNAB Authoring Experience - from [@jeremyrickard](https://github.com/jeremyrickard)
 
-[![Porter: an Opionated CNAB Authoring Experience](./images/porter-an-opinionated-cnab-authoring-experience.png)](https://www.youtube.com/watch?v=__fim6RIW1s)
+[![Porter: an Opinionated CNAB Authoring Experience](./images/porter-an-opinionated-cnab-authoring-experience.png)](https://www.youtube.com/watch?v=__fim6RIW1s)
 
 
 ## GitOps at the edge of the envelope: Radical app deployment at the edge with Porter - from [@squillace](https://github.com/squillace)
