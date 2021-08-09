@@ -79,7 +79,7 @@ install:
       flags:
         name: "{{ bundle.parameters.aks_resource_group }}"
         location: "{{ bundle.parameters.azure_location }}"
-  
+   
   - exec: 
       description: "Create AKS if not exists"
       command: "bash"
