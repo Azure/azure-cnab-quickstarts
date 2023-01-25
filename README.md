@@ -1,8 +1,8 @@
 # Azure CNAB Quickstarts
 
-This repository contains [CNAB](https://cnab.io/) quickstart solutions for deploying cloud-native applications from Azure to either Azure or anywhere at all. CNAB bundles in this repository can be either automatically launched from Azure -- using Azure Container Instances to deploy using [Porter](https://porter.sh) -- or they can be used with Porter anywhere by referencing the `--tag` specified in each bundle directory.
+This repository contains [CNAB](https://cnab.io/) quickstart solutions for deploying cloud-native applications from Azure to either Azure or anywhere at all. CNAB bundles in this repository can be either automatically launched from Azure -- using Azure Container Instances to deploy using [Porter v0](https://v0.getporter.org/docs/) -- or they can be used with Porter anywhere by referencing the `--tag` specified in each bundle directory.
 
-We currently support application bundles built using [Porter](https://porter.sh).
+We currently support application bundles built using [Porter v0](https://v0.getporter.org/docs/). 
 
 The following videos are good resources for getting started with learning about CNAB and Porter:
 
